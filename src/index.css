@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+/* Animation for Document Processing Progress Bar */
+@keyframes docProcessing {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+.doc-progress {
+  animation: docProcessing 3s linear forwards;
+}
+
+/* Animation for Project Creation Progress Bar */
+@keyframes projectCreation {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+.project-progress {
+  animation: projectCreation 5s linear forwards;
+}
