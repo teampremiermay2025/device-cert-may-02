@@ -12,10 +12,17 @@ import ReactFlow, {
   Connection,
   Handle,
   Position,
+  Node,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { useWorkflowStore } from '../store/workflowStore';
 import { PlusIcon } from '@heroicons/react/24/outline';
+
+interface NodeData {
+  label: string;
+  description?: string;
+  status?: 'pending' | 'active' | 'completed' | 'error';
+}
 
 const nodeTypes = {
   task: ({ data, isConnectable }: NodeProps) => (
@@ -93,7 +100,7 @@ export const WorkflowEditor = () => {
       y: event.clientY - event.currentTarget.getBoundingClientRect().top,
     };
 
-    const newNode = {
+    const newNode: Node<NodeData> = {
       id: crypto.randomUUID(),
       type: 'task',
       position,

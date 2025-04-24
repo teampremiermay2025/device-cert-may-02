@@ -1,6 +1,6 @@
 import { FC, FormEvent, useState } from 'react';
 import { Dialog } from '@headlessui/react';
-import { DocumentTextIcon, ClockIcon, ExclamationTriangleIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
+import { DocumentTextIcon, ClockIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 interface NewCertificationModalProps {
   isOpen: boolean;
