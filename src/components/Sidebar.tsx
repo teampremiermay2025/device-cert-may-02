@@ -13,7 +13,7 @@ export const Sidebar: FC<SidebarProps> = ({ onNavigate, onNewCertification }) =>
       <div className="p-4 border-b border-blue-800">
         <div className="flex items-center space-x-3">
           <img src="https://www.att.com/favicon.ico" alt="AT&T Logo" className="w-8 h-8" />
-          <h1 className="text-xl font-bold">AT&T Business</h1>
+          <h1 className="text-xl font-bold">AT&T</h1>
         </div>
       </div>
 

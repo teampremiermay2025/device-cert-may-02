@@ -1,6 +1,10 @@
 import { FC, FormEvent, useState } from 'react';
 import { Dialog } from '@headlessui/react';
 import { DocumentTextIcon, ClockIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { CertificationRequest, CertificationStage, CertificationTask, TaskStatus } from '../types';
+import { storage } from '../lib/storage';
+import { useWorkflowStore } from '../store/workflowStore';
+import { createTasksForStage } from '../lib/workflow';
 
 interface NewCertificationModalProps {
   isOpen: boolean;
@@ -20,6 +24,8 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
     softwareVersion: '',
   });
 
+  const { selectedWorkflow } = useWorkflowStore();
+
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     setCurrentStep('processing');
@@ -38,48 +44,40 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
         clearInterval(interval);
         setCurrentStep('review');
       }
-    }, 3000);
+    }, 1000);
   };
 
   const handleConfirm = () => {
+    if (!selectedWorkflow) return;
+
+    // Get tasks for the initial stage (FORECAST)
+    const forecastStage = selectedWorkflow.stages.find(stage => stage.name === 'FORECAST');
+    if (!forecastStage) return;
+
+    const tasks = createTasksForStage(forecastStage);
+
+    const newCertification: CertificationRequest = {
+      id: crypto.randomUUID(),
+      darpKey: formData.darpKey,
+      projectName: formData.projectName,
+      type: formData.projectType,
+      status: 'FORECAST',
+      targetDate: formData.targetDate,
+      softwareVersion: formData.softwareVersion,
+      lastUpdated: new Date().toISOString(),
+      tasks,
+      issues: [],
+      workflow: selectedWorkflow.id,
+    };
+
+    const certifications = storage.getCertifications();
+    storage.saveCertifications([...certifications, newCertification]);
+    
     onClose();
   };
 
-  const issues = [
-    {
-      title: 'Missing Document - Certification Specs',
-      description: 'Required certification specifications document is not uploaded',
-      type: 'warning'
-    },
-    {
-      title: 'Incomplete Field - Target TA Date',
-      description: 'Target TA date needs to be set for proper scheduling',
-      type: 'error'
-    },
-    {
-      title: 'Version Mismatch - Expected v1.3.0',
-      description: 'Current software version differs from expected version',
-      type: 'info'
-    }
-  ];
-
-  const tasks = [
-    { id: 1, name: 'Compliance Reqs: Chapter Reviews', status: 'pending' },
-    { id: 2, name: 'Deliverable Reqs: Chapter Reviews', status: 'pending' },
-    { id: 3, name: 'Deliverable Reqs: PreAuth', status: 'pending' },
-    { id: 4, name: 'Deliverable Reqs: Samples-Marketing & Certification', status: 'pending' },
-    { id: 5, name: 'Deliverable Reqs: PTCRB', status: 'pending' },
-    { id: 6, name: 'Deliverable Reqs: Certs-Release Notes', status: 'pending' },
-    { id: 7, name: 'Deliverable Reqs: FOTA-16038', status: 'pending' },
-    { id: 8, name: 'Deliverable Reqs: Testing Confirmation-AQT', status: 'pending' },
-    { id: 9, name: 'Deliverable Reqs: Provisioning-ACS', status: 'pending' },
-    { id: 10, name: 'Deliverable Reqs: Provisioning-IMEI', status: 'pending' },
-    { id: 11, name: 'Deliverable Reqs: DE-Device Firmware', status: 'pending' },
-    { id: 12, name: 'TA Approvals Reqs: FFI', status: 'pending' },
-    { id: 13, name: 'Deliverable Reqs: IMEI Central (Cricket)', status: 'pending' },
-    { id: 14, name: 'Deliverable Reqs: IMEI Master (AT&T)', status: 'pending' },
-    { id: 15, name: 'Deliverable Reqs: IMEI ASIM (COLD)', status: 'pending' }
-  ];
+  // Get initial tasks that will be created
+  const initialTasks = selectedWorkflow?.stages.find(stage => stage.name === 'FORECAST')?.tasks || [];
 
   return (
     <Dialog open={isOpen} onClose={onClose} className="relative z-50">
@@ -142,9 +140,8 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
                       Target TA Date
                     </label>
                     <input
-                      type="text"
+                      type="date"
                       className="w-full border rounded p-2"
-                      placeholder="Enter date yyyy-mm-dd"
                       value={formData.targetDate}
                       onChange={(e) => setFormData({ ...formData, targetDate: e.target.value })}
                       required
@@ -171,7 +168,7 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
                     <input
                       type="text"
                       className="w-full border rounded p-2 bg-gray-100"
-                      value="New"
+                      value="FORECAST"
                       disabled
                     />
                   </div>
@@ -235,36 +232,6 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
                   Review Certification Request
                 </Dialog.Title>
                 
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-                  <div className="flex items-center mb-2">
-                    <ExclamationTriangleIcon className="w-5 h-5 text-yellow-600 mr-2" />
-                    <h3 className="font-semibold text-yellow-900">
-                      {issues.length} issues require your attention
-                    </h3>
-                  </div>
-                  <div className="space-y-2">
-                    {issues.map((issue, index) => (
-                      <div key={index} className="flex items-start">
-                        <div className="flex-shrink-0 mt-1">
-                          {issue.type === 'warning' && (
-                            <ExclamationTriangleIcon className="w-4 h-4 text-yellow-600" />
-                          )}
-                          {issue.type === 'error' && (
-                            <ExclamationTriangleIcon className="w-4 h-4 text-red-600" />
-                          )}
-                          {issue.type === 'info' && (
-                            <DocumentTextIcon className="w-4 h-4 text-blue-600" />
-                          )}
-                        </div>
-                        <div className="ml-2">
-                          <p className="text-sm font-medium">{issue.title}</p>
-                          <p className="text-sm text-gray-600">{issue.description}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
                 <div className="space-y-6">
                   <div>
                     <h3 className="text-lg font-semibold mb-2">Project Information</h3>
@@ -291,30 +258,42 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
                       </div>
                       <div>
                         <p className="text-sm text-gray-600">Status</p>
-                        <p className="font-medium">New</p>
+                        <p className="font-medium">FORECAST</p>
                       </div>
                     </div>
                   </div>
 
                   <div>
-                    <h3 className="text-lg font-semibold mb-2">Generated Tasks</h3>
-                    <div className="max-h-64 overflow-y-auto border rounded-lg divide-y">
-                      {tasks.map((task) => (
+                    <h3 className="text-lg font-semibold mb-2">Initial Tasks</h3>
+                    <div className="border rounded-lg divide-y">
+                      {initialTasks.map((task) => (
                         <div key={task.id} className="p-3 flex items-center justify-between hover:bg-gray-50">
                           <div className="flex items-center">
                             <div className="w-6 h-6 flex items-center justify-center">
                               <input 
                                 type="checkbox" 
                                 className="rounded border-gray-300"
-                                defaultChecked
+                                checked={false}
+                                disabled
                               />
                             </div>
-                            <span className="ml-3">{task.name}</span>
+                            <span className="ml-3">{task.title}</span>
                           </div>
-                          <span className="text-sm text-gray-500">{task.status}</span>
+                          <div className="flex items-center space-x-2">
+                            <span className="text-sm text-gray-500">{task.type}</span>
+                            {task.required && (
+                              <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs">
+                                Required
+                              </span>
+                            )}
+                          </div>
                         </div>
                       ))}
                     </div>
+                    <p className="text-sm text-gray-500 mt-2">
+                      These tasks will be created automatically when the certification request is created.
+                      Additional tasks will be added as the certification progresses through different stages.
+                    </p>
                   </div>
                 </div>
               </div>

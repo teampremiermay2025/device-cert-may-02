@@ -1,67 +1,43 @@
-import { FC, useState } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { PlusIcon } from '@heroicons/react/24/outline';
 import { CertificationCard } from './CertificationCard';
 import { CertificationRequest } from '../types';
-import { ViewCertificationModal } from './ViewCertificationModal.tsx';
+import { ViewCertificationModal } from './ViewCertificationModal';
+import { storage } from '../lib/storage';
 
 interface DashboardProps {
   onNewCertification: () => void;
 }
 
-const certifications: CertificationRequest[] = [
-  {
-    id: 'DARP-127205',
-    projectName: 'Smoke Test: ST0919A',
-    type: 'DA IR',
-    status: 'PLANNING',
-    lastUpdated: '2025-02-28',
-    darpKey: 'DARP-127205',
-    targetDate: '2025-03-28',
-    softwareVersion: '1.0.0',
-    tasks: [
-      { id: 1, name: 'Compliance Reqs: Chapter Reviews', status: 'completed', isChecked: true },
-      { id: 2, name: 'Deliverable Reqs: Chapter Reviews', status: 'pending', isChecked: false },
-      { id: 3, name: 'Deliverable Reqs: PreAuth', status: 'pending', isChecked: false },
-    ],
-    issues: [
-      {
-        title: 'Missing Document - Certification Specs',
-        description: 'Required certification specifications document is not uploaded',
-        type: 'warning'
-      }
-    ]
-  },
-  {
-    id: 'DARP-127130',
-    projectName: 'Smoke Test: ST0919A',
-    type: 'DA IR',
-    status: 'PLANNING',
-    lastUpdated: '2025-02-28',
-    darpKey: 'DARP-127130',
-    targetDate: '2025-03-15',
-    softwareVersion: '1.1.0',
-    tasks: [],
-    issues: []
-  },
-  {
-    id: 'DARP-127116',
-    projectName: 'Smoke Test: ST0404A',
-    type: 'DA SMR',
-    status: 'TA COMPLETE',
-    lastUpdated: '2025-02-27',
-    darpKey: 'DARP-127116',
-    targetDate: '2025-03-20',
-    softwareVersion: '2.0.0',
-    tasks: [],
-    issues: []
-  }
-];
-
 export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
+  const [certifications, setCertifications] = useState<CertificationRequest[]>([]);
   const [selectedCertification, setSelectedCertification] = useState<CertificationRequest | null>(null);
+
+  // Listen for storage changes
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setCertifications(storage.getCertifications());
+    };
+
+    window.addEventListener('storage-updated', handleStorageChange);
+    handleStorageChange(); // Initial load
+
+    return () => {
+      window.removeEventListener('storage-updated', handleStorageChange);
+    };
+  }, []);
 
   const handleViewCertification = (cert: CertificationRequest) => {
     setSelectedCertification(cert);
+  };
+
+  const handleUpdateCertification = (updatedCert: CertificationRequest) => {
+    const updatedCertifications = certifications.map(cert =>
+      cert.id === updatedCert.id ? updatedCert : cert
+    );
+    storage.saveCertifications(updatedCertifications);
+    setCertifications(updatedCertifications);
+    setSelectedCertification(updatedCert);
   };
 
   return (
@@ -106,6 +82,7 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
           isOpen={!!selectedCertification}
           onClose={() => setSelectedCertification(null)}
           certification={selectedCertification}
+          onUpdate={handleUpdateCertification}
         />
       )}
     </div>

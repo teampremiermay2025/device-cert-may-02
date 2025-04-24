@@ -1,6 +1,8 @@
-export interface Node {
+import { Edge as ReactFlowEdge, Node as ReactFlowNode } from 'reactflow';
+
+export interface Node extends ReactFlowNode {
   id: string;
-  type: 'start' | 'task' | 'decision' | 'end';
+  type: string;
   position: { x: number; y: number };
   data: {
     label: string;
@@ -10,7 +12,7 @@ export interface Node {
   };
 }
 
-export interface Edge {
+export interface Edge extends ReactFlowEdge {
   id: string;
   source: string;
   target: string;
@@ -29,6 +31,88 @@ export interface Workflow {
   edges: Edge[];
   createdAt: string;
   updatedAt: string;
+  stages: WorkflowStage[];
+}
+
+export interface WorkflowStage {
+  id: string;
+  name: CertificationStage;
+  tasks: WorkflowTask[];
+}
+
+export type CertificationStage = 
+  | 'FORECAST'
+  | 'PLANNING'
+  | 'SUBMITTED'
+  | 'SUBMISSION_REVIEW'
+  | 'DEVICE_ENTRY'
+  | 'DEVICE_TESTING'
+  | 'TAQ_REVIEW'
+  | 'TA_COMPLETE'
+  | 'CLOSED';
+
+export interface WorkflowTask {
+  id: string;
+  title: string;
+  type: string;
+  description?: string;
+  required: boolean;
+}
+
+export interface CertificationRequest {
+  id: string;
+  projectName: string;
+  type: string;
+  status: CertificationStage;
+  lastUpdated: string;
+  darpKey: string;
+  targetDate: string;
+  softwareVersion: string;
+  tasks: CertificationTask[];
+  issues: CertificationIssue[];
+  workflow: string; // workflow id
+}
+
+export interface CertificationTask {
+  id: string;
+  name: string;
+  description?: string;
+  status: TaskStatus;
+  isChecked: boolean;
+  assignee?: string;
+  priority: TaskPriority;
+  dueDate?: string;
+  attachments: TaskAttachment[];
+  comments: TaskComment[];
+  timeSpent?: number; // in minutes
+  labels: string[];
+  stage: CertificationStage;
+}
+
+export type TaskStatus = 'TODO' | 'IN_PROGRESS' | 'REVIEW' | 'DONE';
+export type TaskPriority = 'LOW' | 'MEDIUM' | 'HIGH';
+
+export interface TaskAttachment {
+  id: string;
+  name: string;
+  url: string;
+  size: number;
+  type: string;
+  uploadedAt: string;
+  uploadedBy: string;
+}
+
+export interface TaskComment {
+  id: string;
+  content: string;
+  createdAt: string;
+  createdBy: string;
+}
+
+export interface CertificationIssue {
+  title: string;
+  description: string;
+  type: 'warning' | 'error' | 'info';
 }
 
 export interface WorkflowStore {
@@ -41,30 +125,4 @@ export interface WorkflowStore {
   deleteWorkflow: (id: string) => void;
   setSelectedWorkflow: (workflow: Workflow | null) => void;
   addPredefinedTask: (category: string, task: string) => void;
-}
-
-export interface CertificationRequest {
-  id: string;
-  projectName: string;
-  type: string;
-  status: string;
-  lastUpdated: string;
-  darpKey: string;
-  targetDate: string;
-  softwareVersion: string;
-  tasks: CertificationTask[];
-  issues: CertificationIssue[];
-}
-
-export interface CertificationTask {
-  id: number;
-  name: string;
-  status: 'pending' | 'completed';
-  isChecked: boolean;
-}
-
-export interface CertificationIssue {
-  title: string;
-  description: string;
-  type: 'warning' | 'error' | 'info';
 }
