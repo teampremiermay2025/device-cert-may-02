@@ -27,7 +27,9 @@ const initialCertifications: CertificationRequest[] = [
         attachments: [],
         comments: [],
         labels: ['compliance'],
-        stage: 'PLANNING'
+        stage: 'PLANNING',
+        description: 'Review all compliance requirements chapters',
+        timeSpent: 120
       },
       { 
         id: '2',
@@ -38,7 +40,9 @@ const initialCertifications: CertificationRequest[] = [
         attachments: [],
         comments: [],
         labels: ['deliverable'],
-        stage: 'PLANNING'
+        stage: 'PLANNING',
+        description: 'Review deliverable requirements chapters',
+        timeSpent: 60
       },
       { 
         id: '3',
@@ -49,7 +53,9 @@ const initialCertifications: CertificationRequest[] = [
         attachments: [],
         comments: [],
         labels: ['deliverable', 'auth'],
-        stage: 'PLANNING'
+        stage: 'PLANNING',
+        description: 'Complete pre-authorization requirements',
+        timeSpent: 0
       }
     ],
     issues: [
@@ -86,7 +92,6 @@ const initialCertifications: CertificationRequest[] = [
     tasks: [],
     issues: []
   },
-  // Additional sample certifications
   {
     id: 'DARP-127301',
     projectName: 'Performance Test: PT0501A',
@@ -227,6 +232,14 @@ export const storage = {
   saveCertifications(certifications: CertificationRequest[]) {
     localStorage.setItem(STORAGE_KEYS.CERTIFICATIONS, JSON.stringify(certifications));
     window.dispatchEvent(new Event('storage-updated'));
+  },
+
+  updateCertification(updatedCertification: CertificationRequest) {
+    const certifications = this.getCertifications();
+    const updatedCertifications = certifications.map(cert => 
+      cert.id === updatedCertification.id ? updatedCertification : cert
+    );
+    this.saveCertifications(updatedCertifications);
   },
 
   getWorkflows(): Workflow[] {

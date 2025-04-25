@@ -85,15 +85,11 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
   };
 
   return (
-    <Dialog 
-      open={isOpen} 
-      onClose={onClose} 
-      className="relative z-50"
-      static
-    >
-      <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
-      <div className="fixed inset-0 flex items-center justify-center p-4">
-        <Dialog.Panel className="w-full max-w-4xl bg-white rounded-lg shadow-xl">
+<Dialog open={isOpen} onClose={onClose} className="relative z-50">
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <Dialog.Overlay className="fixed inset-0 bg-black/30" />
+    
+    <Dialog.Panel className="relative z-50 w-full max-w-4xl bg-white rounded-lg shadow-xl">
           <div className="flex flex-col h-[80vh]">
             {/* Header */}
             <div className="p-6 border-b">
