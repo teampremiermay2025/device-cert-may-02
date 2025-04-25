@@ -1,8 +1,9 @@
-import { CertificationRequest, Workflow } from '../types';
+import { CertificationRequest, Workflow, Dashboard } from '../types';
 
 const STORAGE_KEYS = {
   CERTIFICATIONS: 'certifications',
   WORKFLOWS: 'workflows',
+  DASHBOARDS: 'dashboards',
 } as const;
 
 const initialCertifications: CertificationRequest[] = [
@@ -61,9 +62,9 @@ const initialCertifications: CertificationRequest[] = [
   },
   {
     id: 'DARP-127130',
-    projectName: 'Smoke Test: ST0919A',
-    type: 'DA IR',
-    status: 'PLANNING',
+    projectName: 'Smoke Test: ST0919B',
+    type: 'DA MR',
+    status: 'DEVICE_TESTING',
     lastUpdated: '2025-02-28',
     darpKey: 'DARP-127130',
     targetDate: '2025-03-15',
@@ -84,6 +85,132 @@ const initialCertifications: CertificationRequest[] = [
     workflow: 'default-workflow',
     tasks: [],
     issues: []
+  },
+  // Additional sample certifications
+  {
+    id: 'DARP-127301',
+    projectName: 'Performance Test: PT0501A',
+    type: 'DA EMR',
+    status: 'SUBMITTED',
+    lastUpdated: '2025-02-29',
+    darpKey: 'DARP-127301',
+    targetDate: '2025-04-15',
+    softwareVersion: '3.0.0',
+    workflow: 'default-workflow',
+    tasks: [],
+    issues: []
+  },
+  {
+    id: 'DARP-127302',
+    projectName: 'Security Test: ST0601B',
+    type: 'DA IR',
+    status: 'DEVICE_TESTING',
+    lastUpdated: '2025-02-29',
+    darpKey: 'DARP-127302',
+    targetDate: '2025-04-20',
+    softwareVersion: '2.1.0',
+    workflow: 'default-workflow',
+    tasks: [],
+    issues: []
+  },
+  {
+    id: 'DARP-127303',
+    projectName: 'Integration Test: IT0701C',
+    type: 'DA MR',
+    status: 'PLANNING',
+    lastUpdated: '2025-02-29',
+    darpKey: 'DARP-127303',
+    targetDate: '2025-04-25',
+    softwareVersion: '1.5.0',
+    workflow: 'default-workflow',
+    tasks: [],
+    issues: []
+  },
+  {
+    id: 'DARP-127304',
+    projectName: 'Load Test: LT0801D',
+    type: 'DA SMR',
+    status: 'SUBMISSION_REVIEW',
+    lastUpdated: '2025-02-29',
+    darpKey: 'DARP-127304',
+    targetDate: '2025-04-30',
+    softwareVersion: '2.2.0',
+    workflow: 'default-workflow',
+    tasks: [],
+    issues: []
+  },
+  {
+    id: 'DARP-127305',
+    projectName: 'Stress Test: ST0901E',
+    type: 'DA EMR',
+    status: 'DEVICE_ENTRY',
+    lastUpdated: '2025-02-29',
+    darpKey: 'DARP-127305',
+    targetDate: '2025-05-05',
+    softwareVersion: '1.8.0',
+    workflow: 'default-workflow',
+    tasks: [],
+    issues: []
+  },
+  {
+    id: 'DARP-127306',
+    projectName: 'Compatibility Test: CT1001F',
+    type: 'DA IR',
+    status: 'TAQ_REVIEW',
+    lastUpdated: '2025-02-29',
+    darpKey: 'DARP-127306',
+    targetDate: '2025-05-10',
+    softwareVersion: '2.3.0',
+    workflow: 'default-workflow',
+    tasks: [],
+    issues: []
+  }
+];
+
+const defaultDashboards: Dashboard[] = [
+  {
+    id: 'main-dashboard',
+    title: 'Main Dashboard',
+    description: 'Device Certification Dashboard',
+    type: 'default',
+    sharedWith: [],
+    layout: [],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    createdBy: 'system'
+  },
+  {
+    id: 'waiver-dashboard',
+    title: 'Waiver Request',
+    description: 'Manage waiver requests and approvals',
+    type: 'default',
+    sharedWith: [],
+    layout: [],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    createdBy: 'system'
+  },
+  {
+    id: 'device-list',
+    title: 'Device List Dashboard',
+    description: 'View and manage device inventory',
+    type: 'default',
+    sharedWith: [],
+    layout: [],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    createdBy: 'system'
+  },
+  {
+    id: 'device-schedule',
+    title: 'Device Schedule Dashboard',
+    description: 'Track device certification schedules',
+    type: 'default',
+    sharedWith: [],
+    layout: [],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    createdBy: 'system'
   }
 ];
 
@@ -99,7 +226,6 @@ export const storage = {
 
   saveCertifications(certifications: CertificationRequest[]) {
     localStorage.setItem(STORAGE_KEYS.CERTIFICATIONS, JSON.stringify(certifications));
-    // Dispatch a custom event to notify listeners
     window.dispatchEvent(new Event('storage-updated'));
   },
 
@@ -110,5 +236,19 @@ export const storage = {
 
   saveWorkflows(workflows: Workflow[]) {
     localStorage.setItem(STORAGE_KEYS.WORKFLOWS, JSON.stringify(workflows));
+  },
+
+  getDashboards(): Dashboard[] {
+    const data = localStorage.getItem(STORAGE_KEYS.DASHBOARDS);
+    if (!data) {
+      this.saveDashboards(defaultDashboards);
+      return defaultDashboards;
+    }
+    return JSON.parse(data);
+  },
+
+  saveDashboards(dashboards: Dashboard[]) {
+    localStorage.setItem(STORAGE_KEYS.DASHBOARDS, JSON.stringify(dashboards));
+    window.dispatchEvent(new Event('dashboards-updated'));
   }
 };

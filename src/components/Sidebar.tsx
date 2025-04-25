@@ -37,11 +37,20 @@ export const Sidebar: FC<SidebarProps> = ({ onNavigate, onNewCertification }) =>
         <ul className="space-y-2">
           <li>
             <button 
-              onClick={() => onNavigate('dashboard')}
+              onClick={() => onNavigate('home')}
               className="flex items-center space-x-3 w-full px-3 py-2 text-blue-100 hover:bg-blue-800 rounded-lg transition-colors duration-150"
             >
               <HomeIcon className="w-5 h-5" />
-              <span>Dashboard</span>
+              <span>Home</span>
+            </button>
+          </li>
+          <li>
+            <button 
+              onClick={() => onNavigate('dashboard')}
+              className="flex items-center space-x-3 w-full px-3 py-2 text-blue-100 hover:bg-blue-800 rounded-lg transition-colors duration-150"
+            >
+              <FolderIcon className="w-5 h-5" />
+              <span>Main Dashboard</span>
             </button>
           </li>
           <li>
@@ -51,22 +60,6 @@ export const Sidebar: FC<SidebarProps> = ({ onNavigate, onNewCertification }) =>
             >
               <ShareIcon className="w-5 h-5" />
               <span>Workflows</span>
-            </button>
-          </li>
-          <li>
-            <button 
-              className="flex items-center space-x-3 w-full px-3 py-2 text-blue-100 hover:bg-blue-800 rounded-lg transition-colors duration-150"
-            >
-              <FolderIcon className="w-5 h-5" />
-              <span>Projects</span>
-            </button>
-          </li>
-          <li>
-            <button 
-              className="flex items-center space-x-3 w-full px-3 py-2 text-blue-100 hover:bg-blue-800 rounded-lg transition-colors duration-150"
-            >
-              <RocketLaunchIcon className="w-5 h-5" />
-              <span>Releases</span>
             </button>
           </li>
           <li>

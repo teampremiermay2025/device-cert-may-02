@@ -1,19 +1,49 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { Dashboard } from './components/Dashboard';
+import { HomePage } from './components/HomePage';
 import { NewCertificationModal } from './components/NewCertificationModal';
 import { WorkflowEditor } from './components/WorkflowEditor';
 import { WorkflowList } from './components/WorkflowList';
+import { DashboardContainer } from './components/dashboard/DashboardContainer';
 import './App.css';
 
 function App() {
-  const [currentPage, setCurrentPage] = useState('dashboard');
+  const [currentPage, setCurrentPage] = useState('home');
   const [showNewCertModal, setShowNewCertModal] = useState(false);
   const [showSidebar, setShowSidebar] = useState(true);
 
   const handleNewCertification = () => {
     setShowNewCertModal(true);
   };
+
+  // Handle hash-based routing
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash;
+      if (hash === '') {
+        setCurrentPage('home');
+      } else if (hash === '#/dashboard') {
+        setCurrentPage('dashboard');
+      } else if (hash.startsWith('#/dashboards/')) {
+        setCurrentPage('custom-dashboard');
+      } else if (hash === '#/workflows') {
+        setCurrentPage('workflows');
+      }
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    handleHashChange(); // Handle initial hash
+
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+    };
+  }, []);
+
+  // Extract dashboard ID from hash if on a custom dashboard
+  const dashboardId = currentPage === 'custom-dashboard' 
+    ? window.location.hash.replace('#/dashboards/', '')
+    : null;
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -22,8 +52,12 @@ function App() {
         onNewCertification={handleNewCertification}
       />
       <main className="flex-1 overflow-auto">
+        {currentPage === 'home' && <HomePage />}
         {currentPage === 'dashboard' && (
           <Dashboard onNewCertification={handleNewCertification} />
+        )}
+        {currentPage === 'custom-dashboard' && dashboardId && (
+          <DashboardContainer dashboardId={dashboardId} />
         )}
         {currentPage === 'workflows' && (
           <div className="flex h-full">

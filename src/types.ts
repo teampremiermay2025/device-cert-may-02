@@ -70,7 +70,21 @@ export interface CertificationRequest {
   softwareVersion: string;
   tasks: CertificationTask[];
   issues: CertificationIssue[];
-  workflow: string; // workflow id
+  workflow: string;
+  // New fields from Jira
+  sprint: string;
+  sprintReady: boolean;
+  testingStatus: string;
+  epicLink: string;
+  scrumTeam: string;
+  storyPoints: number;
+  application: string;
+  acceptanceCriteria: string[];
+  description: string;
+  resolution: string;
+  fixVersion: string;
+  affectsVersion: string;
+  labels: string[];
 }
 
 export interface CertificationTask {
@@ -84,7 +98,7 @@ export interface CertificationTask {
   dueDate?: string;
   attachments: TaskAttachment[];
   comments: TaskComment[];
-  timeSpent?: number; // in minutes
+  timeSpent?: number;
   labels: string[];
   stage: CertificationStage;
 }
@@ -125,4 +139,35 @@ export interface WorkflowStore {
   deleteWorkflow: (id: string) => void;
   setSelectedWorkflow: (workflow: Workflow | null) => void;
   addPredefinedTask: (category: string, task: string) => void;
+}
+
+export interface Dashboard {
+  id: string;
+  title: string;
+  description?: string;
+  type: 'empty' | 'default' | 'custom';
+  sharedWith: string[];
+  layout: DashboardLayout[];
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string;
+}
+
+export interface DashboardLayout {
+  id: string;
+  type: 'activity' | 'chart' | 'tasks' | 'custom';
+  title: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  config?: {
+    chartType?: 'line' | 'bar' | 'pie';
+    dataSource?: string;
+    filters?: Record<string, any>;
+    viewType?: 'list' | 'board' | 'timeline';
+    showCompleted?: boolean;
+    sortBy?: string;
+    groupBy?: string;
+  };
 }

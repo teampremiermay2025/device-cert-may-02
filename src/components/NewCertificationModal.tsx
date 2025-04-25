@@ -1,7 +1,7 @@
 import { FC, FormEvent, useState } from 'react';
 import { Dialog } from '@headlessui/react';
-import { DocumentTextIcon, ClockIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
-import { CertificationRequest, CertificationStage, CertificationTask, TaskStatus } from '../types';
+import { DocumentTextIcon, ClockIcon, ArrowUpTrayIcon } from '@heroicons/react/24/outline';
+import { CertificationRequest, CertificationStage, CertificationTask } from '../types';
 import { storage } from '../lib/storage';
 import { useWorkflowStore } from '../store/workflowStore';
 import { createTasksForStage } from '../lib/workflow';
@@ -22,6 +22,9 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
     projectType: '',
     targetDate: '',
     softwareVersion: '',
+    assignee: '',
+    estimatedCompletionDate: '',
+    oemDocuments: [] as File[],
   });
 
   const { selectedWorkflow } = useWorkflowStore();
@@ -50,7 +53,6 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
   const handleConfirm = () => {
     if (!selectedWorkflow) return;
 
-    // Get tasks for the initial stage (FORECAST)
     const forecastStage = selectedWorkflow.stages.find(stage => stage.name === 'FORECAST');
     if (!forecastStage) return;
 
@@ -68,6 +70,8 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
       tasks,
       issues: [],
       workflow: selectedWorkflow.id,
+      assignee: formData.assignee,
+      estimatedCompletionDate: formData.estimatedCompletionDate,
     };
 
     const certifications = storage.getCertifications();
@@ -76,138 +80,222 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
     onClose();
   };
 
-  // Get initial tasks that will be created
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    setFormData(prev => ({
+      ...prev,
+      oemDocuments: [...prev.oemDocuments, ...files],
+    }));
+  };
+
+  const removeFile = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      oemDocuments: prev.oemDocuments.filter((_, i) => i !== index),
+    }));
+  };
+
   const initialTasks = selectedWorkflow?.stages.find(stage => stage.name === 'FORECAST')?.tasks || [];
 
   return (
     <Dialog open={isOpen} onClose={onClose} className="relative z-50">
       <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <Dialog.Panel className="w-full max-w-4xl bg-white rounded-lg">
+        <Dialog.Panel className="w-full max-w-4xl bg-white rounded-lg max-h-[90vh] overflow-hidden">
           {currentStep === 'form' && (
-            <div className="p-6">
-              <Dialog.Title className="text-xl font-bold mb-4">
-                Start a new certification request
-              </Dialog.Title>
+            <div className="flex flex-col h-full">
+              <div className="p-6 border-b">
+                <Dialog.Title className="text-xl font-bold">
+                  Start a new certification request
+                </Dialog.Title>
+              </div>
 
-              <form onSubmit={handleSubmit}>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium mb-1 after:content-['*'] after:text-red-500">
-                    DARP Key
-                  </label>
-                  <input
-                    type="text"
-                    className="w-full border rounded p-2"
-                    placeholder="Enter DARP key"
-                    value={formData.darpKey}
-                    onChange={(e) => setFormData({ ...formData, darpKey: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium mb-1 after:content-['*'] after:text-red-500">
-                    Project Name
-                  </label>
-                  <input
-                    type="text"
-                    className="w-full border rounded p-2"
-                    placeholder="Enter project name"
-                    value={formData.projectName}
-                    onChange={(e) => setFormData({ ...formData, projectName: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="flex mb-4">
-                  <div className="w-1/2 mr-2">
-                    <label className="block text-sm font-medium mb-1 after:content-['*'] after:text-red-500">
-                      Project Type
-                    </label>
-                    <select 
-                      className="w-full border rounded p-2"
-                      value={formData.projectType}
-                      onChange={(e) => setFormData({ ...formData, projectType: e.target.value })}
-                      required
-                    >
-                      <option value="">Select project type</option>
-                      <option>DA IR</option>
-                      <option>DA MR</option>
-                      <option>DA EMR</option>
-                      <option>DA SMR</option>
-                    </select>
+              <div className="flex-1 overflow-y-auto p-6">
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-1 after:content-['*'] after:text-red-500">
+                        DARP Key
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full border rounded p-2"
+                        placeholder="Enter DARP key"
+                        value={formData.darpKey}
+                        onChange={(e) => setFormData({ ...formData, darpKey: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1 after:content-['*'] after:text-red-500">
+                        Project Name
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full border rounded p-2"
+                        placeholder="Enter project name"
+                        value={formData.projectName}
+                        onChange={(e) => setFormData({ ...formData, projectName: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1 after:content-['*'] after:text-red-500">
+                        Project Type
+                      </label>
+                      <select 
+                        className="w-full border rounded p-2"
+                        value={formData.projectType}
+                        onChange={(e) => setFormData({ ...formData, projectType: e.target.value })}
+                        required
+                      >
+                        <option value="">Select project type</option>
+                        <option>DA IR</option>
+                        <option>DA MR</option>
+                        <option>DA EMR</option>
+                        <option>DA SMR</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1 after:content-['*'] after:text-red-500">
+                        Target TA Date
+                      </label>
+                      <input
+                        type="date"
+                        className="w-full border rounded p-2"
+                        value={formData.targetDate}
+                        onChange={(e) => setFormData({ ...formData, targetDate: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">
+                        Software Version
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full border rounded p-2"
+                        placeholder="Ex. 1.0"
+                        value={formData.softwareVersion}
+                        onChange={(e) => setFormData({ ...formData, softwareVersion: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">
+                        Status
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full border rounded p-2 bg-gray-100"
+                        value="FORECAST"
+                        disabled
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">
+                        Assignee
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full border rounded p-2"
+                        placeholder="Enter assignee name"
+                        value={formData.assignee}
+                        onChange={(e) => setFormData({ ...formData, assignee: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">
+                        Estimated Completion Date
+                      </label>
+                      <input
+                        type="date"
+                        className="w-full border rounded p-2"
+                        value={formData.estimatedCompletionDate}
+                        onChange={(e) => setFormData({ ...formData, estimatedCompletionDate: e.target.value })}
+                      />
+                    </div>
                   </div>
-                  <div className="w-1/2 ml-2">
-                    <label className="block text-sm font-medium mb-1 after:content-['*'] after:text-red-500">
-                      Target TA Date
-                    </label>
-                    <input
-                      type="date"
-                      className="w-full border rounded p-2"
-                      value={formData.targetDate}
-                      onChange={(e) => setFormData({ ...formData, targetDate: e.target.value })}
-                      required
-                    />
-                  </div>
-                </div>
-                <div className="flex mb-4">
-                  <div className="w-1/2 mr-2">
+
+                  <div>
                     <label className="block text-sm font-medium mb-1">
-                      Software Version
+                      Upload OEM Documents
                     </label>
-                    <input
-                      type="text"
-                      className="w-full border rounded p-2"
-                      placeholder="Ex. 1.0"
-                      value={formData.softwareVersion}
-                      onChange={(e) => setFormData({ ...formData, softwareVersion: e.target.value })}
-                    />
+                    <div className="border-dashed border-2 border-gray-300 rounded-lg p-6">
+                      <div className="text-center">
+                        <ArrowUpTrayIcon className="mx-auto h-12 w-12 text-gray-400" />
+                        <div className="mt-4">
+                          <label htmlFor="file-upload" className="cursor-pointer">
+                            <span className="mt-2 text-sm text-gray-600">
+                              Drag & drop files here, or click to select files
+                            </span>
+                            <input
+                              id="file-upload"
+                              type="file"
+                              className="hidden"
+                              multiple
+                              onChange={handleFileChange}
+                              accept=".xlsx,.doc,.docx,.pdf"
+                            />
+                          </label>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-2">
+                          Supported formats: XLSX, DOC, PDF | Maximum upload size 1000 MB
+                        </p>
+                      </div>
+                    </div>
+
+                    {formData.oemDocuments.length > 0 && (
+                      <div className="mt-4">
+                        <h4 className="text-sm font-medium text-gray-700 mb-2">
+                          Selected Files
+                        </h4>
+                        <div className="space-y-2">
+                          {formData.oemDocuments.map((file, index) => (
+                            <div
+                              key={index}
+                              className="flex items-center justify-between p-2 bg-gray-50 rounded-lg"
+                            >
+                              <div className="flex items-center">
+                                <DocumentTextIcon className="h-5 w-5 text-gray-400 mr-2" />
+                                <span className="text-sm text-gray-900">{file.name}</span>
+                                <span className="ml-2 text-sm text-gray-500">
+                                  ({Math.round(file.size / 1024)} KB)
+                                </span>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => removeFile(index)}
+                                className="text-red-600 hover:text-red-800"
+                              >
+                                Remove
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <div className="w-1/2 ml-2">
-                    <label className="block text-sm font-medium mb-1">
-                      Status
-                    </label>
-                    <input
-                      type="text"
-                      className="w-full border rounded p-2 bg-gray-100"
-                      value="FORECAST"
-                      disabled
-                    />
-                  </div>
-                </div>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium mb-1">
-                    Upload OEM Documents
-                  </label>
-                  <div className="border-dashed border-2 border-gray-300 p-4 text-center">
-                    <p>Drag & Drop or choose files to upload</p>
-                    <input type="file" id="oemDocs" multiple className="hidden" />
-                    <button
-                      type="button"
-                      onClick={() => document.getElementById('oemDocs')?.click()}
-                      className="text-blue-600"
-                    >
-                      Choose Files
-                    </button>
-                    <p className="text-sm text-gray-600 mt-2">
-                      Supported formats: XLSX, DOC, PDF | Maximum upload size 1000 MB
-                    </p>
-                  </div>
-                </div>
-                <div className="flex justify-end">
+                </form>
+              </div>
+
+              <div className="p-6 border-t bg-gray-50">
+                <div className="flex justify-end space-x-3">
                   <button
                     type="button"
-                    className="bg-gray-300 text-black px-4 py-2 rounded mr-2"
+                    className="px-4 py-2 text-gray-700 bg-white border rounded-lg hover:bg-gray-50"
                     onClick={onClose}
                   >
                     Cancel
                   </button>
                   <button
-                    type="submit"
-                    className="bg-blue-600 text-white px-4 py-2 rounded"
+                    type="button"
+                    onClick={handleSubmit}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                   >
                     Continue
                   </button>
                 </div>
-              </form>
+              </div>
             </div>
           )}
 
@@ -226,8 +314,8 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
           )}
 
           {currentStep === 'review' && (
-            <div className="divide-y">
-              <div className="p-6">
+            <div className="flex flex-col h-full">
+              <div className="p-6 border-b">
                 <Dialog.Title className="text-xl font-bold mb-4">
                   Review Certification Request
                 </Dialog.Title>
@@ -260,6 +348,36 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
                         <p className="text-sm text-gray-600">Status</p>
                         <p className="font-medium">FORECAST</p>
                       </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Assignee</p>
+                        <p className="font-medium">{formData.assignee || 'Not specified'}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Estimated Completion</p>
+                        <p className="font-medium">{formData.estimatedCompletionDate || 'Not specified'}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">OEM Documents</h3>
+                    <div className="border rounded-lg divide-y">
+                      {formData.oemDocuments.map((file, index) => (
+                        <div key={index} className="p-3 flex items-center justify-between">
+                          <div className="flex items-center">
+                            <DocumentTextIcon className="h-5 w-5 text-gray-400 mr-2" />
+                            <span className="text-sm">{file.name}</span>
+                            <span className="ml-2 text-sm text-gray-500">
+                              ({Math.round(file.size / 1024)} KB)
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                      {formData.oemDocuments.length === 0 && (
+                        <div className="p-3 text-sm text-gray-500">
+                          No documents uploaded
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -298,7 +416,7 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
                 </div>
               </div>
 
-              <div className="p-6 bg-gray-50">
+              <div className="p-6 bg-gray-50 mt-auto">
                 <div className="flex justify-between items-center">
                   <div className="flex items-center text-sm text-gray-600">
                     <ClockIcon className="w-4 h-4 mr-1" />
