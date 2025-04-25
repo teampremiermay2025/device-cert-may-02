@@ -4,11 +4,12 @@ import {
   DocumentTextIcon, 
   ClockIcon, 
   ExclamationTriangleIcon,
-  ChevronRightIcon,
-  CheckCircleIcon
+  ChevronRightIcon
 } from '@heroicons/react/24/outline';
 import { CertificationRequest, CertificationTask } from '../types';
 import { TaskDetailModal } from './TaskDetailModal';
+import { TaskBoard } from './TaskBoard';
+import { getStageColor } from '../lib/workflow';
 
 interface ViewCertificationModalProps {
   isOpen: boolean;
@@ -24,75 +25,80 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
   onUpdate,
 }) => {
   const [selectedTask, setSelectedTask] = useState<CertificationTask | null>(null);
+  const [view, setView] = useState<'list' | 'board'>('board');
 
   const handleTaskUpdate = (updatedTask: CertificationTask) => {
     const updatedTasks = certification.tasks.map(task =>
       task.id === updatedTask.id ? updatedTask : task
     );
 
-    // Check if all tasks in the current stage are completed
-    const currentStageTasks = updatedTasks.filter(task => task.stage === certification.status);
-    const allTasksCompleted = currentStageTasks.every(task => task.status === 'DONE');
-
-    // Move to next stage if all tasks are completed
-    let nextStatus = certification.status;
-    if (allTasksCompleted) {
-      const stages: CertificationRequest['status'][] = [
-        'FORECAST',
-        'PLANNING',
-        'SUBMITTED',
-        'SUBMISSION_REVIEW',
-        'DEVICE_ENTRY',
-        'DEVICE_TESTING',
-        'TAQ_REVIEW',
-        'TA_COMPLETE',
-        'CLOSED'
-      ];
-      
-      const currentIndex = stages.indexOf(certification.status);
-      if (currentIndex < stages.length - 1) {
-        nextStatus = stages[currentIndex + 1];
-      }
-    }
-
     onUpdate({
       ...certification,
-      status: nextStatus,
       tasks: updatedTasks,
       lastUpdated: new Date().toISOString(),
     });
   };
 
-  const getStatusColor = (status: string) => {
-    const colors: Record<string, string> = {
-      'TODO': 'bg-gray-100 text-gray-800',
-      'IN_PROGRESS': 'bg-blue-100 text-blue-800',
-      'REVIEW': 'bg-yellow-100 text-yellow-800',
-      'DONE': 'bg-green-100 text-green-800'
-    };
-    return colors[status] || 'bg-gray-100 text-gray-800';
-  };
-
-  const handleTaskClick = (e: React.MouseEvent, task: CertificationTask) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setSelectedTask(task);
-  };
-
   return (
     <>
-      <Dialog open={isOpen} onClose={onClose} className="relative z-[49]">
+      <Dialog 
+        open={isOpen} 
+        onClose={onClose} 
+        className="relative z-[49]"
+      >
         <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <Dialog.Panel className="w-full max-w-4xl bg-white rounded-lg max-h-[90vh] overflow-hidden">
-            <div className="divide-y h-full flex flex-col">
-              <div className="p-6 overflow-y-auto">
-                <Dialog.Title className="text-xl font-bold mb-4">
-                  View Certification Request
-                </Dialog.Title>
-                
-                {certification.issues.length > 0 && (
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+          <Dialog.Panel className="w-full max-w-6xl bg-white rounded-lg h-[90vh] flex flex-col">
+            {/* Header */}
+            <div className="p-6 border-b flex-shrink-0">
+              <div className="flex justify-between items-start">
+                <div>
+                  <Dialog.Title className="text-xl font-bold flex items-center gap-3">
+                    {certification.darpKey}
+                    <span className={`px-2 py-1 rounded-full text-sm ${getStageColor(certification.status)}`}>
+                      {certification.status}
+                    </span>
+                  </Dialog.Title>
+                  <p className="text-gray-600 mt-1">{certification.projectName}</p>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setView('list')}
+                      className={`px-3 py-1 rounded ${
+                        view === 'list' 
+                          ? 'bg-blue-100 text-blue-700' 
+                          : 'bg-gray-100 hover:bg-gray-200'
+                      }`}
+                    >
+                      List
+                    </button>
+                    <button
+                      onClick={() => setView('board')}
+                      className={`px-3 py-1 rounded ${
+                        view === 'board' 
+                          ? 'bg-blue-100 text-blue-700' 
+                          : 'bg-gray-100 hover:bg-gray-200'
+                      }`}
+                    >
+                      Board
+                    </button>
+                  </div>
+                  <button
+                    onClick={onClose}
+                    className="text-gray-400 hover:text-gray-500"
+                  >
+                    ×
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 min-h-0 overflow-hidden">
+              {certification.issues.length > 0 && (
+                <div className="p-4 border-b">
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                     <div className="flex items-center mb-2">
                       <ExclamationTriangleIcon className="w-5 h-5 text-yellow-600 mr-2" />
                       <h3 className="font-semibold text-yellow-900">
@@ -121,68 +127,52 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
                       ))}
                     </div>
                   </div>
-                )}
+                </div>
+              )}
 
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="text-lg font-semibold mb-2">Project Information</h3>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <p className="text-sm text-gray-600">DARP Key</p>
-                        <p className="font-medium">{certification.darpKey}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-600">Project Name</p>
-                        <p className="font-medium">{certification.projectName}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-600">Project Type</p>
-                        <p className="font-medium">{certification.type}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-600">Target TA Date</p>
-                        <p className="font-medium">{certification.targetDate}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-600">Software Version</p>
-                        <p className="font-medium">{certification.softwareVersion}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-600">Status</p>
-                        <p className="font-medium">{certification.status}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h3 className="text-lg font-semibold mb-2">Tasks Progress</h3>
-                    <div className="border rounded-lg divide-y">
+              <div className="h-full overflow-auto">
+                {view === 'board' ? (
+                  <TaskBoard
+                    tasks={certification.tasks}
+                    onTaskUpdate={handleTaskUpdate}
+                    onTaskClick={setSelectedTask}
+                  />
+                ) : (
+                  <div className="p-4">
+                    <div className="bg-white rounded-lg border">
                       {certification.tasks.map((task) => (
-                        <div 
-                          key={task.id} 
-                          className="p-3 flex items-center justify-between hover:bg-gray-50 cursor-pointer"
-                          onClick={(e) => handleTaskClick(e, task)}
+                        <div
+                          key={task.id}
+                          className="p-4 border-b last:border-b-0 hover:bg-gray-50 cursor-pointer"
+                          onClick={() => setSelectedTask(task)}
                         >
-                          <div className="flex items-center flex-1">
-                            <div className="w-6 h-6 flex items-center justify-center">
-                              <input 
-                                type="checkbox" 
-                                className="rounded border-gray-300"
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <input
+                                type="checkbox"
                                 checked={task.status === 'DONE'}
-                                readOnly
+                                className="rounded border-gray-300"
+                                onChange={(e) => {
+                                  handleTaskUpdate({
+                                    ...task,
+                                    status: e.target.checked ? 'DONE' : 'TODO'
+                                  });
+                                }}
                                 onClick={(e) => e.stopPropagation()}
                               />
+                              <div>
+                                <h4 className="font-medium">{task.name}</h4>
+                                {task.description && (
+                                  <p className="text-sm text-gray-600 mt-1">
+                                    {task.description}
+                                  </p>
+                                )}
+                              </div>
                             </div>
-                            <span className="ml-3 flex-1">{task.name}</span>
-                            <div className="flex items-center space-x-3">
-                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(task.status)}`}>
-                                {task.status}
+                            <div className="flex items-center gap-3">
+                              <span className={`px-2 py-1 rounded-full text-xs ${getStageColor(task.stage)}`}>
+                                {task.stage}
                               </span>
-                              {task.priority === 'HIGH' && (
-                                <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                  High Priority
-                                </span>
-                              )}
                               <ChevronRightIcon className="w-4 h-4 text-gray-400" />
                             </div>
                           </div>
@@ -190,22 +180,23 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
                       ))}
                     </div>
                   </div>
-                </div>
+                )}
               </div>
+            </div>
 
-              <div className="p-6 bg-gray-50 mt-auto">
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center text-sm text-gray-600">
-                    <ClockIcon className="w-4 h-4 mr-1" />
-                    <span>Last updated: {new Date(certification.lastUpdated).toLocaleString()}</span>
-                  </div>
-                  <button
-                    onClick={onClose}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                  >
-                    Close
-                  </button>
+            {/* Footer */}
+            <div className="p-6 bg-gray-50 border-t flex-shrink-0">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center text-sm text-gray-600">
+                  <ClockIcon className="w-4 h-4 mr-1" />
+                  <span>Last updated: {new Date(certification.lastUpdated).toLocaleString()}</span>
                 </div>
+                <button
+                  onClick={onClose}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  Close
+                </button>
               </div>
             </div>
           </Dialog.Panel>
@@ -217,7 +208,7 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
           isOpen={!!selectedTask}
           onClose={() => setSelectedTask(null)}
           task={selectedTask}
-          onUpdate={(updatedTask) => handleTaskUpdate(updatedTask)}
+          onUpdate={handleTaskUpdate}
         />
       )}
     </>
