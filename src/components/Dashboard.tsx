@@ -12,17 +12,11 @@ interface DashboardProps {
 interface StatusCount {
   stage: CertificationStage;
   total: number;
-  byType: {
-    'DA IR': number;
-    'DA MR': number;
-    'DA EMR': number;
-    'DA SMR': number;
-  };
 }
 
 interface FilterState {
   status: CertificationStage | '';
-  type: string;
+  types: string[];
   primaryPC: string;
   deviceModel: string;
   deviceType: string;
@@ -35,7 +29,7 @@ interface FilterState {
 
 const initialFilterState: FilterState = {
   status: '',
-  type: '',
+  types: [],
   primaryPC: '',
   deviceModel: '',
   deviceType: '',
@@ -92,7 +86,6 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
   const [filters, setFilters] = useState<FilterState>(initialFilterState);
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState<'card' | 'grid'>('card');
-  const [editingCell, setEditingCell] = useState<{row: number, col: string} | null>(null);
   const [isStatusOverviewExpanded, setIsStatusOverviewExpanded] = useState(true);
 
   useEffect(() => {
@@ -108,28 +101,46 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
     };
   }, []);
 
-  const statusCounts = statusOrder.map(stage => ({
-    stage,
-    total: certifications.filter(cert => cert.status === stage).length,
-    byType: {
-      'DA IR': certifications.filter(cert => cert.status === stage && cert.type === 'DA IR').length,
-      'DA MR': certifications.filter(cert => cert.status === stage && cert.type === 'DA MR').length,
-      'DA EMR': certifications.filter(cert => cert.status === stage && cert.type === 'DA EMR').length,
-      'DA SMR': certifications.filter(cert => cert.status === stage && cert.type === 'DA SMR').length,
-    }
+  // Calculate status counts based on filtered certifications
+  const getFilteredStatusCounts = (certs: CertificationRequest[]): StatusCount[] => {
+    return statusOrder.map(stage => ({
+      stage,
+      total: certs.filter(cert => cert.status === stage).length,
+    }));
+  };
+
+  const projectTypeCounts = projectTypes.map(type => ({
+    type,
+    count: certifications.filter(cert => cert.type === type).length
   }));
 
-  const totalActive = statusCounts.reduce((sum, status) => 
-    status.stage !== 'CLOSED' ? sum + status.total : sum, 0
-  );
+  const totalActive = certifications.filter(cert => cert.status !== 'CLOSED').length;
+
+  const toggleTypeFilter = (type: string) => {
+    setFilters(prev => ({
+      ...prev,
+      types: prev.types.includes(type)
+        ? prev.types.filter(t => t !== type)
+        : [...prev.types, type]
+    }));
+  };
+
+  const selectAllTypes = () => {
+    setFilters(prev => ({
+      ...prev,
+      types: prev.types.length === projectTypes.length ? [] : [...projectTypes]
+    }));
+  };
 
   const filteredCertifications = certifications.filter(cert => {
     if (filters.status && cert.status !== filters.status) return false;
-    if (filters.type && cert.type !== filters.type) return false;
+    if (filters.types.length > 0 && !filters.types.includes(cert.type)) return false;
     if (filters.hideTest && cert.projectName.toLowerCase().includes('test')) return false;
     if (filters.showActive && cert.status === 'CLOSED') return false;
     return true;
   });
+
+  const statusCounts = getFilteredStatusCounts(filteredCertifications);
 
   return (
     <div className="p-8 max-w-7xl mx-auto">
@@ -170,6 +181,33 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
         </div>
       </div>
 
+      {/* Project Type Filters */}
+      <div className="mb-6 flex flex-wrap gap-2 items-center">
+        <button
+          onClick={selectAllTypes}
+          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+            filters.types.length === projectTypes.length
+              ? 'bg-gray-800 text-white'
+              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+          }`}
+        >
+          All Types
+        </button>
+        {projectTypeCounts.map(({ type, count }) => (
+          <button
+            key={type}
+            onClick={() => toggleTypeFilter(type)}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+              filters.types.includes(type)
+                ? getTypeColor(type)
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            {type} ({count})
+          </button>
+        ))}
+      </div>
+
       {showFilters && (
         <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
           <h3 className="text-sm font-medium text-gray-700 mb-4">Filter Certifications</h3>
@@ -186,19 +224,6 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
                   <option key={stage} value={stage}>
                     {stage.split('_').map(word => word.charAt(0) + word.slice(1).toLowerCase()).join(' ')}
                   </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm text-gray-700 mb-1">Project Type</label>
-              <select
-                value={filters.type}
-                onChange={(e) => setFilters(f => ({ ...f, type: e.target.value }))}
-                className="w-full border rounded-lg px-3 py-2"
-              >
-                <option value="">All Types</option>
-                {projectTypes.map(type => (
-                  <option key={type} value={type}>{type}</option>
                 ))}
               </select>
             </div>
@@ -288,7 +313,7 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
           
           {isStatusOverviewExpanded && (
             <div className="grid grid-cols-3 gap-4">
-              {statusCounts.map(({ stage, total, byType }) => (
+              {statusCounts.map(({ stage, total }) => (
                 <button
                   key={stage}
                   onClick={() => setFilters(f => ({ ...f, status: f.status === stage ? '' : stage }))}
@@ -298,21 +323,11 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
                     filters.status === stage ? 'ring-2 ring-blue-500' : ''
                   }`}
                 >
-                  <div className="flex justify-between items-center mb-2">
+                  <div className="flex justify-between items-center">
                     <span className="font-medium">
                       {stage.split('_').map(word => word.charAt(0) + word.slice(1).toLowerCase()).join(' ')}
                     </span>
                     <span className="text-2xl font-bold">{total}</span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    {Object.entries(byType).map(([type, count]) => (
-                      count > 0 && (
-                        <div key={type} className={`flex justify-between items-center px-2 py-1 rounded ${getTypeColor(type)}`}>
-                          <span className="text-sm">{type}</span>
-                          <span className="font-medium">{count}</span>
-                        </div>
-                      )
-                    ))}
                   </div>
                 </button>
               ))}
