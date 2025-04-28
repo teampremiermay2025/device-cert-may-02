@@ -1,5 +1,14 @@
 import { FC } from 'react';
-import { HomeIcon, FolderIcon, RocketLaunchIcon, PlusCircleIcon, ShareIcon, StarIcon } from '@heroicons/react/24/outline';
+import { 
+  HomeIcon, 
+  FolderIcon, 
+  RocketLaunchIcon, 
+  ShareIcon, 
+  StarIcon,
+  DevicePhoneMobileIcon,
+  CircleStackIcon,
+  WrenchScrewdriverIcon
+} from '@heroicons/react/24/outline';
 import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
 
 interface SidebarProps {
@@ -8,7 +17,7 @@ interface SidebarProps {
 }
 
 export const Sidebar: FC<SidebarProps> = ({ onNavigate, onNewCertification }) => {
-  const currentPath = window.location.hash.replace('#/', '') || 'home';
+  const currentPath = window.location.hash.replace('#/', '') || 'dashboard';
 
   const isActive = (path: string) => currentPath === path;
 
@@ -44,9 +53,9 @@ export const Sidebar: FC<SidebarProps> = ({ onNavigate, onNewCertification }) =>
           <ul className="space-y-2">
             <li>
               <button 
-                onClick={() => onNavigate('home')}
+                onClick={() => onNavigate('dashboards')}
                 className={`flex items-center space-x-3 w-full px-3 py-2 text-blue-100 hover:bg-blue-800 rounded-lg transition-colors duration-150 relative ${
-                  isActive('home') ? 'bg-blue-800 before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-blue-400 before:rounded-r' : ''
+                  isActive('dashboards') ? 'bg-blue-800 before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-blue-400 before:rounded-r' : ''
                 }`}
               >
                 <HomeIcon className="w-5 h-5" />
@@ -57,11 +66,11 @@ export const Sidebar: FC<SidebarProps> = ({ onNavigate, onNewCertification }) =>
               <button 
                 onClick={() => onNavigate('dashboard')}
                 className={`flex items-center space-x-3 w-full px-3 py-2 text-blue-100 hover:bg-blue-800 rounded-lg transition-colors duration-150 relative ${
-                  isActive('dashboard') ? 'bg-blue-800 before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-blue-400 before:rounded-r' : ''
+                  isActive('dashboards') ? 'bg-blue-800 before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-blue-400 before:rounded-r' : ''
                 }`}
               >
                 <FolderIcon className="w-5 h-5" />
-                <span>Main Dashboard</span>
+                <span>Dashboards</span>
               </button>
             </li>
             <li>
@@ -75,13 +84,38 @@ export const Sidebar: FC<SidebarProps> = ({ onNavigate, onNewCertification }) =>
                 <span>Workflows</span>
               </button>
             </li>
+            <li className="py-2">
+              <div className="px-3 text-sm font-semibold text-blue-200 uppercase tracking-wider mb-2">Products</div>
+              <ul className="space-y-1 pl-3">
+                <li>
+                  <button 
+                    onClick={() => onNavigate('iot')}
+                    className="flex items-center space-x-3 w-full px-3 py-2 text-blue-100 hover:bg-blue-800 rounded-lg"
+                  >
+                    <CircleStackIcon className="w-5 h-5" />
+                    <span>IoT</span>
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => onNavigate('non-iot')}
+                    className="flex items-center space-x-3 w-full px-3 py-2 text-blue-100 hover:bg-blue-800 rounded-lg"
+                  >
+                    <DevicePhoneMobileIcon className="w-5 h-5" />
+                    <span>Non-IoT</span>
+                  </button>
+                </li>
+              </ul>
+            </li>
             <li>
               <button 
-                onClick={onNewCertification}
-                className="flex items-center space-x-3 w-full px-3 py-2 text-blue-100 hover:bg-blue-800 rounded-lg transition-colors duration-150"
+                onClick={() => onNavigate('device-config')}
+                className={`flex items-center space-x-3 w-full px-3 py-2 text-blue-100 hover:bg-blue-800 rounded-lg transition-colors duration-150 relative ${
+                  isActive('device-config') ? 'bg-blue-800 before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-blue-400 before:rounded-r' : ''
+                }`}
               >
-                <PlusCircleIcon className="w-5 h-5" />
-                <span>Add Certification</span>
+                <WrenchScrewdriverIcon className="w-5 h-5" />
+                <span>Device Configuration</span>
               </button>
             </li>
           </ul>
@@ -97,10 +131,13 @@ export const Sidebar: FC<SidebarProps> = ({ onNavigate, onNewCertification }) =>
           </div>
           <ul className="space-y-1">
             <li>
-              <button className="flex items-center w-full px-3 py-2 text-blue-100 hover:bg-blue-700/50 rounded-lg transition-colors duration-150 text-sm">
+              <button 
+                onClick={() => onNavigate('home')}
+                className="flex items-center w-full px-3 py-2 text-blue-100 hover:bg-blue-700/50 rounded-lg transition-colors duration-150 text-sm"
+              >
                 <div className="flex items-center space-x-3 flex-1">
                   <div className="w-1.5 h-1.5 rounded-full bg-green-400"></div>
-                  <span>Device Schedule</span>
+                  <span>Main Dashboard</span>
                 </div>
                 <StarIconSolid className="w-3.5 h-3.5 text-yellow-400 ml-2" />
               </button>

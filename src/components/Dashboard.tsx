@@ -1,5 +1,5 @@
 import { FC, useState, useEffect } from 'react';
-import { PlusIcon, FunnelIcon, Bars4Icon, TableCellsIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, FunnelIcon, Bars4Icon, TableCellsIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 import { CertificationCard } from './CertificationCard';
 import { CertificationRequest, CertificationStage } from '../types';
 import { ViewCertificationModal } from './ViewCertificationModal';
@@ -61,6 +61,31 @@ const statusOrder: CertificationStage[] = [
 const projectTypes = ['DA IR', 'DA MR', 'DA EMR', 'DA SMR'];
 const deviceTypes = ['Handset', 'Tablet', 'Watch', 'Other'];
 
+const getStatusColor = (status: CertificationStage): string => {
+  const colors: Record<CertificationStage, string> = {
+    'FORECAST': 'bg-purple-50 border-purple-200 hover:bg-purple-100',
+    'PLANNING': 'bg-blue-50 border-blue-200 hover:bg-blue-100',
+    'SUBMITTED': 'bg-yellow-50 border-yellow-200 hover:bg-yellow-100',
+    'SUBMISSION_REVIEW': 'bg-orange-50 border-orange-200 hover:bg-orange-100',
+    'DEVICE_ENTRY': 'bg-cyan-50 border-cyan-200 hover:bg-cyan-100',
+    'DEVICE_TESTING': 'bg-indigo-50 border-indigo-200 hover:bg-indigo-100',
+    'TAQ_REVIEW': 'bg-pink-50 border-pink-200 hover:bg-pink-100',
+    'TA_COMPLETE': 'bg-green-50 border-green-200 hover:bg-green-100',
+    'CLOSED': 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+  };
+  return colors[status];
+};
+
+const getTypeColor = (type: string): string => {
+  const colors: Record<string, string> = {
+    'DA IR': 'bg-blue-100 text-blue-800',
+    'DA MR': 'bg-green-100 text-green-800',
+    'DA EMR': 'bg-purple-100 text-purple-800',
+    'DA SMR': 'bg-orange-100 text-orange-800'
+  };
+  return colors[type] || 'bg-gray-100 text-gray-800';
+};
+
 export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
   const [certifications, setCertifications] = useState<CertificationRequest[]>([]);
   const [selectedCertification, setSelectedCertification] = useState<CertificationRequest | null>(null);
@@ -68,6 +93,7 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState<'card' | 'grid'>('card');
   const [editingCell, setEditingCell] = useState<{row: number, col: string} | null>(null);
+  const [isStatusOverviewExpanded, setIsStatusOverviewExpanded] = useState(true);
 
   useEffect(() => {
     const handleStorageChange = () => {
@@ -93,6 +119,10 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
     }
   }));
 
+  const totalActive = statusCounts.reduce((sum, status) => 
+    status.stage !== 'CLOSED' ? sum + status.total : sum, 0
+  );
+
   const filteredCertifications = certifications.filter(cert => {
     if (filters.status && cert.status !== filters.status) return false;
     if (filters.type && cert.type !== filters.type) return false;
@@ -100,27 +130,6 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
     if (filters.showActive && cert.status === 'CLOSED') return false;
     return true;
   });
-
-  const gridColumns = [
-    { key: 'darpKey', label: 'Key' },
-    { key: 'projectName', label: 'Summary' },
-    { key: 'type', label: 'Project Type' },
-    { key: 'status', label: 'Status' },
-    { key: 'softwareVersion', label: 'Software Version' },
-    { key: 'targetDate', label: 'Target Date' },
-  ];
-
-  const handleCellEdit = (certId: string, field: string, value: string) => {
-    const updatedCertifications = certifications.map(cert => {
-      if (cert.id === certId) {
-        return { ...cert, [field]: value };
-      }
-      return cert;
-    });
-    storage.saveCertifications(updatedCertifications);
-    setCertifications(updatedCertifications);
-    setEditingCell(null);
-  };
 
   return (
     <div className="p-8 max-w-7xl mx-auto">
@@ -258,35 +267,57 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
 
       <div className="bg-white rounded-lg shadow-sm mb-8">
         <div className="p-6">
-          <h2 className="text-lg font-semibold mb-4">Status Overview</h2>
-          <div className="grid grid-cols-3 gap-4">
-            {statusCounts.map(({ stage, total, byType }) => (
-              <button
-                key={stage}
-                onClick={() => setFilters(f => ({ ...f, status: f.status === stage ? '' : stage }))}
-                className={`p-4 rounded-lg border transition-colors ${
-                  filters.status === stage ? 'ring-2 ring-blue-500' : ''
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <h2 className="text-lg font-semibold">Status Overview</h2>
+              <span className="text-sm text-gray-500">
+                {totalActive} Active Certifications
+              </span>
+            </div>
+            <button
+              onClick={() => setIsStatusOverviewExpanded(!isStatusOverviewExpanded)}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <ChevronDownIcon
+                className={`w-5 h-5 transform transition-transform ${
+                  isStatusOverviewExpanded ? 'rotate-180' : ''
                 }`}
-              >
-                <div className="flex justify-between items-center mb-2">
-                  <span className="font-medium">
-                    {stage.split('_').map(word => word.charAt(0) + word.slice(1).toLowerCase()).join(' ')}
-                  </span>
-                  <span className="text-2xl font-bold">{total}</span>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {Object.entries(byType).map(([type, count]) => (
-                    count > 0 && (
-                      <div key={type} className="flex justify-between items-center px-2 py-1 bg-gray-50 rounded">
-                        <span className="text-sm">{type}</span>
-                        <span className="font-medium">{count}</span>
-                      </div>
-                    )
-                  ))}
-                </div>
-              </button>
-            ))}
+              />
+            </button>
           </div>
+          
+          {isStatusOverviewExpanded && (
+            <div className="grid grid-cols-3 gap-4">
+              {statusCounts.map(({ stage, total, byType }) => (
+                <button
+                  key={stage}
+                  onClick={() => setFilters(f => ({ ...f, status: f.status === stage ? '' : stage }))}
+                  className={`p-4 rounded-lg border transition-all ${
+                    getStatusColor(stage)
+                  } ${
+                    filters.status === stage ? 'ring-2 ring-blue-500' : ''
+                  }`}
+                >
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="font-medium">
+                      {stage.split('_').map(word => word.charAt(0) + word.slice(1).toLowerCase()).join(' ')}
+                    </span>
+                    <span className="text-2xl font-bold">{total}</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {Object.entries(byType).map(([type, count]) => (
+                      count > 0 && (
+                        <div key={type} className={`flex justify-between items-center px-2 py-1 rounded ${getTypeColor(type)}`}>
+                          <span className="text-sm">{type}</span>
+                          <span className="font-medium">{count}</span>
+                        </div>
+                      )
+                    ))}
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
@@ -313,46 +344,51 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  {gridColumns.map(column => (
-                    <th
-                      key={column.key}
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      {column.label}
-                    </th>
-                  ))}
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Key
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Summary
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Project Type
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Software Version
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Target Date
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredCertifications.map((cert, rowIndex) => (
+                {filteredCertifications.map((cert) => (
                   <tr
                     key={cert.id}
                     className="hover:bg-gray-50 cursor-pointer"
                     onClick={() => setSelectedCertification(cert)}
                   >
-                    {gridColumns.map(column => (
-                      <td
-                        key={column.key}
-                        className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setEditingCell({ row: rowIndex, col: column.key });
-                        }}
-                      >
-                        {editingCell?.row === rowIndex && editingCell?.col === column.key ? (
-                          <input
-                            type="text"
-                            value={cert[column.key as keyof CertificationRequest] as string}
-                            onChange={(e) => handleCellEdit(cert.id, column.key, e.target.value)}
-                            onBlur={() => setEditingCell(null)}
-                            className="w-full border rounded px-2 py-1"
-                            autoFocus
-                          />
-                        ) : (
-                          cert[column.key as keyof CertificationRequest]
-                        )}
-                      </td>
-                    ))}
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {cert.darpKey}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {cert.projectName}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {cert.type}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {cert.status}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {cert.softwareVersion}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {cert.targetDate}
+                    </td>
                   </tr>
                 ))}
               </tbody>
