@@ -2,7 +2,20 @@ import { useState } from 'react';
 import { PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { Dialog } from '@headlessui/react';
 import { useWorkflowStore } from '../store/workflowStore';
-import { WorkflowEditor } from './WorkflowEditor';
+import { WorkflowModal } from './WorkflowModal';
+import type { CertificationStage } from '../types';
+
+const CERTIFICATION_STAGES: CertificationStage[] = [
+  'FORECAST',
+  'PLANNING',
+  'SUBMITTED',
+  'SUBMISSION_REVIEW',
+  'DEVICE_ENTRY',
+  'DEVICE_TESTING',
+  'TAQ_REVIEW',
+  'TA_COMPLETE',
+  'CLOSED',
+];
 
 export const WorkflowList = () => {
   const { workflows, setSelectedWorkflow, addWorkflow, deleteWorkflow, selectedWorkflow } = useWorkflowStore();
@@ -11,29 +24,31 @@ export const WorkflowList = () => {
   const [newWorkflowDescription, setNewWorkflowDescription] = useState('');
 
   const handleCreateWorkflow = () => {
+    const defaultStages = CERTIFICATION_STAGES.map(stage => ({
+      id: stage.toLowerCase().replace(/\s+/g, '-'),
+      name: stage,
+      tasks: [],
+    }));
+
+    // Initialize nodes from stages
+    const defaultNodes = defaultStages.map((stage, i) => ({
+      id: stage.id,
+      type: 'stage',
+      position: { x: 100 + i * 200, y: 100 },
+      data: { label: stage.name },
+    }));
+
     const newWorkflow = {
       id: crypto.randomUUID(),
       name: newWorkflowName,
       description: newWorkflowDescription,
-      status: 'draft',
+      status: 'draft' as const,
       version: 1,
-      nodes: [
-        {
-          id: 'start',
-          type: 'start',
-          position: { x: 100, y: 100 },
-          data: { label: 'Start' }
-        },
-        {
-          id: 'end',
-          type: 'end',
-          position: { x: 100, y: 300 },
-          data: { label: 'End' }
-        }
-      ],
+      nodes: defaultNodes,
       edges: [],
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
+      stages: defaultStages,
     };
 
     addWorkflow(newWorkflow);
@@ -57,15 +72,6 @@ export const WorkflowList = () => {
             Create Workflow
           </button>
         </div>
-        <NewWorkflowModal
-          isOpen={isNewWorkflowModalOpen}
-          onClose={() => setIsNewWorkflowModalOpen(false)}
-          onSubmit={handleCreateWorkflow}
-          name={newWorkflowName}
-          setName={setNewWorkflowName}
-          description={newWorkflowDescription}
-          setDescription={setNewWorkflowDescription}
-        />
       </div>
     );
   }
@@ -82,7 +88,6 @@ export const WorkflowList = () => {
             <PlusIcon className="w-5 h-5" />
           </button>
         </div>
-        
         <div className="divide-y overflow-y-auto">
           {workflows.map((workflow) => (
             <div
@@ -90,29 +95,14 @@ export const WorkflowList = () => {
               className={`p-4 hover:bg-gray-50 cursor-pointer ${
                 selectedWorkflow?.id === workflow.id ? 'bg-blue-50' : ''
               }`}
+              onClick={() => {
+                setSelectedWorkflow(workflow);
+              }}
             >
-              <div className="flex justify-between items-start">
-                <div
-                  className="flex-1"
-                  onClick={() => setSelectedWorkflow(workflow)}
-                >
-                  <h3 className="font-medium">{workflow.name}</h3>
-                  <p className="text-sm text-gray-500">{workflow.description}</p>
-                  <div className="mt-2 flex items-center space-x-2">
-                    <span className={`px-2 py-1 rounded-full text-xs ${
-                      workflow.status === 'active' ? 'bg-green-100 text-green-800' :
-                      workflow.status === 'draft' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
-                      {workflow.status}
-                    </span>
-                    <span className="text-xs text-gray-500">
-                      v{workflow.version}
-                    </span>
-                  </div>
-                </div>
+              <div className="flex justify-between items-center">
+                <span className="font-medium">{workflow.name}</span>
                 <button
-                  onClick={() => deleteWorkflow(workflow.id)}
+                  onClick={(e) => { e.stopPropagation(); deleteWorkflow(workflow.id); }}
                   className="p-1 hover:bg-red-100 rounded text-red-600"
                 >
                   <TrashIcon className="w-4 h-4" />
@@ -121,21 +111,23 @@ export const WorkflowList = () => {
             </div>
           ))}
         </div>
-
-        <NewWorkflowModal
-          isOpen={isNewWorkflowModalOpen}
-          onClose={() => setIsNewWorkflowModalOpen(false)}
-          onSubmit={handleCreateWorkflow}
-          name={newWorkflowName}
-          setName={setNewWorkflowName}
-          description={newWorkflowDescription}
-          setDescription={setNewWorkflowDescription}
-        />
+        {isNewWorkflowModalOpen && (
+          <NewWorkflowModal
+            isOpen={isNewWorkflowModalOpen}
+            onClose={() => setIsNewWorkflowModalOpen(false)}
+            onSubmit={handleCreateWorkflow}
+            name={newWorkflowName}
+            setName={setNewWorkflowName}
+            description={newWorkflowDescription}
+            setDescription={setNewWorkflowDescription}
+          />
+        )}
       </div>
-
       <div className="flex-1">
         {selectedWorkflow ? (
-          <WorkflowEditor />
+          <div className="h-full">
+            <WorkflowModal onClose={() => setSelectedWorkflow(null)} />
+          </div>
         ) : (
           <div className="h-full flex items-center justify-center bg-gray-50">
             <p className="text-gray-500">Select a workflow to edit</p>

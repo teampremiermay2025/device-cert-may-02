@@ -64,23 +64,6 @@ function App() {
             <div className={`${showSidebar ? 'w-80' : 'w-0'} transition-all duration-300 bg-white border-r`}>
               {showSidebar && <WorkflowList />}
             </div>
-            <div className="flex-1">
-              <div className="h-16 bg-white border-b px-4 flex items-center justify-between">
-                <button
-                  onClick={() => setShowSidebar(!showSidebar)}
-                  className="p-2 hover:bg-gray-100 rounded"
-                >
-                  {showSidebar ? '←' : '→'}
-                </button>
-                <h1 className="text-xl font-semibold">Workflow Builder</h1>
-                <div className="flex space-x-2">
-                  <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                    Save
-                  </button>
-                </div>
-              </div>
-              <WorkflowEditor />
-            </div>
           </div>
         )}
       </main>
