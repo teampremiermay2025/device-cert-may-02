@@ -14,6 +14,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
  
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
+import { TasksPage } from './components/TasksPage';
 
 // Wrap the main app content in a component to use hooks
 const AppContent = () => {
@@ -64,12 +65,7 @@ const AppContent = () => {
               <p className="text-gray-600 mt-2">Personal task management coming soon...</p>
             </div>
           } />
-          <Route path="/tasks" element={
-            <div className="p-8">
-              <h1 className="text-2xl font-bold">Tasks</h1>
-              <p className="text-gray-600 mt-2">Task management coming soon...</p>
-            </div>
-          } />
+          <Route path="/tasks" element={<TasksPage />} />
           <Route path="/teams" element={
             <ProtectedRoute requiredPermission="canManageTeams">
               <TeamManagement />
