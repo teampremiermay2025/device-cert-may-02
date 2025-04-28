@@ -3,8 +3,9 @@ import { Sidebar } from './components/Sidebar';
 import { Dashboard } from './components/Dashboard';
 import { HomePage } from './components/HomePage';
 import { NewCertificationModal } from './components/NewCertificationModal';
-import { WorkflowEditor } from './components/WorkflowEditor';
-import { WorkflowList } from './components/WorkflowList';
+
+
+import JiraWorkflowEditor from './components/JiraWorkflowEditor';
 import { DashboardContainer } from './components/dashboard/DashboardContainer';
 import './App.css';
 
@@ -68,7 +69,7 @@ function App() {
         {currentPage === 'workflows' && (
           <div className="flex h-full">
             <div className={`${showSidebar ? 'w-80' : 'w-0'} transition-all duration-300 bg-white border-r`}>
-              {showSidebar && <WorkflowList />}
+              {showSidebar && <JiraWorkflowEditor />}
             </div>
           </div>
         )}
