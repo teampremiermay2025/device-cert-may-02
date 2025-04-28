@@ -61,30 +61,41 @@ export interface WorkflowTask {
 
 export interface CertificationRequest {
   id: string;
+  darpKey: string;
   projectName: string;
   type: string;
   status: CertificationStage;
   lastUpdated: string;
-  darpKey: string;
   targetDate: string;
   softwareVersion: string;
   tasks: CertificationTask[];
   issues: CertificationIssue[];
   workflow: string;
-  // New fields from Jira
-  sprint: string;
-  sprintReady: boolean;
-  testingStatus: string;
-  epicLink: string;
-  scrumTeam: string;
-  storyPoints: number;
-  application: string;
-  acceptanceCriteria: string[];
-  description: string;
-  resolution: string;
-  fixVersion: string;
+  // Extended fields
+  vendor: string;
+  deviceType: string;
+  deviceModel: string;
+  deviceMarketingName: string;
+  deviceCodeName: string;
+  deviceOS: string;
+  deviceOSVersion: string;
+  deviceHardwareVersion: string;
+  devicePaymentType: string;
+  deviceChannel: string;
+  securityLevel: string;
+  assignee: string;
+  reporter: string;
+  primaryPC: string;
+  vendorProjectLead: string;
+  createdAt: string;
+  updatedAt: string;
+  forecastedDEDate: string;
+  forecastedFFWDate: string;
+  forecastedTADate: string;
+  forecastedLaunchDate: string;
+  components: string;
   affectsVersion: string;
-  labels: string[];
+  resolution: string;
 }
 
 export interface CertificationTask {
@@ -103,7 +114,7 @@ export interface CertificationTask {
   stage: CertificationStage;
 }
 
-export type TaskStatus = 'TODO' | 'IN_PROGRESS' | 'REVIEW' | 'DONE';
+export type TaskStatus = 'TODO' | 'IN_PROGRESS' | 'REVIEW' | 'DONE' | 'PENDING_REVIEW' | 'READY_FOR_REVIEW' | 'PENDING_APPROVAL';
 export type TaskPriority = 'LOW' | 'MEDIUM' | 'HIGH';
 
 export interface TaskAttachment {
