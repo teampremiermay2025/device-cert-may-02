@@ -12,7 +12,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 /* Custom scrollbar styles */
@@ -38,6 +38,7 @@ body {
   0% { width: 0%; }
   100% { width: 100%; }
 }
+
 .doc-progress {
   animation: docProcessing 3s linear forwards;
 }
@@ -47,6 +48,58 @@ body {
   0% { width: 0%; }
   100% { width: 100%; }
 }
+
 .project-progress {
   animation: projectCreation 5s linear forwards;
+}
+
+/* Floating animations */
+@keyframes float-diagonal-right {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(100px, 50px); }
+}
+
+@keyframes float-diagonal-left {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-100px, 50px); }
+}
+
+@keyframes float-diagonal-right-up {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(100px, -50px); }
+}
+
+@keyframes float-diagonal-left-up {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-100px, -50px); }
+}
+
+@keyframes float-up {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-float-diagonal-right {
+  animation: float-diagonal-right 15s infinite ease-in-out;
+}
+
+.animate-float-diagonal-left {
+  animation: float-diagonal-left 15s infinite ease-in-out;
+}
+
+.animate-float-diagonal-right-up {
+  animation: float-diagonal-right-up 15s infinite ease-in-out;
+}
+
+.animate-float-diagonal-left-up {
+  animation: float-diagonal-left-up 15s infinite ease-in-out;
+}
+
+.animate-marquee {
+  animation: marquee 20s linear infinite;
 }

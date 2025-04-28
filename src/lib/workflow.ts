@@ -1,6 +1,6 @@
 import { CertificationStage, CertificationTask, TaskStatus, WorkflowStage } from '../types';
 
-export const getNextStage = (currentStage: CertificationStage): CertificationStage | null => {
+const getNextStage = (currentStage: CertificationStage): CertificationStage | null => {
   const stages: CertificationStage[] = [
     'FORECAST',
     'PLANNING',
