@@ -375,9 +375,9 @@ function JiraWorkflowEditorContent() {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex h-full w-full">
       {/* Left Sidebar - Saved Workflows */}
-      <div className="w-64 bg-white border-r h-screen flex flex-col">
+      <div className="w-64 bg-white border-r h-full flex flex-col">
         <div className="p-4 border-b">
           <h2 className="text-lg font-semibold">Saved Workflows</h2>
         </div>
@@ -436,7 +436,7 @@ function JiraWorkflowEditorContent() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col h-full">
         {/* Header */}
         <div className="p-3 bg-white border-b flex justify-between items-center">
           <div className="flex items-center space-x-2">
@@ -501,7 +501,7 @@ function JiraWorkflowEditorContent() {
 
         {/* Workflow Canvas */}
         <div className="flex-1 flex relative">
-          <div className="absolute top-4 left-4 flex items-center space-x-2 bg-white p-2 rounded-md border shadow-sm">
+          <div className="absolute top-4 left-4 flex items-center space-x-2 bg-white p-2 rounded-md border shadow-sm z-10">
             <div className="flex items-center space-x-2">
               <input
                 type="checkbox"
@@ -517,7 +517,7 @@ function JiraWorkflowEditorContent() {
               🔍+
             </button>
           </div>
-          <div className="flex-1 h-[calc(100vh-4rem)]">
+          <div className="w-full h-full">
             <ReactFlow
               nodes={nodes}
               edges={edges.map((edge) => ({
@@ -550,7 +550,7 @@ function JiraWorkflowEditorContent() {
       </div>
 
       {/* Right Panel - Editor Panel and Tasks */}
-      <div className="w-80 bg-white border-l p-6 overflow-y-auto h-screen">
+      <div className="w-80 bg-white border-l p-6 overflow-y-auto h-full">
         {selectedElement ? (
           <>
             {selectedElement.type === "node" ? (
@@ -621,7 +621,7 @@ function JiraWorkflowEditorContent() {
                         </div>
                       ))}
                   </div>
-                  {selectedElement.data.id !== "start" && (
+                  {selectedElement.data.id !== "start" && selectedElement.data.id !== "stop" && (
                     <button
                       onClick={deleteStatus}
                       className="w-full px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-100 transition-colors"

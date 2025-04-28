@@ -1,0 +1,76 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "name": "Michel Chriqui",
+      "role": "PRODUCT_OWNER",
+      "email": "michel.chriqui@example.com",
+      "avatar": "https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg",
+      "permissions": {
+        "canManageUsers": true,
+        "canManageWorkflows": true,
+        "canApproveReleases": true,
+        "canAccessReports": true,
+        "canManageTeams": true
+      }
+    },
+    {
+      "id": "2",
+      "name": "Prabha Aithal",
+      "role": "LEADERSHIP",
+      "email": "prabha.aithal@example.com",
+      "avatar": "https://images.pexels.com/photos/3796217/pexels-photo-3796217.jpeg",
+      "permissions": {
+        "canManageUsers": true,
+        "canManageWorkflows": true,
+        "canApproveReleases": true,
+        "canAccessReports": true,
+        "canManageTeams": true
+      }
+    },
+    {
+      "id": "3",
+      "name": "James Weber",
+      "role": "OEM_MEMBER",
+      "email": "james.weber@example.com",
+      "avatar": "https://images.pexels.com/photos/2269872/pexels-photo-2269872.jpeg",
+      "permissions": {
+        "canManageWorkflows": false,
+        "canApproveReleases": false,
+        "canAccessReports": true,
+        "canManageTeams": false
+      }
+    },
+    {
+      "id": "4",
+      "name": "Rhonda Green",
+      "role": "TMOBILE_STAFF",
+      "email": "rhonda.green@example.com",
+      "avatar": "https://images.pexels.com/photos/1587009/pexels-photo-1587009.jpeg",
+      "permissions": {
+        "canManageWorkflows": false,
+        "canApproveReleases": false,
+        "canAccessReports": true,
+        "canManageTeams": false
+      }
+    }
+  ],
+  "roles": {
+    "PRODUCT_OWNER": {
+      "name": "Product Owner",
+      "description": "Full access to all system features and management capabilities"
+    },
+    "LEADERSHIP": {
+      "name": "Leadership",
+      "description": "Strategic oversight and approval capabilities"
+    },
+    "OEM_MEMBER": {
+      "name": "OEM Member",
+      "description": "Access to device certification and testing features"
+    },
+    "TMOBILE_STAFF": {
+      "name": "T-Mobile Staff",
+      "description": "Limited access for certification guidance"
+    }
+  }
+}
