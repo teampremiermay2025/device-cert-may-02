@@ -18,6 +18,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
 import { useAuth } from '../contexts/AuthContext';
+import { useLocation } from 'react-router-dom';
 
 interface SidebarProps {
   onNavigate: (page: string) => void;
@@ -25,10 +26,10 @@ interface SidebarProps {
 }
 
 export const Sidebar: FC<SidebarProps> = ({ onNavigate, onNewCertification }) => {
-  const currentPath = window.location.hash.replace('#/', '') || 'dashboard';
+  const location = useLocation();
   const { user, logout } = useAuth();
 
-  const isActive = (path: string) => currentPath === path;
+  const isActive = (path: string) => location.pathname === path;
 
   return (
     <div className="w-64 bg-blue-900 text-white min-h-screen flex flex-col">
@@ -44,12 +45,12 @@ export const Sidebar: FC<SidebarProps> = ({ onNavigate, onNewCertification }) =>
       <div className="p-4 border-b border-blue-800">
         <div className="flex items-center space-x-3">
           <img 
-            src="https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg" 
+            src={user?.avatar || "https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg"}
             alt="User Avatar" 
             className="w-10 h-10 rounded-full object-cover"
           />
           <div>
-            <p className="font-semibold text-white">{user?.email}</p>
+            <p className="font-semibold text-white">{user?.name}</p>
             <p className="text-sm text-blue-200">{user?.role}</p>
           </div>
         </div>
@@ -63,9 +64,9 @@ export const Sidebar: FC<SidebarProps> = ({ onNavigate, onNewCertification }) =>
             <ul className="space-y-2">
               <li>
                 <button 
-                  onClick={() => onNavigate('command-search')}
+                  onClick={() => onNavigate('/command-search')}
                   className={`flex items-center space-x-3 w-full px-3 py-2 text-blue-100 hover:bg-blue-800 rounded-lg transition-colors duration-150 ${
-                    isActive('command-search') ? 'bg-blue-800' : ''
+                    isActive('/command-search') ? 'bg-blue-800' : ''
                   }`}
                 >
                   <CommandLineIcon className="w-5 h-5" />
@@ -75,9 +76,9 @@ export const Sidebar: FC<SidebarProps> = ({ onNavigate, onNewCertification }) =>
               </li>
               <li>
                 <button 
-                  onClick={() => onNavigate('home')}
+                  onClick={() => onNavigate('/')}
                   className={`flex items-center space-x-3 w-full px-3 py-2 text-blue-100 hover:bg-blue-800 rounded-lg ${
-                    isActive('home') ? 'bg-blue-800' : ''
+                    isActive('/') ? 'bg-blue-800' : ''
                   }`}
                 >
                   <HomeIcon className="w-5 h-5" />
@@ -86,9 +87,9 @@ export const Sidebar: FC<SidebarProps> = ({ onNavigate, onNewCertification }) =>
               </li>
               <li>
                 <button 
-                  onClick={() => onNavigate('updates')}
+                  onClick={() => onNavigate('/updates')}
                   className={`flex items-center space-x-3 w-full px-3 py-2 text-blue-100 hover:bg-blue-800 rounded-lg ${
-                    isActive('updates') ? 'bg-blue-800' : ''
+                    isActive('/updates') ? 'bg-blue-800' : ''
                   }`}
                 >
                   <BellIcon className="w-5 h-5" />
@@ -98,9 +99,9 @@ export const Sidebar: FC<SidebarProps> = ({ onNavigate, onNewCertification }) =>
               </li>
               <li>
                 <button 
-                  onClick={() => onNavigate('releases')}
+                  onClick={() => onNavigate('/releases')}
                   className={`flex items-center space-x-3 w-full px-3 py-2 text-blue-100 hover:bg-blue-800 rounded-lg ${
-                    isActive('releases') ? 'bg-blue-800' : ''
+                    isActive('/releases') ? 'bg-blue-800' : ''
                   }`}
                 >
                   <RocketLaunchIcon className="w-5 h-5" />
@@ -109,9 +110,9 @@ export const Sidebar: FC<SidebarProps> = ({ onNavigate, onNewCertification }) =>
               </li>
               <li>
                 <button 
-                  onClick={() => onNavigate('my-tasks')}
+                  onClick={() => onNavigate('/my-tasks')}
                   className={`flex items-center space-x-3 w-full px-3 py-2 text-blue-100 hover:bg-blue-800 rounded-lg ${
-                    isActive('my-tasks') ? 'bg-blue-800' : ''
+                    isActive('/my-tasks') ? 'bg-blue-800' : ''
                   }`}
                 >
                   <ClipboardDocumentListIcon className="w-5 h-5" />
@@ -129,9 +130,9 @@ export const Sidebar: FC<SidebarProps> = ({ onNavigate, onNewCertification }) =>
             <ul className="space-y-2">
               <li>
                 <button 
-                  onClick={() => onNavigate('projects')}
+                  onClick={() => onNavigate('/projects')}
                   className={`flex items-center space-x-3 w-full px-3 py-2 text-blue-100 hover:bg-blue-800 rounded-lg ${
-                    isActive('projects') ? 'bg-blue-800' : ''
+                    isActive('/projects') ? 'bg-blue-800' : ''
                   }`}
                 >
                   <FolderIcon className="w-5 h-5" />
@@ -140,9 +141,9 @@ export const Sidebar: FC<SidebarProps> = ({ onNavigate, onNewCertification }) =>
               </li>
               <li>
                 <button 
-                  onClick={() => onNavigate('tasks')}
+                  onClick={() => onNavigate('/tasks')}
                   className={`flex items-center space-x-3 w-full px-3 py-2 text-blue-100 hover:bg-blue-800 rounded-lg ${
-                    isActive('tasks') ? 'bg-blue-800' : ''
+                    isActive('/tasks') ? 'bg-blue-800' : ''
                   }`}
                 >
                   <ListBulletIcon className="w-5 h-5" />
@@ -151,9 +152,9 @@ export const Sidebar: FC<SidebarProps> = ({ onNavigate, onNewCertification }) =>
               </li>
               <li>
                 <button 
-                  onClick={() => onNavigate('workflows')}
+                  onClick={() => onNavigate('/workflows')}
                   className={`flex items-center space-x-3 w-full px-3 py-2 text-blue-100 hover:bg-blue-800 rounded-lg ${
-                    isActive('workflows') ? 'bg-blue-800' : ''
+                    isActive('/workflows') ? 'bg-blue-800' : ''
                   }`}
                 >
                   <ShareIcon className="w-5 h-5" />
@@ -162,9 +163,9 @@ export const Sidebar: FC<SidebarProps> = ({ onNavigate, onNewCertification }) =>
               </li>
               <li>
                 <button 
-                  onClick={() => onNavigate('teams')}
+                  onClick={() => onNavigate('/teams')}
                   className={`flex items-center space-x-3 w-full px-3 py-2 text-blue-100 hover:bg-blue-800 rounded-lg ${
-                    isActive('teams') ? 'bg-blue-800' : ''
+                    isActive('/teams') ? 'bg-blue-800' : ''
                   }`}
                 >
                   <UserGroupIcon className="w-5 h-5" />
@@ -173,9 +174,9 @@ export const Sidebar: FC<SidebarProps> = ({ onNavigate, onNewCertification }) =>
               </li>
               <li>
                 <button 
-                  onClick={() => onNavigate('reports')}
+                  onClick={() => onNavigate('/reports')}
                   className={`flex items-center space-x-3 w-full px-3 py-2 text-blue-100 hover:bg-blue-800 rounded-lg ${
-                    isActive('reports') ? 'bg-blue-800' : ''
+                    isActive('/reports') ? 'bg-blue-800' : ''
                   }`}
                 >
                   <ChartBarIcon className="w-5 h-5" />
@@ -185,9 +186,9 @@ export const Sidebar: FC<SidebarProps> = ({ onNavigate, onNewCertification }) =>
               </li>
               <li>
                 <button 
-                  onClick={() => onNavigate('darp-ai')}
+                  onClick={() => onNavigate('/darp-ai')}
                   className={`flex items-center space-x-3 w-full px-3 py-2 text-blue-100 hover:bg-blue-800 rounded-lg ${
-                    isActive('darp-ai') ? 'bg-blue-800' : ''
+                    isActive('/darp-ai') ? 'bg-blue-800' : ''
                   }`}
                 >
                   <SparklesIcon className="w-5 h-5" />
@@ -209,7 +210,7 @@ export const Sidebar: FC<SidebarProps> = ({ onNavigate, onNewCertification }) =>
             <ul className="space-y-1">
               <li>
                 <button 
-                  onClick={() => onNavigate('home')}
+                  onClick={() => onNavigate('/')}
                   className="flex items-center w-full px-3 py-2 text-blue-100 hover:bg-blue-700/50 rounded-lg transition-colors duration-150 text-sm"
                 >
                   <div className="flex items-center space-x-3 flex-1">
@@ -228,7 +229,6 @@ export const Sidebar: FC<SidebarProps> = ({ onNavigate, onNewCertification }) =>
                   <StarIconSolid className="w-3.5 h-3.5 text-yellow-400 ml-2" />
                 </button>
               </li>
-             
             </ul>
           </div>
         </div>
