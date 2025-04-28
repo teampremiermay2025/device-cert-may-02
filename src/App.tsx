@@ -8,11 +8,12 @@ import { NewCertificationModal } from './components/NewCertificationModal';
 import JiraWorkflowEditor from './components/JiraWorkflowEditor';
 import { DashboardContainer } from './components/dashboard/DashboardContainer';
 import './App.css';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
   const [showNewCertModal, setShowNewCertModal] = useState(false);
-  const [showSidebar, setShowSidebar] = useState(true);
 
   const handleNewCertification = () => {
     setShowNewCertModal(true);
@@ -66,12 +67,9 @@ function App() {
         {currentPage === 'custom-dashboard' && dashboardId && (
           <DashboardContainer dashboardId={dashboardId} />
         )}
+  
         {currentPage === 'workflows' && (
-          <div className="flex h-full">
-            <div className={`${showSidebar ? 'w-80' : 'w-0'} transition-all duration-300 bg-white border-r`}>
-              {showSidebar && <JiraWorkflowEditor />}
-            </div>
-          </div>
+          <JiraWorkflowEditor />
         )}
         {currentPage === 'iot' && (
           <div className="p-8">
@@ -97,6 +95,7 @@ function App() {
         isOpen={showNewCertModal}
         onClose={() => setShowNewCertModal(false)}
       />
+      <ToastContainer />
     </div>
   );
 }
