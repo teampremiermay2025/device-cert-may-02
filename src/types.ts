@@ -9,6 +9,7 @@ export interface Node extends ReactFlowNode {
     description?: string;
     status?: 'pending' | 'active' | 'completed' | 'error';
     progress?: number;
+    category?: string; // Added to support JiraWorkflowEditor nodes
   };
 }
 
@@ -19,6 +20,10 @@ export interface Edge extends ReactFlowEdge {
   label?: string;
   type?: string;
   animated?: boolean;
+  data?: {
+    label: string;
+    anyStatus: boolean;
+  }; // Added to support JiraWorkflowEditor edges
 }
 
 export interface Workflow {
@@ -32,6 +37,7 @@ export interface Workflow {
   createdAt: string;
   updatedAt: string;
   stages: WorkflowStage[];
+  tasks?: Record<string, any[]>; // Added to support JiraWorkflowEditor tasks (e.g., { "Forecast": [{ id, title, status }] })
 }
 
 export interface WorkflowStage {
@@ -143,13 +149,13 @@ export interface CertificationIssue {
 export interface WorkflowStore {
   workflows: Workflow[];
   selectedWorkflow: Workflow | null;
-  predefinedTasks: Record<string, string[]>;
+  predefinedTasks: Record<string, WorkflowTask[]>; // Updated to match implementation
   setWorkflows: (workflows: Workflow[]) => void;
   addWorkflow: (workflow: Workflow) => void;
   updateWorkflow: (workflow: Workflow) => void;
   deleteWorkflow: (id: string) => void;
   setSelectedWorkflow: (workflow: Workflow | null) => void;
-  addPredefinedTask: (category: string, task: string) => void;
+  addPredefinedTask: (category: string, task: WorkflowTask) => void; // Updated to match implementation
 }
 
 export interface Dashboard {

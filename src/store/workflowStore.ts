@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { WorkflowStore, Workflow, CertificationStage } from '../types';
+import { WorkflowStore, Workflow, WorkflowStage, WorkflowTask } from '../types';
 import { storage } from '../lib/storage';
 
 const defaultWorkflow: Workflow = {

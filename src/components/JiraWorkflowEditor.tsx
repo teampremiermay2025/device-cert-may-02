@@ -187,7 +187,12 @@ function JiraWorkflowEditorContent() {
   useEffect(() => {
     const saved = localStorage.getItem("jiraWorkflows");
     if (saved) {
-      setSavedWorkflows(JSON.parse(saved));
+      const workflows = JSON.parse(saved);
+      setSavedWorkflows(workflows);
+      // Load tasks from the first workflow if available
+      if (workflows.length > 0 && workflows[0].tasks) {
+        setTasks(workflows[0].tasks);
+      }
     }
   }, []);
 
@@ -198,6 +203,12 @@ function JiraWorkflowEditorContent() {
     setWorkflowName(workflow.name);
     setSelectedWorkflowId(workflow.id);
     setSelectedElement(null); // Reset selected element when loading a new workflow
+    // Load tasks from the selected workflow
+    if (workflow.tasks) {
+      setTasks(workflow.tasks);
+    } else {
+      setTasks(tasksData); // Fallback to default tasks
+    }
   };
 
   // Handle node click to select a status
@@ -266,6 +277,7 @@ function JiraWorkflowEditorContent() {
       name: workflowName,
       nodes,
       edges,
+      tasks, // Include tasks in the saved workflow
       createdAt: new Date().toISOString(),
     };
 
@@ -292,6 +304,7 @@ function JiraWorkflowEditorContent() {
     setSelectedElement(null);
     setWorkflowName("");
     setSelectedWorkflowId(null);
+    setTasks(tasksData); // Reset tasks to initial data
   };
 
   // Update status (node) name or category
@@ -355,6 +368,7 @@ function JiraWorkflowEditorContent() {
       setSelectedElement(null);
       setWorkflowName("");
       setSelectedWorkflowId(null);
+      setTasks(tasksData); // Reset tasks when deleting the selected workflow
     }
   };
 

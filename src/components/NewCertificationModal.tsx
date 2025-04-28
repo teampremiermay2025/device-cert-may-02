@@ -1,7 +1,7 @@
-import { FC, FormEvent, useState } from 'react';
+import { FC, FormEvent, useState, useEffect, useMemo } from 'react';
 import { Dialog } from '@headlessui/react';
 import { DocumentTextIcon, ClockIcon, ArrowUpTrayIcon } from '@heroicons/react/24/outline';
-import { CertificationRequest, CertificationStage, CertificationTask } from '../types';
+import { CertificationRequest, CertificationStage, CertificationTask, TaskStatus, TaskPriority } from '../types';
 import { storage } from '../lib/storage';
 import { useWorkflowStore } from '../store/workflowStore';
 import { createTasksForStage } from '../lib/workflow';
@@ -26,8 +26,133 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
     estimatedCompletionDate: '',
     oemDocuments: [] as File[],
   });
+  const [savedWorkflows, setSavedWorkflows] = useState<any[]>([]);
+  const [selectedWorkflow, setSelectedWorkflow] = useState<any>(null);
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
-  const { selectedWorkflow } = useWorkflowStore();
+  const { selectedWorkflow: defaultWorkflow, setSelectedWorkflow: setStoreSelectedWorkflow } = useWorkflowStore();
+
+  // Load saved workflows from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem("jiraWorkflows");
+    if (saved) {
+      try {
+        const workflows = JSON.parse(saved);
+        console.log("Saved Workflows:", workflows);
+        if (!Array.isArray(workflows)) {
+          throw new Error("jiraWorkflows is not an array");
+        }
+        setSavedWorkflows(workflows);
+      } catch (error) {
+        console.error("Error parsing jiraWorkflows from localStorage:", error);
+        setSavedWorkflows([]);
+        setErrorMessage("Error loading workflows. Using default workflow.");
+      }
+    }
+  }, []);
+
+  // Memoize defaultWorkflow to prevent unnecessary re-renders
+  const memoizedDefaultWorkflow = useMemo(() => defaultWorkflow, [defaultWorkflow]);
+
+  // Match project type to a workflow when projectType changes
+  useEffect(() => {
+    if (formData.projectType) {
+      try {
+        const matchedWorkflow = savedWorkflows.find(
+          (w) => w.name && w.name.toLowerCase() === formData.projectType.toLowerCase()
+        );
+        console.log("Matched Workflow:", matchedWorkflow);
+
+        if (matchedWorkflow) {
+          if (!matchedWorkflow.id) throw new Error("Matched workflow missing 'id'");
+          if (!matchedWorkflow.name) throw new Error("Matched workflow missing 'name'");
+          if (!Array.isArray(matchedWorkflow.nodes)) {
+            console.warn("Matched workflow 'nodes' is not an array, defaulting to []");
+            matchedWorkflow.nodes = [];
+          }
+          if (!Array.isArray(matchedWorkflow.edges)) {
+            console.warn("Matched workflow 'edges' is not an array, defaulting to []");
+            matchedWorkflow.edges = [];
+          }
+          if (typeof matchedWorkflow.tasks !== 'object' || matchedWorkflow.tasks === null) {
+            console.warn("Matched workflow 'tasks' is not an object, defaulting to {}");
+            matchedWorkflow.tasks = {};
+          }
+
+          const transformedWorkflow = {
+            id: matchedWorkflow.id,
+            name: matchedWorkflow.name,
+            description: matchedWorkflow.description || '',
+            status: matchedWorkflow.status || 'active',
+            version: matchedWorkflow.version || 1,
+            nodes: matchedWorkflow.nodes,
+            edges: matchedWorkflow.edges,
+            createdAt: matchedWorkflow.createdAt || new Date().toISOString(),
+            updatedAt: matchedWorkflow.updatedAt || new Date().toISOString(),
+            stages: matchedWorkflow.nodes
+              .filter((node: any) => node && node.type === "customNode")
+              .map((node: any) => {
+                const label = node.data?.label || 'FORECAST';
+                const stageTasks = matchedWorkflow.tasks[label];
+                return {
+                  id: node.id || crypto.randomUUID(),
+                  name: label.toUpperCase() as CertificationStage,
+                  tasks: Array.isArray(stageTasks)
+                    ? stageTasks.map((task: any) => ({
+                        id: task?.id || crypto.randomUUID(),
+                        title: task?.title || 'Untitled Task',
+                        type: task?.type || 'task',
+                        description: task?.description || undefined,
+                        required: task?.required !== undefined ? task.required : false,
+                      }))
+                    : [],
+                };
+              }),
+            tasks: matchedWorkflow.tasks,
+          };
+          console.log("Transformed Workflow:", transformedWorkflow);
+
+          // Only update if the transformed workflow is different from the current selectedWorkflow
+          if (JSON.stringify(selectedWorkflow) !== JSON.stringify(transformedWorkflow)) {
+            setSelectedWorkflow(transformedWorkflow);
+          }
+
+          // Only update the store if the transformed workflow is different from the defaultWorkflow
+          if (JSON.stringify(memoizedDefaultWorkflow) !== JSON.stringify(transformedWorkflow)) {
+            setStoreSelectedWorkflow(transformedWorkflow);
+          }
+
+          setErrorMessage('');
+        } else {
+          // Only update if different
+          if (JSON.stringify(selectedWorkflow) !== JSON.stringify(memoizedDefaultWorkflow)) {
+            setSelectedWorkflow(memoizedDefaultWorkflow);
+          }
+          if (JSON.stringify(memoizedDefaultWorkflow) !== JSON.stringify(memoizedDefaultWorkflow)) {
+            setStoreSelectedWorkflow(memoizedDefaultWorkflow);
+          }
+          setErrorMessage(`No workflow found for project type "${formData.projectType}". Using default workflow.`);
+        }
+      } catch (error) {
+        console.error("Error matching or transforming workflow:", error);
+        if (JSON.stringify(selectedWorkflow) !== JSON.stringify(memoizedDefaultWorkflow)) {
+          setSelectedWorkflow(memoizedDefaultWorkflow);
+        }
+        if (JSON.stringify(memoizedDefaultWorkflow) !== JSON.stringify(memoizedDefaultWorkflow)) {
+          setStoreSelectedWorkflow(memoizedDefaultWorkflow);
+        }
+        setErrorMessage("Error processing workflow. Using default workflow.");
+      }
+    } else {
+      if (JSON.stringify(selectedWorkflow) !== JSON.stringify(memoizedDefaultWorkflow)) {
+        setSelectedWorkflow(memoizedDefaultWorkflow);
+      }
+      if (JSON.stringify(memoizedDefaultWorkflow) !== JSON.stringify(memoizedDefaultWorkflow)) {
+        setStoreSelectedWorkflow(memoizedDefaultWorkflow);
+      }
+      setErrorMessage('');
+    }
+  }, [formData.projectType, savedWorkflows, memoizedDefaultWorkflow, setStoreSelectedWorkflow]);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -50,14 +175,50 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
     }, 1000);
   };
 
+  const mapTaskStatus = (jiraStatus: string): TaskStatus => {
+    switch (jiraStatus?.toLowerCase() || '') {
+      case 'not started':
+        return 'TODO';
+      case 'in progress':
+        return 'IN_PROGRESS';
+      case 'completed':
+        return 'DONE';
+      default:
+        return 'TODO';
+    }
+  };
+
+  const transformTasks = (jiraTasks: any[]): CertificationTask[] => {
+    if (!Array.isArray(jiraTasks)) return [];
+    return jiraTasks.map((task) => ({
+      id: task?.id || crypto.randomUUID(),
+      name: task?.title || 'Untitled Task',
+      description: task?.description || undefined,
+      status: mapTaskStatus(task?.status),
+      isChecked: task?.isChecked || false,
+      assignee: formData.assignee || undefined,
+      priority: task?.priority || 'MEDIUM' as TaskPriority,
+      dueDate: formData.targetDate || undefined,
+      attachments: task?.attachments || [],
+      comments: task?.comments || [],
+      timeSpent: task?.timeSpent || undefined,
+      labels: task?.labels || [],
+      stage: 'FORECAST' as CertificationStage,
+    }));
+  };
+
   const handleConfirm = () => {
     if (!selectedWorkflow) return;
 
-    const forecastStage = selectedWorkflow.stages.find(stage => stage.name === 'FORECAST');
-    if (!forecastStage) return;
+    const forecastKey = Object.keys(selectedWorkflow.tasks || {}).find(
+      (key) => key.toLowerCase() === 'forecast'
+    );
+    const forecastStageTasks = forecastKey ? selectedWorkflow.tasks[forecastKey] : [];
+    const tasks = forecastStageTasks.length > 0
+      ? transformTasks(forecastStageTasks)
+      : createTasksForStage(memoizedDefaultWorkflow.stages.find((stage) => stage.name === 'FORECAST')!);
 
-    const tasks = createTasksForStage(forecastStage);
-
+    const now = new Date().toISOString();
     const newCertification: CertificationRequest = {
       id: crypto.randomUUID(),
       darpKey: formData.darpKey,
@@ -66,12 +227,34 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
       status: 'FORECAST',
       targetDate: formData.targetDate,
       softwareVersion: formData.softwareVersion,
-      lastUpdated: new Date().toISOString(),
+      lastUpdated: now,
       tasks,
       issues: [],
       workflow: selectedWorkflow.id,
       assignee: formData.assignee,
-      estimatedCompletionDate: formData.estimatedCompletionDate,
+      vendor: '',
+      deviceType: '',
+      deviceModel: '',
+      deviceMarketingName: '',
+      deviceCodeName: '',
+      deviceOS: '',
+      deviceOSVersion: '',
+      deviceHardwareVersion: '',
+      devicePaymentType: '',
+      deviceChannel: '',
+      securityLevel: '',
+      reporter: '',
+      primaryPC: '',
+      vendorProjectLead: '',
+      createdAt: now,
+      updatedAt: now,
+      forecastedDEDate: '',
+      forecastedFFWDate: '',
+      forecastedTADate: formData.targetDate,
+      forecastedLaunchDate: formData.estimatedCompletionDate,
+      components: '',
+      affectsVersion: formData.softwareVersion,
+      resolution: '',
     };
 
     const certifications = storage.getCertifications();
@@ -95,7 +278,26 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
     }));
   };
 
-  const initialTasks = selectedWorkflow?.stages.find(stage => stage.name === 'FORECAST')?.tasks || [];
+  const forecastKey = selectedWorkflow?.tasks
+    ? Object.keys(selectedWorkflow.tasks).find((key) => key.toLowerCase() === 'forecast')
+    : undefined;
+  const initialTasks = forecastKey && selectedWorkflow?.tasks[forecastKey]
+    ? transformTasks(selectedWorkflow.tasks[forecastKey])
+    : memoizedDefaultWorkflow?.stages.find((stage) => stage.name === 'FORECAST')?.tasks.map((task) => ({
+        id: task.id,
+        name: task.title,
+        description: task.description,
+        status: 'TODO' as TaskStatus,
+        isChecked: false,
+        assignee: formData.assignee || undefined,
+        priority: 'MEDIUM' as TaskPriority,
+        dueDate: formData.targetDate || undefined,
+        attachments: [],
+        comments: [],
+        timeSpent: undefined,
+        labels: [],
+        stage: 'FORECAST' as CertificationStage,
+      })) || [];
 
   return (
     <Dialog open={isOpen} onClose={onClose} className="relative z-50">
@@ -111,6 +313,11 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
               </div>
 
               <div className="flex-1 overflow-y-auto p-6">
+                {errorMessage && (
+                  <div className="mb-4 p-3 bg-yellow-100 text-yellow-800 rounded-lg">
+                    {errorMessage}
+                  </div>
+                )}
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
@@ -337,6 +544,10 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
                         <p className="font-medium">{formData.projectType || 'Not specified'}</p>
                       </div>
                       <div>
+                        <p className="text-sm text-gray-600">Workflow</p>
+                        <p className="font-medium">{selectedWorkflow?.name || 'Default Workflow'}</p>
+                      </div>
+                      <div>
                         <p className="text-sm text-gray-600">Target TA Date</p>
                         <p className="font-medium">{formData.targetDate || 'Not specified'}</p>
                       </div>
@@ -384,29 +595,35 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
                   <div>
                     <h3 className="text-lg font-semibold mb-2">Initial Tasks</h3>
                     <div className="border rounded-lg divide-y">
-                      {initialTasks.map((task) => (
-                        <div key={task.id} className="p-3 flex items-center justify-between hover:bg-gray-50">
-                          <div className="flex items-center">
-                            <div className="w-6 h-6 flex items-center justify-center">
-                              <input 
-                                type="checkbox" 
-                                className="rounded border-gray-300"
-                                checked={false}
-                                disabled
-                              />
-                            </div>
-                            <span className="ml-3">{task.title}</span>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <span className="text-sm text-gray-500">{task.type}</span>
-                            {task.required && (
-                              <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs">
-                                Required
-                              </span>
-                            )}
-                          </div>
+                      {initialTasks.length === 0 ? (
+                        <div className="p-3 text-sm text-gray-500">
+                          No initial tasks available.
                         </div>
-                      ))}
+                      ) : (
+                        initialTasks.map((task: CertificationTask) => (
+                          <div key={task.id} className="p-3 flex items-center justify-between hover:bg-gray-50">
+                            <div className="flex items-center">
+                              <div className="w-6 h-6 flex items-center justify-center">
+                                <input 
+                                  type="checkbox" 
+                                  className="rounded border-gray-300"
+                                  checked={task.isChecked}
+                                  disabled
+                                />
+                              </div>
+                              <span className="ml-3">{task.name}</span>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <span className="text-sm text-gray-500">{task.status}</span>
+                              {task.priority === 'HIGH' && (
+                                <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs">
+                                  High Priority
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        ))
+                      )}
                     </div>
                     <p className="text-sm text-gray-500 mt-2">
                       These tasks will be created automatically when the certification request is created.
