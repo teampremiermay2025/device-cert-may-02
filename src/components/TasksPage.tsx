@@ -321,6 +321,7 @@ export const TasksPage = () => {
       {/* Task Detail Modal */}
       {selectedTask && (
         <TaskDetailModal
+          isOpen={!!selectedTask}
           task={selectedTask}
           onClose={() => setSelectedTask(null)}
           onUpdate={handleTaskUpdate}
