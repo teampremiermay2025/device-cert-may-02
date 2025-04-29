@@ -12,6 +12,7 @@ import { LoginPage } from './components/LoginPage';
 import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import KanbanReleasesBoard from './components/KanbanReleasesBoard';
+import ReleasesCalendar from './components/ReleasesCalendar';
 
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
@@ -57,6 +58,7 @@ const AppContent = () => {
             </div>
           } />
           <Route path="/releases" element={<KanbanReleasesBoard />} />
+          <Route path="/calendar" element={<ReleasesCalendar />} />
        
           <Route path="/tasks" element={<TasksPage />} />
           <Route path="/teams" element={

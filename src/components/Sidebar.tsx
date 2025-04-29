@@ -14,7 +14,8 @@ import {
   ShareIcon,
   BoltIcon,
   StarIcon,
-  ArrowRightOnRectangleIcon
+  ArrowRightOnRectangleIcon,
+  CalendarIcon
 } from '@heroicons/react/24/outline';
 import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
 import { useAuth } from '../contexts/AuthContext';
@@ -140,17 +141,17 @@ export const Sidebar: FC<SidebarProps> = ({ onNavigate, onNewCertification }) =>
                     <span>Projects</span>
                   </button>
                 </li>
-               {/*  <li>
+                <li>
                   <button 
-                    onClick={() => onNavigate('/tasks')}
+                    onClick={() => onNavigate('/calendar')}
                     className={`flex items-center space-x-3 w-full px-3 py-2 text-blue-100 hover:bg-blue-800 rounded-lg ${
-                      isActive('/tasks') ? 'bg-blue-800' : ''
+                      isActive('/calendar') ? 'bg-blue-800' : ''
                     }`}
                   >
-                    <ListBulletIcon className="w-5 h-5" />
-                    <span>Tasks</span>
+                    <CalendarIcon className="w-5 h-5" />
+                    <span>Calendar</span>
                   </button>
-                </li> */}
+                </li>
                 <li>
                   <button 
                     onClick={() => onNavigate('/workflows')}
