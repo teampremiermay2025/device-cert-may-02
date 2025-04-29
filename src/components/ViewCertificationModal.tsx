@@ -610,5 +610,3 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
     </Dialog>
   );
 };
-
-export { ViewCertificationModal }
