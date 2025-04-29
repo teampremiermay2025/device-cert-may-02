@@ -19,7 +19,7 @@
     "device_os_version": "20",
     "device_hardware_version": "1.0",
     "device_payment_type": "Post-Paid",
-    "device_channel": "Stock",
+    "device_channel": ["Stock",""],
     "chapter_no": "1004.1",
     "chapter_name": "Attestation-RTT",
     "requirement_tag": "RTT_wireframe.doc",

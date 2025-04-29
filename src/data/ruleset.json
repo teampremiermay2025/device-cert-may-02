@@ -1,0 +1,470 @@
+[
+  {
+    "chapter": "1000.0",
+    "deliverable": "SYSTEM USE",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": ["DA IR", "DA MR", "E DA MR", "DA ADAPT IR"],
+    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
+    "device": "ALL DEV",
+    "stage": "PLANNING"
+  },
+  {
+    "chapter": "1000.1",
+    "deliverable": "PreAuth",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": ["DA IR", "DA MR", "E DA MR"],
+    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
+    "device": "ALL DEV",
+    "stage": "SUBMISSION REVIEW"
+  },
+  {
+    "chapter": "1000.1",
+    "deliverable": "PreAuth",
+    "requirement_tag": "PTN Test Authorization Letter (18062)",
+    "issue_types": ["DA IR", "DA MR", "E DA MR"],
+    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
+    "device": "ALL DEV",
+    "stage": "DEVICE TESTING"
+  },
+  {
+    "chapter": "1000.2",
+    "deliverable": "PreAuth-Testing",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": ["DA IR", "DA MR", "E DA MR", "NDAP IR"],
+    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
+    "device": "ALL DEV",
+    "stage": "TA COMPLETE"
+  },
+  {
+    "chapter": "1000.2",
+    "deliverable": "PreAuth-Testing",
+    "requirement_tag": "PTN-10776 Testing Results for Radio PTN (pre-LE) [include 16706 logs]",
+    "issue_types": ["DA IR", "DA MR", "E DA MR"],
+    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
+    "device": "ALL DEV",
+    "stage": "SUBMITTED"
+  },
+  {
+    "chapter": "1000.2",
+    "deliverable": "PreAuth-Testing",
+    "requirement_tag": "APTN-10776 Test Results for Application PTN (pre-LE) [include 16706 logs]",
+    "issue_types": ["DA IR", "DA MR", "E DA MR", "NDAP IR"],
+    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
+    "device": "ALL DEV",
+    "stage": "FORECAST"
+  },
+  {
+    "chapter": "1001.1",
+    "deliverable": "SAMPLES",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": ["DA IR", "DA MR", "E DA MR"],
+    "device_channels": ["CRICKET IETA"],
+    "device": "ALL DEV",
+    "stage": "DEVICE ENTRY"
+  },
+  {
+    "chapter": "1001.2",
+    "deliverable": "Testing",
+    "requirement_tag": "Sample Validation",
+    "issue_types": ["DA IR", "DA MR"],
+    "device_channels": ["CRICKET VITA"],
+    "device": "ALL DEV",
+    "stage": "TAQ REVIEW"
+  },
+  {
+    "chapter": "1001.3",
+    "deliverable": "PreAuth",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": ["DA IR", "E DA MR"],
+    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
+    "device": "ALL DEV",
+    "stage": "PLANNING"
+  },
+  {
+    "chapter": "1001.4",
+    "deliverable": "PreAuth-Testing",
+    "requirement_tag": "PTN-10800 Test Results",
+    "issue_types": ["DA IR", "DA MR", "NDAP IR"],
+    "device_channels": ["CRICKET IETA"],
+    "device": "ALL DEV",
+    "stage": "SUBMISSION REVIEW"
+  },
+  {
+    "chapter": "1002.0",
+    "deliverable": "SYSTEM DEPLOY",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": ["DA IR", "DA MR", "E DA MR"],
+    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
+    "device": "ALL DEV",
+    "stage": "DEVICE TESTING"
+  },
+  {
+    "chapter": "1002.1",
+    "deliverable": "PreAuth",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": ["DA IR", "DA MR"],
+    "device_channels": ["CRICKET VITA"],
+    "device": "ALL DEV",
+    "stage": "TA COMPLETE"
+  },
+  {
+    "chapter": "1002.2",
+    "deliverable": "PreAuth-Testing",
+    "requirement_tag": "PTN-10801 Test Results",
+    "issue_types": ["DA IR", "E DA MR", "NDAP IR"],
+    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
+    "device": "ALL DEV",
+    "stage": "SUBMITTED"
+  },
+  {
+    "chapter": "1003.0",
+    "deliverable": "SYSTEM VALIDATION",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": ["DA IR", "DA MR", "E DA MR"],
+    "device_channels": ["CRICKET IETA"],
+    "device": "ALL DEV",
+    "stage": "FORECAST"
+  },
+  {
+    "chapter": "1003.1",
+    "deliverable": "Testing",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": ["DA IR", "DA MR"],
+    "device_channels": ["CRICKET VITA"],
+    "device": "ALL DEV",
+    "stage": "DEVICE ENTRY"
+  },
+  {
+    "chapter": "1003.2",
+    "deliverable": "PreAuth-Testing",
+    "requirement_tag": "APTN-10802 Validation Results",
+    "issue_types": ["DA IR", "E DA MR", "NDAP IR"],
+    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
+    "device": "ALL DEV",
+    "stage": "TAQ REVIEW"
+  },
+  {
+    "chapter": "1004.0",
+    "deliverable": "SYSTEM FINALIZE",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": ["DA IR", "DA MR", "E DA MR"],
+    "device_channels": ["CRICKET IETA"],
+    "device": "ALL DEV",
+    "stage": "PLANNING"
+  },
+  {
+    "chapter": "1004.1",
+    "deliverable": "PreAuth",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": ["DA IR", "DA MR"],
+    "device_channels": ["CRICKET VITA"],
+    "device": "ALL DEV",
+    "stage": "SUBMISSION REVIEW"
+  },
+  {
+    "chapter": "1004.2",
+    "deliverable": "PreAuth-Testing",
+    "requirement_tag": "PTN-10803 Final Test Results",
+    "issue_types": ["DA IR", "E DA MR", "NDAP IR"],
+    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
+    "device": "ALL DEV",
+    "stage": "DEVICE TESTING"
+  },
+  {
+    "chapter": "1005.0",
+    "deliverable": "SYSTEM RELEASE",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": ["DA IR", "DA MR", "E DA MR"],
+    "device_channels": ["CRICKET IETA"],
+    "device": "ALL DEV",
+    "stage": "TA COMPLETE"
+  },
+  {
+    "chapter": "1005.1",
+    "deliverable": "Testing",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": ["DA IR", "DA MR"],
+    "device_channels": ["CRICKET VITA"],
+    "device": "ALL DEV",
+    "stage": "SUBMITTED"
+  },
+  {
+    "chapter": "1005.2",
+    "deliverable": "PreAuth-Testing",
+    "requirement_tag": "PTN-10804 Release Validation",
+    "issue_types": ["DA IR", "E DA MR", "NDAP IR"],
+    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
+    "device": "ALL DEV",
+    "stage": "FORECAST"
+  },
+  {
+    "chapter": "1006.0",
+    "deliverable": "SYSTEM MONITOR",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": ["DA IR", "DA MR", "E DA MR"],
+    "device_channels": ["CRICKET IETA"],
+    "device": "ALL DEV",
+    "stage": "DEVICE ENTRY"
+  },
+  {
+    "chapter": "1006.1",
+    "deliverable": "PreAuth",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": ["DA IR", "DA MR"],
+    "device_channels": ["CRICKET VITA"],
+    "device": "ALL DEV",
+    "stage": "TAQ REVIEW"
+  },
+  {
+    "chapter": "1006.2",
+    "deliverable": "PreAuth-Testing",
+    "requirement_tag": "PTN-10805 Monitoring Results",
+    "issue_types": ["DA IR", "E DA MR", "NDAP IR"],
+    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
+    "device": "ALL DEV",
+    "stage": "PLANNING"
+  },
+  {
+    "chapter": "1007.0",
+    "deliverable": "SYSTEM UPDATE",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": ["DA IR", "DA MR", "E DA MR"],
+    "device_channels": ["CRICKET IETA"],
+    "device": "ALL DEV",
+    "stage": "SUBMISSION REVIEW"
+  },
+  {
+    "chapter": "1007.1",
+    "deliverable": "Testing",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": ["DA IR", "DA MR"],
+    "device_channels": ["CRICKET VITA"],
+    "device": "ALL DEV",
+    "stage": "DEVICE TESTING"
+  },
+  {
+    "chapter": "1007.2",
+    "deliverable": "PreAuth-Testing",
+    "requirement_tag": "PTN-10806 Update Validation",
+    "issue_types": ["DA IR", "E DA MR", "NDAP IR"],
+    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
+    "device": "ALL DEV",
+    "stage": "TA COMPLETE"
+  },
+  {
+    "chapter": "1008.0",
+    "deliverable": "SYSTEM MAINTAIN",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": ["DA IR", "DA MR", "E DA MR"],
+    "device_channels": ["CRICKET IETA"],
+    "device": "ALL DEV",
+    "stage": "SUBMITTED"
+  },
+  {
+    "chapter": "1008.1",
+    "deliverable": "PreAuth",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": ["DA IR", "DA MR"],
+    "device_channels": ["CRICKET VITA"],
+    "device": "ALL DEV",
+    "stage": "FORECAST"
+  },
+  {
+    "chapter": "1008.2",
+    "deliverable": "PreAuth-Testing",
+    "requirement_tag": "PTN-10807 Maintenance Results",
+    "issue_types": ["DA IR", "E DA MR", "NDAP IR"],
+    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
+    "device": "ALL DEV",
+    "stage": "DEVICE ENTRY"
+  },
+  {
+    "chapter": "1009.0",
+    "deliverable": "SYSTEM OPTIMIZE",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": ["DA IR", "DA MR", "E DA MR"],
+    "device_channels": ["CRICKET IETA"],
+    "device": "ALL DEV",
+    "stage": "TAQ REVIEW"
+  },
+  {
+    "chapter": "1009.1",
+    "deliverable": "Testing",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": ["DA IR", "DA MR"],
+    "device_channels": ["CRICKET VITA"],
+    "device": "ALL DEV",
+    "stage": "PLANNING"
+  },
+  {
+    "chapter": "1009.2",
+    "deliverable": "PreAuth-Testing",
+    "requirement_tag": "PTN-10808 Optimization Results",
+    "issue_types": ["DA IR", "E DA MR", "NDAP IR"],
+    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
+    "device": "ALL DEV",
+    "stage": "SUBMISSION REVIEW"
+  },
+  {
+    "chapter": "1010.0",
+    "deliverable": "SYSTEM REVIEW",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": ["DA IR", "DA MR", "E DA MR"],
+    "device_channels": ["CRICKET IETA"],
+    "device": "ALL DEV",
+    "stage": "DEVICE TESTING"
+  },
+  {
+    "chapter": "1010.1",
+    "deliverable": "PreAuth",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": ["DA IR", "DA MR"],
+    "device_channels": ["CRICKET VITA"],
+    "device": "ALL DEV",
+    "stage": "TA COMPLETE"
+  },
+  {
+    "chapter": "1010.2",
+    "deliverable": "PreAuth-Testing",
+    "requirement_tag": "PTN-10809 Review Results",
+    "issue_types": ["DA IR", "E DA MR", "NDAP IR"],
+    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
+    "device": "ALL DEV",
+    "stage": "SUBMITTED"
+  },
+  {
+    "chapter": "1011.0",
+    "deliverable": "SYSTEM CLOSE",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": ["DA IR", "DA MR", "E DA MR"],
+    "device_channels": ["CRICKET IETA"],
+    "device": "ALL DEV",
+    "stage": "FORECAST"
+  },
+  {
+    "chapter": "1011.1",
+    "deliverable": "Testing",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": ["DA IR", "DA MR"],
+    "device_channels": ["CRICKET VITA"],
+    "device": "ALL DEV",
+    "stage": "DEVICE ENTRY"
+  },
+  {
+    "chapter": "1011.2",
+    "deliverable": "PreAuth-Testing",
+    "requirement_tag": "PTN-10810 Closure Results",
+    "issue_types": ["DA IR", "E DA MR", "NDAP IR"],
+    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
+    "device": "ALL DEV",
+    "stage": "TAQ REVIEW"
+  },
+  {
+    "chapter": "1012.0",
+    "deliverable": "SYSTEM ARCHIVE",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": ["DA IR", "DA MR", "E DA MR"],
+    "device_channels": ["CRICKET IETA"],
+    "device": "ALL DEV",
+    "stage": "PLANNING"
+  },
+  {
+    "chapter": "1012.1",
+    "deliverable": "PreAuth",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": ["DA IR", "DA MR"],
+    "device_channels": ["CRICKET VITA"],
+    "device": "ALL DEV",
+    "stage": "SUBMISSION REVIEW"
+  },
+  {
+    "chapter": "1012.2",
+    "deliverable": "PreAuth-Testing",
+    "requirement_tag": "PTN-10811 Archive Results",
+    "issue_types": ["DA IR", "E DA MR", "NDAP IR"],
+    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
+    "device": "ALL DEV",
+    "stage": "DEVICE TESTING"
+  },
+  {
+    "chapter": "1013.0",
+    "deliverable": "SYSTEM AUDIT",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": ["DA IR", "DA MR", "E DA MR"],
+    "device_channels": ["CRICKET IETA"],
+    "device": "ALL DEV",
+    "stage": "TA COMPLETE"
+  },
+  {
+    "chapter": "1013.1",
+    "deliverable": "Testing",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": ["DA IR", "DA MR"],
+    "device_channels": ["CRICKET VITA"],
+    "device": "ALL DEV",
+    "stage": "SUBMITTED"
+  },
+  {
+    "chapter": "1013.2",
+    "deliverable": "PreAuth-Testing",
+    "requirement_tag": "PTN-10812 Audit Results",
+    "issue_types": ["DA IR", "E DA MR", "NDAP IR"],
+    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
+    "device": "ALL DEV",
+    "stage": "FORECAST"
+  },
+  {
+    "chapter": "1014.0",
+    "deliverable": "SYSTEM REPORT",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": ["DA IR", "DA MR", "E DA MR"],
+    "device_channels": ["CRICKET IETA"],
+    "device": "ALL DEV",
+    "stage": "DEVICE ENTRY"
+  },
+  {
+    "chapter": "1014.1",
+    "deliverable": "PreAuth",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": ["DA IR", "DA MR"],
+    "device_channels": ["CRICKET VITA"],
+    "device": "ALL DEV",
+    "stage": "TAQ REVIEW"
+  },
+  {
+    "chapter": "1014.2",
+    "deliverable": "PreAuth-Testing",
+    "requirement_tag": "PTN-10813 Report Results",
+    "issue_types": ["DA IR", "E DA MR", "NDAP IR"],
+    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
+    "device": "ALL DEV",
+    "stage": "PLANNING"
+  },
+  {
+    "chapter": "1015.0",
+    "deliverable": "SYSTEM FEEDBACK",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": ["DA IR", "DA MR", "E DA MR"],
+    "device_channels": ["CRICKET IETA"],
+    "device": "ALL DEV",
+    "stage": "SUBMISSION REVIEW"
+  },
+  {
+    "chapter": "1015.1",
+    "deliverable": "Testing",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": ["DA IR", "DA MR"],
+    "device_channels": ["CRICKET VITA"],
+    "device": "ALL DEV",
+    "stage": "DEVICE TESTING"
+  },
+  {
+    "chapter": "1015.2",
+    "deliverable": "PreAuth-Testing",
+    "requirement_tag": "PTN-10814 Feedback Results",
+    "issue_types": ["DA IR", "E DA MR", "NDAP IR"],
+    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
+    "device": "ALL DEV",
+    "stage": "TA COMPLETE"
+  }
+]
