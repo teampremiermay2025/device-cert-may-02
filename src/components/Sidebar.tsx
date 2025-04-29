@@ -77,9 +77,9 @@ export const Sidebar: FC<SidebarProps> = ({ onNavigate, onNewCertification }) =>
                 </li>
                 <li>
                   <button 
-                    onClick={() => onNavigate('/')}
+                    onClick={() => onNavigate('/home')}
                     className={`flex items-center space-x-3 w-full px-3 py-2 text-blue-100 hover:bg-blue-800 rounded-lg ${
-                      isActive('/') ? 'bg-blue-800' : ''
+                      isActive('/home') ? 'bg-blue-800' : ''
                     }`}
                   >
                     <HomeIcon className="w-5 h-5" />

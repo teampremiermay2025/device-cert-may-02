@@ -48,21 +48,21 @@ export const LearnPage = () => {
       </nav>
 
       {/* Hero Section with Background Content */}
-      <div className="relative min-h-[calc(100vh-72px)] bg-gradient-to-b from-white to-[#E6F4FF]">
+      <div className="relative min-h-[calc(100vh-72px)] bg-gradient-to-b from-white to-[#F0F8FF]">
         {/* Main Content */}
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-5 z-20">
-          <span className="inline-block px-4 py-1 bg-[#E2F4FF] text-[#009FDB] rounded-full text-sm mb-5 font-medium">
+          <span className="inline-block px-4 py-1.5 bg-[#E2F4FF] text-[#009FDB] rounded-full text-sm mb-6 font-medium tracking-wide">
             AVAILABLE NOW
           </span>
-          <h1 className="text-6xl font-bold mb-5 text-[#00539B]">
+          <h1 className="text-6xl sm:text-7xl font-bold mb-8 text-[#00539B] leading-tight">
             Streamline Device Certification Life Cycles
           </h1>
-          <p className="text-xl text-[#444444] mb-8 max-w-2xl">
+          <p className="text-xl sm:text-2xl text-[#444444] mb-10 max-w-2xl leading-relaxed">
             Accelerate certifications with precision, security, and real-time insights.
           </p>
           <button
             onClick={() => navigate('/login')}
-            className="inline-flex items-center px-8 py-3 bg-[#009FDB] text-white rounded-full hover:bg-[#007DB0] transition-colors"
+            className="inline-flex items-center px-8 py-3.5 bg-[#009FDB] text-white rounded-full hover:bg-[#007DB0] transition-all duration-300 transform hover:scale-105"
           >
             View Demo
             <img
@@ -75,58 +75,54 @@ export const LearnPage = () => {
 
         {/* Floating Tags */}
         <div className="absolute inset-0 z-10">
-          <h3 className="text-sm font-medium text-[#666666] text-center mt-20 mb-20">
+          <h3 className="text-sm sm:text-base font-medium text-[#666666] text-center mt-24 mb-24">
             CAPABILITIES WE WORK ON:
           </h3>
-          <div className="absolute left-[15%] top-40 animate-float-diagonal-right">
+          <div className="absolute left-[15%] top-40 animate-float-diagonal-right duration-2000">
             <div className="w-8 h-8 border-2 border-dotted border-[#009FDB] rounded mb-2" />
             <div className="w-5 h-5 transform rotate-90 mx-auto mb-2 text-[#009FDB]">↑</div>
-            <div className="px-4 py-2 bg-white/80 backdrop-blur rounded-full flex items-center gap-2 shadow-sm">
+            <div className="px-4 py-2.5 bg-white/80 backdrop-blur rounded-full flex items-center gap-2 shadow-sm">
               <span className="w-2 h-2 bg-[#009FDB] rounded-full" />
               Configurable Workflows
             </div>
           </div>
-          <div className="absolute right-[15%] top-40 animate-float-diagonal-left">
+          <div className="absolute right-[15%] top-40 animate-float-diagonal-left duration-2000">
             <div className="w-10 h-5 border-2 border-dotted border-[#009FDB] rounded mb-2" />
             <div className="w-5 h-5 transform rotate-90 mx-auto mb-2 text-[#009FDB]">↑</div>
-            <div className="px-4 py-2 bg-white/80 backdrop-blur rounded-full flex items-center gap-2 shadow-sm">
+            <div className="px-4 py-2.5 bg-white/80 backdrop-blur rounded-full flex items-center gap-2 shadow-sm">
               <span className="w-2 h-2 bg-[#009FDB] rounded-full" />
               Dashboards
             </div>
           </div>
-          <div className="absolute left-[15%] top-[400px] animate-float-diagonal-right-up">
+          <div className="absolute left-[15%] top-[400px] animate-float-diagonal-right-up duration-2000">
             <div className="w-5 h-10 border-2 border-dotted border-[#009FDB] rounded mb-2" />
             <div className="w-5 h-5 transform rotate-90 mx-auto mb-2 text-[#009FDB]">↑</div>
-            <div className="px-4 py-2 bg-white/80 backdrop-blur rounded-full flex items-center gap-2 shadow-sm">
+            <div className="px-4 py-2.5 bg-white/80 backdrop-blur rounded-full flex items-center gap-2 shadow-sm">
               <span className="w-2 h-2 bg-[#009FDB] rounded-full" />
-              Powerful Reports
-            </div>
-          </div>
-          <div className="absolute right-[15%] top-[400px] animate-float-diagonal-left-up">
-            <div className="w-8 h-8 border-2 border-dotted border-[#009FDB] rounded-full mb-2" />
-            <div className="w-5 h-5 transform rotate-90 mx-auto mb-2 text-[#009FDB]">↑</div>
-            <div className="px-4 py-2 bg-white/80 backdrop-blur rounded-full flex items-center gap-2 shadow-sm">
-              <span className="w-2 h-2 bg-[#009FDB] rounded-full" />
-              Consolidated View
+              Real-time Insights
             </div>
           </div>
         </div>
       </div>
 
-      {/* OEM Section */}
-      <div className="bg-white py-16 overflow-hidden">
-        <h3 className="text-sm font-medium text-[#666666] text-center mb-12">
-          DEVICE OEMS WE WORK WITH:
-        </h3>
-        <div className="flex justify-center items-center gap-16 px-5 overflow-hidden">
-          <div className="flex items-center gap-16 animate-marquee">
-            {[...oems, ...oems].map((oem, index) => (
-              <img
-                key={`${oem.name}-${index}`}
-                src={oem.url}
-                alt={oem.name}
-                className="h-12 opacity-50 hover:opacity-100 transition-opacity cursor-pointer"
-              />
+      {/* OEMs Section */}
+      <div className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12 text-[#00539B]">
+            Trusted by Leading OEMs
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-8">
+            {oems.map((oem, index) => (
+              <div 
+                key={index} 
+                className="flex items-center justify-center p-4 hover:bg-[#F0F8FF] rounded-lg transition-colors duration-300"
+              >
+                <img 
+                  src={oem.url} 
+                  alt={oem.name} 
+                  className="h-12 w-auto"
+                />
+              </div>
             ))}
           </div>
         </div>

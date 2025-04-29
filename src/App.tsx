@@ -15,6 +15,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 import { TasksPage } from './components/TasksPage';
+import { LearnPage } from './components/LearnPage';
 
 // Wrap the main app content in a component to use hooks
 const AppContent = () => {
@@ -37,7 +38,8 @@ const AppContent = () => {
       />
       <main className="flex-1 overflow-auto">
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/home" element={<HomePage />} />
+       
           <Route path="/projects" element={<Dashboard onNewCertification={handleNewCertification} />} />
           <Route path="/dashboards/:id" element={<DashboardContainer dashboardId="" />} />
           <Route path="/workflows" element={<JiraWorkflowEditor />} />
@@ -100,6 +102,7 @@ function App() {
     <Router>
       <AuthProvider>
         <Routes>
+        <Route path="/" element={<LearnPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/*" element={
             <ProtectedRoute>

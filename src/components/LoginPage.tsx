@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import userData from '../data/users.json';
+import { useNavigate } from 'react-router-dom';
 
 export const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -8,6 +9,7 @@ export const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -16,6 +18,7 @@ export const LoginPage = () => {
 
     try {
       await login(email, password);
+      navigate('/home'); // Redirect to home page after successful login
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Invalid credentials');
     } finally {
