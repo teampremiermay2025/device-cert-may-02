@@ -1,5 +1,5 @@
 src/assets/*
-src/data/*
+src/data/users.json
 src/lib/*
 src/store/*
 src/supabase/*
@@ -11,9 +11,6 @@ src/components/JiraWorkflowEditor.tsx
 src/components/Sidebar.tsx
 src/App.tsx
 
-src/components/NewCertificationModal.tsx
-src/components/CertificationCard.tsx
-src/components/ViewCertificationMOdal.tsx
 
 src/components/TaskBoard.tsx
 src/components/TaskDetailModal.tsx

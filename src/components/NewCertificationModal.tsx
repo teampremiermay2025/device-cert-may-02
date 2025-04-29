@@ -5,6 +5,7 @@ import { CertificationRequest, CertificationStage, CertificationTask, TaskStatus
 import { storage } from '../lib/storage';
 import { useWorkflowStore } from '../store/workflowStore';
 import { createTasksForStage } from '../lib/workflow';
+import deviceData from '../data/devices.json';
 
 interface NewCertificationModalProps {
   isOpen: boolean;
@@ -25,7 +26,55 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
     assignee: '',
     estimatedCompletionDate: '',
     oemDocuments: [] as File[],
+    forecastedDEDate: '',
+    forecastedFFWDate: '',
+    forecastedTADate: '',
+    forecastedLaunchDate: '',
+    deviceModel: '',
   });
+
+  // Group devices by type
+  const groupedDevices = useMemo(() => {
+    const groups = {
+      'IoT': deviceData.filter(device => device.Type === 'IoT'),
+      'Non-IoT': deviceData.filter(device => device.Type === 'Non-IoT')
+    };
+    return groups;
+  }, []);
+
+  // Handle date synchronization
+  const handleDateChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value,
+      forecastedDEDate: field === 'forecastedDEDate' ? value : prev.forecastedDEDate || value,
+      forecastedFFWDate: field === 'forecastedFFWDate' ? value : prev.forecastedFFWDate || value,
+      forecastedTADate: field === 'forecastedTADate' ? value : prev.forecastedTADate || value,
+      forecastedLaunchDate: field === 'forecastedLaunchDate' ? value : prev.forecastedLaunchDate || value,
+    }));
+  };
+
+  // Handle device selection
+  const handleDeviceSelection = (deviceIssueKey: string) => {
+    const selectedDevice = deviceData.find(device => device['Device Issue Key'] === deviceIssueKey);
+    if (selectedDevice) {
+      setFormData(prev => ({
+        ...prev,
+        deviceModel: deviceIssueKey,
+        // Update other device-related fields
+        vendor: selectedDevice['Device Vendor'],
+        deviceType: selectedDevice['Device Type'],
+        deviceMarketingName: selectedDevice['Device Marketing Name'],
+        deviceCodeName: selectedDevice['Device Code Name'],
+        deviceOS: selectedDevice['Device OS'],
+        deviceOSVersion: selectedDevice['Device OS Version'],
+        deviceHardwareVersion: selectedDevice['Device Hardware Version'],
+        devicePaymentType: selectedDevice['Device Payment Type'],
+        deviceChannel: selectedDevice['Device Channel'],
+      }));
+    }
+  };
+
   const [savedWorkflows, setSavedWorkflows] = useState<any[]>([]);
   const [selectedWorkflow, setSelectedWorkflow] = useState<any>(null);
   const [errorMessage, setErrorMessage] = useState<string>('');
@@ -38,7 +87,6 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
     if (saved) {
       try {
         const workflows = JSON.parse(saved);
-        console.log("Saved Workflows:", workflows);
         if (!Array.isArray(workflows)) {
           throw new Error("jiraWorkflows is not an array");
         }
@@ -61,7 +109,6 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
         const matchedWorkflow = savedWorkflows.find(
           (w) => w.name && w.name.toLowerCase() === formData.projectType.toLowerCase()
         );
-        console.log("Matched Workflow:", matchedWorkflow);
 
         if (matchedWorkflow) {
           if (!matchedWorkflow.id) throw new Error("Matched workflow missing 'id'");
@@ -110,21 +157,17 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
               }),
             tasks: matchedWorkflow.tasks,
           };
-          console.log("Transformed Workflow:", transformedWorkflow);
 
-          // Only update if the transformed workflow is different from the current selectedWorkflow
           if (JSON.stringify(selectedWorkflow) !== JSON.stringify(transformedWorkflow)) {
             setSelectedWorkflow(transformedWorkflow);
           }
 
-          // Only update the store if the transformed workflow is different from the defaultWorkflow
           if (JSON.stringify(memoizedDefaultWorkflow) !== JSON.stringify(transformedWorkflow)) {
             setStoreSelectedWorkflow(transformedWorkflow);
           }
 
           setErrorMessage('');
         } else {
-          // Only update if different
           if (JSON.stringify(selectedWorkflow) !== JSON.stringify(memoizedDefaultWorkflow)) {
             setSelectedWorkflow(memoizedDefaultWorkflow);
           }
@@ -218,6 +261,8 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
       ? transformTasks(forecastStageTasks)
       : createTasksForStage(memoizedDefaultWorkflow.stages.find((stage) => stage.name === 'FORECAST')!);
 
+    const selectedDevice = deviceData.find(device => device['Device Issue Key'] === formData.deviceModel);
+
     const now = new Date().toISOString();
     const newCertification: CertificationRequest = {
       id: crypto.randomUUID(),
@@ -232,26 +277,26 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
       issues: [],
       workflow: selectedWorkflow.id,
       assignee: formData.assignee,
-      vendor: '',
-      deviceType: '',
-      deviceModel: '',
-      deviceMarketingName: '',
-      deviceCodeName: '',
-      deviceOS: '',
-      deviceOSVersion: '',
-      deviceHardwareVersion: '',
-      devicePaymentType: '',
-      deviceChannel: '',
+      vendor: selectedDevice?.['Device Vendor'] || '',
+      deviceType: selectedDevice?.['Device Type'] || '',
+      deviceModel: selectedDevice?.['Device Model'] || '',
+      deviceMarketingName: selectedDevice?.['Device Marketing Name'] || '',
+      deviceCodeName: selectedDevice?.['Device Code Name'] || '',
+      deviceOS: selectedDevice?.['Device OS'] || '',
+      deviceOSVersion: selectedDevice?.['Device OS Version'] || '',
+      deviceHardwareVersion: selectedDevice?.['Device Hardware Version'] || '',
+      devicePaymentType: selectedDevice?.['Device Payment Type'] || '',
+      deviceChannel: selectedDevice?.['Device Channel'] || '',
       securityLevel: '',
       reporter: '',
       primaryPC: '',
       vendorProjectLead: '',
       createdAt: now,
       updatedAt: now,
-      forecastedDEDate: '',
-      forecastedFFWDate: '',
-      forecastedTADate: formData.targetDate,
-      forecastedLaunchDate: formData.estimatedCompletionDate,
+      forecastedDEDate: formData.forecastedDEDate,
+      forecastedFFWDate: formData.forecastedFFWDate,
+      forecastedTADate: formData.forecastedTADate,
+      forecastedLaunchDate: formData.forecastedLaunchDate,
       components: '',
       affectsVersion: formData.softwareVersion,
       resolution: '',
@@ -364,15 +409,73 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-1 after:content-['*'] after:text-red-500">
-                        Target TA Date
+                      <label className="block text-sm font-medium mb-1">
+                        Device Model
+                      </label>
+                      <select
+                        className="w-full border rounded p-2"
+                        value={formData.deviceModel}
+                        onChange={(e) => handleDeviceSelection(e.target.value)}
+                      >
+                        <option value="">Select device model</option>
+                        <optgroup label="IoT Devices">
+                          {groupedDevices['IoT'].map(device => (
+                            <option key={device['Device Issue Key']} value={device['Device Issue Key']}>
+                              {device['Device Model']} - {device['Device Marketing Name']}
+                            </option>
+                          ))}
+                        </optgroup>
+                        <optgroup label="Non-IoT Devices">
+                          {groupedDevices['Non-IoT'].map(device => (
+                            <option key={device['Device Issue Key']} value={device['Device Issue Key']}>
+                              {device['Device Model']} - {device['Device Marketing Name']}
+                            </option>
+                          ))}
+                        </optgroup>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">
+                        Forecasted DE Date
                       </label>
                       <input
                         type="date"
                         className="w-full border rounded p-2"
-                        value={formData.targetDate}
-                        onChange={(e) => setFormData({ ...formData, targetDate: e.target.value })}
-                        required
+                        value={formData.forecastedDEDate}
+                        onChange={(e) => handleDateChange('forecastedDEDate', e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">
+                        Forecasted FFW Date
+                      </label>
+                      <input
+                        type="date"
+                        className="w-full border rounded p-2"
+                        value={formData.forecastedFFWDate}
+                        onChange={(e) => handleDateChange('forecastedFFWDate', e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">
+                        Forecasted TA Date
+                      </label>
+                      <input
+                        type="date"
+                        className="w-full border rounded p-2"
+                        value={formData.forecastedTADate}
+                        onChange={(e) => handleDateChange('forecastedTADate', e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">
+                        Forecasted Launch Date
+                      </label>
+                      <input
+                        type="date"
+                        className="w-full border rounded p-2"
+                        value={formData.forecastedLaunchDate}
+                        onChange={(e) => handleDateChange('forecastedLaunchDate', e.target.value)}
                       />
                     </div>
                     <div>
@@ -408,17 +511,6 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
                         placeholder="Enter assignee name"
                         value={formData.assignee}
                         onChange={(e) => setFormData({ ...formData, assignee: e.target.value })}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-1">
-                        Estimated Completion Date
-                      </label>
-                      <input
-                        type="date"
-                        className="w-full border rounded p-2"
-                        value={formData.estimatedCompletionDate}
-                        onChange={(e) => setFormData({ ...formData, estimatedCompletionDate: e.target.value })}
                       />
                     </div>
                   </div>
@@ -548,8 +640,10 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
                         <p className="font-medium">{selectedWorkflow?.name || 'Default Workflow'}</p>
                       </div>
                       <div>
-                        <p className="text-sm text-gray-600">Target TA Date</p>
-                        <p className="font-medium">{formData.targetDate || 'Not specified'}</p>
+                        <p className="text-sm text-gray-600">Device Model</p>
+                        <p className="font-medium">
+                          {deviceData.find(d => d['Device Issue Key'] === formData.deviceModel)?.['Device Model'] || 'Not specified'}
+                        </p>
                       </div>
                       <div>
                         <p className="text-sm text-gray-600">Software Version</p>
@@ -563,9 +657,27 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
                         <p className="text-sm text-gray-600">Assignee</p>
                         <p className="font-medium">{formData.assignee || 'Not specified'}</p>
                       </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">Forecasted Dates</h3>
+                    <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <p className="text-sm text-gray-600">Estimated Completion</p>
-                        <p className="font-medium">{formData.estimatedCompletionDate || 'Not specified'}</p>
+                        <p className="text-sm text-gray-600">DE Date</p>
+                        <p className="font-medium">{formData.forecastedDEDate || 'Not specified'}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">FFW Date</p>
+                        <p className="font-medium">{formData.forecastedFFWDate || 'Not specified'}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">TA Date</p>
+                        <p className="font-medium">{formData.forecastedTADate || 'Not specified'}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Launch Date</p>
+                        <p className="font-medium">{formData.forecastedLaunchDate || 'Not specified'}</p>
                       </div>
                     </div>
                   </div>

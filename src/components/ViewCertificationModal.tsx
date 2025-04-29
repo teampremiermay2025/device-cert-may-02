@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from 'react';
+import { FC, useState, useCallback } from 'react';
 import { Dialog } from '@headlessui/react';
 import { 
   ClockIcon, 
@@ -14,7 +14,11 @@ import {
   EllipsisHorizontalIcon,
   UserCircleIcon,
   EyeIcon,
-  StarIcon
+  StarIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  DevicePhoneMobileIcon,
+  CalendarIcon,
 } from '@heroicons/react/24/outline';
 import { CertificationRequest, CertificationTask, CertificationStage } from '../types';
 import { TaskBoard } from './TaskBoard';
@@ -40,126 +44,26 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
   const [showTimeTracking, setShowTimeTracking] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [workflow, setWorkflow] = useState<any>(null);
+  
+  // New state for expandable sections
+  const [expandedSections, setExpandedSections] = useState({
+    deviceDetails: false,
+    forecastedDates: false,
+  });
 
-  // Load the associated workflow from jiraWorkflows
-  useEffect(() => {
-    const saved = localStorage.getItem("jiraWorkflows");
-    if (saved) {
-      try {
-        const workflows = JSON.parse(saved);
-        if (!Array.isArray(workflows)) {
-          throw new Error("jiraWorkflows is not an array");
-        }
-        const matchedWorkflow = workflows.find(
-          (w: any) => w.id === certification.workflow
-        );
-        if (matchedWorkflow) {
-          if (!matchedWorkflow.id) throw new Error("Matched workflow missing 'id'");
-          if (!matchedWorkflow.name) throw new Error("Matched workflow missing 'name'");
-          if (!Array.isArray(matchedWorkflow.nodes)) {
-            matchedWorkflow.nodes = [];
-          }
-          if (!Array.isArray(matchedWorkflow.edges)) {
-            matchedWorkflow.edges = [];
-          }
-          if (typeof matchedWorkflow.tasks !== 'object' || matchedWorkflow.tasks === null) {
-            matchedWorkflow.tasks = {};
-          }
-
-          const transformedWorkflow = {
-            id: matchedWorkflow.id,
-            name: matchedWorkflow.name,
-            description: matchedWorkflow.description || '',
-            status: matchedWorkflow.status || 'active',
-            version: matchedWorkflow.version || 1,
-            nodes: matchedWorkflow.nodes,
-            edges: matchedWorkflow.edges,
-            createdAt: matchedWorkflow.createdAt || new Date().toISOString(),
-            updatedAt: matchedWorkflow.updatedAt || new Date().toISOString(),
-            stages: matchedWorkflow.nodes
-              .filter((node: any) => node && node.type === "customNode")
-              .map((node: any) => {
-                const label = node.data?.label || 'FORECAST';
-                const stageTasks = matchedWorkflow.tasks[label];
-                return {
-                  id: node.id || crypto.randomUUID(),
-                  name: label.toUpperCase() as CertificationStage,
-                  tasks: Array.isArray(stageTasks)
-                    ? stageTasks.map((task: any) => ({
-                        id: task?.id || crypto.randomUUID(),
-                        title: task?.title || 'Untitled Task',
-                        type: task?.type || 'task',
-                        description: task?.description || undefined,
-                        required: task?.required !== undefined ? task.required : false,
-                      }))
-                    : [],
-                };
-              }),
-            tasks: matchedWorkflow.tasks,
-          };
-          setWorkflow(transformedWorkflow);
-        } else {
-          // Fallback to a default workflow if none is found
-          setWorkflow({
-            id: 'default-workflow',
-            name: 'Default Workflow',
-            stages: [
-              { id: 'forecast', name: 'FORECAST', tasks: [] },
-              { id: 'in_progress', name: 'IN_PROGRESS', tasks: [] },
-              { id: 'lab_entry', name: 'LAB_ENTRY', tasks: [] },
-              { id: 'testing', name: 'TESTING', tasks: [] },
-              { id: 'approval', name: 'APPROVAL', tasks: [] },
-              { id: 'completed', name: 'COMPLETED', tasks: [] },
-            ],
-            tasks: {},
-          });
-        }
-      } catch (error) {
-        console.error("Error loading workflow:", error);
-        // Fallback to a default workflow
-        setWorkflow({
-          id: 'default-workflow',
-          name: 'Default Workflow',
-          stages: [
-            { id: 'forecast', name: 'FORECAST', tasks: [] },
-            { id: 'in_progress', name: 'IN_PROGRESS', tasks: [] },
-            { id: 'lab_entry', name: 'LAB_ENTRY', tasks: [] },
-            { id: 'testing', name: 'TESTING', tasks: [] },
-            { id: 'approval', name: 'APPROVAL', tasks: [] },
-            { id: 'completed', name: 'COMPLETED', tasks: [] },
-          ],
-          tasks: {},
-        });
-      }
-    }
-  }, [certification.workflow]);
+  const toggleSection = (section: keyof typeof expandedSections) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
 
   const handleTaskSelect = (task: CertificationTask) => {
     setSelectedTask(task);
     setEditedTask(task);
   };
 
-  const transformTasks = (jiraTasks: any[], stage: CertificationStage): CertificationTask[] => {
-    if (!Array.isArray(jiraTasks)) return [];
-    return jiraTasks.map((task) => ({
-      id: task?.id || crypto.randomUUID(),
-      name: task?.title || 'Untitled Task',
-      description: task?.description || undefined,
-      status: 'TODO' as TaskStatus,
-      isChecked: false,
-      assignee: certification.assignee || undefined,
-      priority: task?.priority || 'MEDIUM' as TaskPriority,
-      dueDate: certification.targetDate || undefined,
-      attachments: task?.attachments || [],
-      comments: task?.comments || [],
-      timeSpent: task?.timeSpent || undefined,
-      labels: task?.labels || [],
-      stage,
-    }));
-  };
-
   const handleTaskUpdate = (updatedTask?: CertificationTask) => {
-    // Use updatedTask if provided (e.g., from TaskBoard), otherwise use editedTask
     const taskToUpdate = updatedTask || editedTask;
     if (!taskToUpdate) return;
 
@@ -173,29 +77,24 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
       lastUpdated: new Date().toISOString(),
     };
 
-    // Check if all tasks in the current stage are "Done"
     const currentStageTasks = updatedCertification.tasks.filter(
       task => task.stage === certification.status
     );
     const allTasksDone = currentStageTasks.every(task => task.status === 'DONE');
 
     if (allTasksDone && workflow) {
-      // Determine the current stage index and the next stage
       const stageOrder = workflow.stages.map((stage: any) => stage.name);
       const currentStageIndex = stageOrder.indexOf(certification.status);
       const nextStageIndex = currentStageIndex + 1;
 
       if (nextStageIndex < stageOrder.length) {
         const nextStage = stageOrder[nextStageIndex] as CertificationStage;
-
-        // Load tasks for the next stage from the workflow
         const nextStageKey = Object.keys(workflow.tasks || {}).find(
           (key) => key.toLowerCase() === nextStage.toLowerCase()
         );
         const nextStageTasks = nextStageKey ? workflow.tasks[nextStageKey] : [];
         const newTasks = transformTasks(nextStageTasks, nextStage);
 
-        // Update the certification with the new status and tasks
         updatedCertification = {
           ...updatedCertification,
           status: nextStage,
@@ -235,10 +134,9 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
   const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
   const timeSpent = certification.tasks.reduce((total, task) => total + (task.timeSpent || 0), 0);
-  const estimatedTime = 480; // 8 hours in minutes (example)
+  const estimatedTime = 480;
   const remainingTime = Math.max(0, estimatedTime - timeSpent);
 
-  // Filter tasks to only show those matching the current certification.status
   const currentStageTasks = certification.tasks.filter(
     task => task.stage === certification.status
   );
@@ -252,7 +150,6 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
       <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
       <div className="fixed inset-0 flex items-center justify-center p-4">
         <Dialog.Panel className="w-full max-w-6xl bg-white rounded-lg h-[90vh] flex flex-col">
-          {/* Header */}
           <div className="p-4 border-b flex-shrink-0">
             <div className="flex justify-between items-start">
               {selectedTask ? (
@@ -304,11 +201,255 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
             </div>
           </div>
 
-          {/* Content */}
-          {selectedTask && editedTask ? (
+          {!selectedTask && (
+            <div className="flex-1 overflow-hidden flex flex-col min-h-0">
+              <div className="bg-gray-50 border-b flex-shrink-0">
+                <div className="max-w-7xl mx-auto p-4">
+                  <div className="space-y-4">
+                    <div className="bg-white rounded-lg border p-4">
+                      <h3 className="text-lg font-semibold mb-4">Basic Details</h3>
+                      <div className="grid grid-cols-3 gap-4">
+                        <div>
+                          <p className="text-sm font-medium text-gray-500">DARP Key</p>
+                          <p className="mt-1">{certification.darpKey}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-500">Project Name</p>
+                          <p className="mt-1">{certification.projectName}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-500">Type</p>
+                          <p className="mt-1">{certification.type}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-white rounded-lg border">
+                      <button
+                        className="w-full p-4 flex justify-between items-center"
+                        onClick={() => toggleSection('deviceDetails')}
+                      >
+                        <div className="flex items-center">
+                          <DevicePhoneMobileIcon className="w-5 h-5 mr-2 text-gray-500" />
+                          <h3 className="text-lg font-semibold">Device Details</h3>
+                        </div>
+                        {expandedSections.deviceDetails ? (
+                          <ChevronUpIcon className="w-5 h-5 text-gray-500" />
+                        ) : (
+                          <ChevronDownIcon className="w-5 h-5 text-gray-500" />
+                        )}
+                      </button>
+                      {expandedSections.deviceDetails && (
+                        <div className="px-4 pb-4">
+                          <div className="grid grid-cols-3 gap-4">
+                            <div>
+                              <p className="text-sm font-medium text-gray-500">Vendor</p>
+                              <p className="mt-1">{certification.vendor}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium text-gray-500">Device Type</p>
+                              <p className="mt-1">{certification.deviceType}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium text-gray-500">Model</p>
+                              <p className="mt-1">{certification.deviceModel}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium text-gray-500">Marketing Name</p>
+                              <p className="mt-1">{certification.deviceMarketingName}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium text-gray-500">Code Name</p>
+                              <p className="mt-1">{certification.deviceCodeName}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium text-gray-500">OS</p>
+                              <p className="mt-1">{certification.deviceOS} {certification.deviceOSVersion}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium text-gray-500">Hardware Version</p>
+                              <p className="mt-1">{certification.deviceHardwareVersion}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium text-gray-500">Payment Type</p>
+                              <p className="mt-1">{certification.devicePaymentType}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium text-gray-500">Channel</p>
+                              <p className="mt-1">{certification.deviceChannel}</p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="bg-white rounded-lg border">
+                      <button
+                        className="w-full p-4 flex justify-between items-center"
+                        onClick={() => toggleSection('forecastedDates')}
+                      >
+                        <div className="flex items-center">
+                          <CalendarIcon className="w-5 h-5 mr-2 text-gray-500" />
+                          <h3 className="text-lg font-semibold">Forecasted Dates</h3>
+                        </div>
+                        {expandedSections.forecastedDates ? (
+                          <ChevronUpIcon className="w-5 h-5 text-gray-500" />
+                        ) : (
+                          <ChevronDownIcon className="w-5 h-5 text-gray-500" />
+                        )}
+                      </button>
+                      {expandedSections.forecastedDates && (
+                        <div className="px-4 pb-4">
+                          <div className="grid grid-cols-4 gap-4">
+                            <div>
+                              <p className="text-sm font-medium text-gray-500">Device Entry (DE) Date</p>
+                              <p className="mt-1">{certification.forecastedDEDate || 'Not specified'}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium text-gray-500">FFW Date</p>
+                              <p className="mt-1">{certification.forecastedFFWDate || 'Not specified'}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium text-gray-500">TA Date</p>
+                              <p className="mt-1">{certification.forecastedTADate || 'Not specified'}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium text-gray-500">Launch Date</p>
+                              <p className="mt-1">{certification.forecastedLaunchDate || 'Not specified'}</p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {certification.issues.length > 0 && (
+                <div className="border-b flex-shrink-0">
+                  <div className="max-w-7xl mx-auto p-4">
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                      <div className="flex items-center mb-2">
+                        <ExclamationTriangleIcon className="w-5 h-5 text-yellow-600 mr-2" />
+                        <h3 className="font-semibold text-yellow-900">
+                          {certification.issues.length} issues require your attention
+                        </h3>
+                      </div>
+                      <div className="space-y-2">
+                        {certification.issues.map((issue, index) => (
+                          <div key={index} className="flex items-start">
+                            <div className="flex-shrink-0 mt-1">
+                              {issue.type === 'warning' && (
+                                <ExclamationTriangleIcon className="w-4 h-4 text-yellow-600" />
+                              )}
+                              {issue.type === 'error' && (
+                                <XCircleIcon className="w-4 h-4 text-red-600" />
+                              )}
+                              {issue.type === 'info' && (
+                                <CheckCircleIcon className="w-4 h-4 text-blue-600" />
+                              )}
+                            </div>
+                            <div className="ml-2">
+                              <p className="text-sm font-medium">{issue.title}</p>
+                              <p className="text-sm text-gray-600">{issue.description}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex-1 min-h-0 flex flex-col">
+                <div className="p-4 border-b bg-white flex-shrink-0">
+                  <div className="flex justify-between items-center">
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setView('list')}
+                        className={`px-3 py-1 rounded ${
+                          view === 'list' 
+                            ? 'bg-blue-100 text-blue-700' 
+                            : 'bg-gray-100 hover:bg-gray-200'
+                        }`}
+                      >
+                        List
+                      </button>
+                      <button
+                        onClick={() => setView('board')}
+                        className={`px-3 py-1 rounded ${
+                          view === 'board' 
+                            ? 'bg-blue-100 text-blue-700' 
+                            : 'bg-gray-100 hover:bg-gray-200'
+                        }`}
+                      >
+                        Board
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex-1 overflow-auto">
+                  {view === 'board' ? (
+                    <TaskBoard
+                      tasks={currentStageTasks}
+                      onTaskUpdate={handleTaskUpdate}
+                      onTaskClick={handleTaskSelect}
+                    />
+                  ) : (
+                    <div className="max-w-7xl mx-auto p-4">
+                      <div className="bg-white rounded-lg border">
+                        {certification.tasks.map((task) => (
+                          <div
+                            key={task.id}
+                            className="p-4 border-b last:border-b-0 hover:bg-gray-50 cursor-pointer"
+                            onClick={() => handleTaskSelect(task)}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                <input
+                                  type="checkbox"
+                                  checked={task.status === 'DONE'}
+                                  className="rounded border-gray-300"
+                                  onChange={(e) => {
+                                    const updatedTask = {
+                                      ...task,
+                                      status: e.target.checked ? 'DONE' : 'TODO'
+                                    };
+                                    setEditedTask(updatedTask);
+                                    handleTaskUpdate(updatedTask);
+                                  }}
+                                  onClick={(e) => e.stopPropagation()}
+                                />
+                                <div>
+                                  <h4 className="font-medium">{task.name}</h4>
+                                  {task.description && (
+                                    <p className="text-sm text-gray-600 mt-1">
+                                      {task.description}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <span className={`px-2 py-1 rounded-full text-xs ${getStageColor(task.stage)}`}>
+                                  {task.stage}
+                                </span>
+                                <ChevronRightIcon className="w-4 h-4 text-gray-400" />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {selectedTask && editedTask && (
             <div className="flex-1 overflow-auto">
               <div className="flex">
-                {/* Main content */}
                 <div className="flex-1 p-6 border-r">
                   <div className="mb-6">
                     <h3 className="text-lg font-semibold mb-2">Description</h3>
@@ -320,7 +461,6 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
                     />
                   </div>
 
-                  {/* Comments */}
                   <div>
                     <h3 className="text-lg font-semibold mb-2">Comments</h3>
                     <div className="mb-4">
@@ -358,10 +498,8 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
                   </div>
                 </div>
 
-                {/* Sidebar */}
                 <div className="w-80 p-6">
                   <div className="space-y-6">
-                    {/* Status */}
                     <div>
                       <h3 className="text-sm font-medium text-gray-500 mb-2">
                         Status
@@ -383,7 +521,6 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
                       </div>
                     </div>
 
-                    {/* Priority */}
                     <div>
                       <h3 className="text-sm font-medium text-gray-500 mb-2">
                         Priority
@@ -405,7 +542,6 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
                       </div>
                     </div>
 
-                    {/* Assignee */}
                     <div>
                       <h3 className="text-sm font-medium text-gray-500 mb-2">
                         Assignee
@@ -419,7 +555,6 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
                       />
                     </div>
 
-                    {/* Due Date */}
                     <div>
                       <h3 className="text-sm font-medium text-gray-500 mb-2">
                         Due Date
@@ -432,7 +567,6 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
                       />
                     </div>
 
-                    {/* Labels */}
                     <div>
                       <h3 className="text-sm font-medium text-gray-500 mb-2">
                         Labels
@@ -452,7 +586,6 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
                 </div>
               </div>
 
-              {/* Footer */}
               <div className="border-t bg-gray-50 p-4 flex justify-end space-x-3">
                 <button
                   onClick={() => {
@@ -471,261 +604,11 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
                 </button>
               </div>
             </div>
-          ) : (
-            <div className="flex-1 overflow-hidden flex flex-col min-h-0">
-              {/* Details Section */}
-              <div className="bg-gray-50 border-b flex-shrink-0">
-                <div className="max-w-7xl mx-auto p-4">
-                  <div className="grid grid-cols-3 gap-4">
-                    {/* Left Column - People */}
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-500 mb-2">People</h3>
-                      <div className="bg-white rounded-lg border p-4 space-y-3">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <UserCircleIcon className="w-6 h-6 text-gray-400" />
-                            <div>
-                              <p className="text-sm font-medium">Assignee</p>
-                              <p className="text-sm text-gray-500">{certification.assignee}</p>
-                            </div>
-                          </div>
-                          <button className="text-blue-600 hover:text-blue-700 text-sm">
-                            Assign
-                          </button>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <UserCircleIcon className="w-6 h-6 text-gray-400" />
-                            <div>
-                              <p className="text-sm font-medium">Reporter</p>
-                              <p className="text-sm text-gray-500">{certification.reporter}</p>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <EyeIcon className="w-6 h-6 text-gray-400" />
-                            <div>
-                              <p className="text-sm font-medium">Watchers</p>
-                              <p className="text-sm text-gray-500">3 watchers</p>
-                            </div>
-                          </div>
-                          <button className="text-blue-600 hover:text-blue-700 text-sm">
-                            Watch
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Middle Column - Dates */}
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-500 mb-2">Dates</h3>
-                      <div className="bg-white rounded-lg border p-4 space-y-3">
-                        <div>
-                          <p className="text-sm font-medium">Created</p>
-                          <p className="text-sm text-gray-500">
-                            {new Date(certification.lastUpdated).toLocaleString()}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium">Updated</p>
-                          <p className="text-sm text-gray-500">
-                            {new Date(certification.lastUpdated).toLocaleString()}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium">Target Date</p>
-                          <p className="text-sm text-gray-500">
-                            {new Date(certification.targetDate).toLocaleDateString()}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Right Column - Time Tracking */}
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-500 mb-2">Time Tracking</h3>
-                      <div className="bg-white rounded-lg border p-4">
-                        <div 
-                          className="cursor-pointer"
-                          onClick={() => setShowTimeTracking(!showTimeTracking)}
-                        >
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-medium">Time Spent</span>
-                            <span className="text-sm text-gray-500">
-                              {Math.floor(timeSpent / 60)}h {timeSpent % 60}m
-                            </span>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div 
-                              className="bg-blue-600 h-2 rounded-full" 
-                              style={{ width: `${(timeSpent / estimatedTime) * 100}%` }}
-                            />
-                          </div>
-                          <div className="flex items-center justify-between mt-2">
-                            <span className="text-sm font-medium">Remaining</span>
-                            <span className="text-sm text-gray-500">
-                              {Math.floor(remainingTime / 60)}h {remainingTime % 60}m
-                            </span>
-                          </div>
-                        </div>
-
-                        {showTimeTracking && (
-                          <div className="mt-4 pt-4 border-t">
-                            <button className="w-full px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                              Log Time
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Progress Bar */}
-                  <div className="mt-4 bg-white rounded-lg border p-4">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-medium text-gray-700">Overall Progress</span>
-                      <span className="text-sm text-gray-500">{progress}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div 
-                        className="bg-blue-600 h-2 rounded-full" 
-                        style={{ width: `${progress}%` }}
-                      />
-                    </div>
-                    <div className="mt-2 flex items-center justify-between text-sm text-gray-500">
-                      <span>{completedTasks} of {totalTasks} tasks completed</span>
-                      <span>Last updated: {new Date(certification.lastUpdated).toLocaleString()}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Issues Section */}
-              {certification.issues.length > 0 && (
-                <div className="border-b flex-shrink-0">
-                  <div className="max-w-7xl mx-auto p-4">
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                      <div className="flex items-center mb-2">
-                        <ExclamationTriangleIcon className="w-5 h-5 text-yellow-600 mr-2" />
-                        <h3 className="font-semibold text-yellow-900">
-                          {certification.issues.length} issues require your attention
-                        </h3>
-                      </div>
-                      <div className="space-y-2">
-                        {certification.issues.map((issue, index) => (
-                          <div key={index} className="flex items-start">
-                            <div className="flex-shrink-0 mt-1">
-                              {issue.type === 'warning' && (
-                                <ExclamationTriangleIcon className="w-4 h-4 text-yellow-600" />
-                              )}
-                              {issue.type === 'error' && (
-                                <XCircleIcon className="w-4 h-4 text-red-600" />
-                              )}
-                              {issue.type === 'info' && (
-                                <CheckCircleIcon className="w-4 h-4 text-blue-600" />
-                              )}
-                            </div>
-                            <div className="ml-2">
-                              <p className="text-sm font-medium">{issue.title}</p>
-                              <p className="text-sm text-gray-600">{issue.description}</p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Tasks Section */}
-              <div className="flex-1 min-h-0 flex flex-col">
-                <div className="p-4 border-b bg-white flex-shrink-0">
-                  <div className="flex justify-between items-center">
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => setView('list')}
-                        className={`px-3 py-1 rounded ${
-                          view === 'list' 
-                            ? 'bg-blue-100 text-blue-700' 
-                            : 'bg-gray-100 hover:bg-gray-200'
-                        }`}
-                      >
-                        List
-                      </button>
-                      <button
-                        onClick={() => setView('board')}
-                        className={`px-3 py-1 rounded ${
-                          view === 'board' 
-                            ? 'bg-blue-100 text-blue-700' 
-                            : 'bg-gray-100 hover:bg-gray-200'
-                        }`}
-                      >
-                        Board
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="flex-1 overflow-auto">
-                  {view === 'board' ? (
-                    <TaskBoard
-                      tasks={currentStageTasks}
-                      onTaskUpdate={handleTaskUpdate} // Pass the updated handleTaskUpdate
-                      onTaskClick={handleTaskSelect}
-                    />
-                  ) : (
-                    <div className="max-w-7xl mx-auto p-4">
-                      <div className="bg-white rounded-lg border">
-                        {certification.tasks.map((task) => (
-                          <div
-                            key={task.id}
-                            className="p-4 border-b last:border-b-0 hover:bg-gray-50 cursor-pointer"
-                            onClick={() => handleTaskSelect(task)}
-                          >
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-3">
-                                <input
-                                  type="checkbox"
-                                  checked={task.status === 'DONE'}
-                                  className="rounded border-gray-300"
-                                  onChange={(e) => {
-                                    const updatedTask = {
-                                      ...task,
-                                      status: e.target.checked ? 'DONE' : 'TODO'
-                                    };
-                                    setEditedTask(updatedTask);
-                                    HANDLEtaskUpdate(updatedTask);
-                                  }}
-                                  onClick={(e) => e.stopPropagation()}
-                                />
-                                <div>
-                                  <h4 className="font-medium">{task.name}</h4>
-                                  {task.description && (
-                                    <p className="text-sm text-gray-600 mt-1">
-                                      {task.description}
-                                    </p>
-                                  )}
-                                </div>
-                              </div>
-                              <div className="flex items-center gap-3">
-                                <span className={`px-2 py-1 rounded-full text-xs ${getStageColor(task.stage)}`}>
-                                  {task.stage}
-                                </span>
-                                <ChevronRightIcon className="w-4 h-4 text-gray-400" />
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
           )}
         </Dialog.Panel>
       </div>
     </Dialog>
   );
 };
+
+export { ViewCertificationModal }
