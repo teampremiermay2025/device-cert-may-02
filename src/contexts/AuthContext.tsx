@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import userData from '../data/users.json';
 
 interface User {
   id: string;
@@ -49,9 +48,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setLoading(false);
   }, []);
 
+  const getAllUsers = () => JSON.parse(localStorage.getItem('users') || '[]');
+
   const login = async (email: string, password: string) => {
     // For demo purposes, accept any user from users.json with a simple password check
-    const foundUser = userData.users.find(u => u.email === email);
+    const foundUser = getAllUsers().find(u => u.email === email);
     
     if (foundUser && password === 'password123') { // In a real app, use proper password hashing
       setUser(foundUser);

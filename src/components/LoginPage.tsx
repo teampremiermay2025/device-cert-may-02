@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import userData from '../data/users.json';
 import { useNavigate } from 'react-router-dom';
+
+const users = JSON.parse(localStorage.getItem('users') || '[]');
 
 export const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -39,9 +40,9 @@ export const LoginPage = () => {
           Available test accounts:
         </p>
         <div className="mt-2 text-center text-sm text-gray-500">
-          {userData.users.map(user => (
+          {users.map(user => (
             <div key={user.id}>
-              {user.email} ({userData.roles[user.role as keyof typeof userData.roles].name})
+              {user.email} ({user.role})
             </div>
           ))}
           <div className="mt-1">Password for all accounts: password123</div>

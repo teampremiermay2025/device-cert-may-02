@@ -18,6 +18,10 @@ import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 import { TasksPage } from './components/TasksPage';
 import { LearnPage } from './components/LearnPage';
+import { initializeLocalStorage } from './localStorageInit';
+
+// Initialize localStorage with seed data if not already present
+initializeLocalStorage();
 
 // Wrap the main app content in a component to use hooks
 const AppContent = () => {

@@ -53,6 +53,19 @@
         "canAccessReports": true,
         "canManageTeams": false
       }
+    },
+    {
+      "id": "5",
+      "name": "John Doe",
+      "role": "OEM_MEMBER",
+      "email": "john.doe@example.com",
+      "avatar": "https://images.pexels.com/photos/2269872/pexels-photo-2269872.jpeg",
+      "permissions": {
+        "canManageWorkflows": false,
+        "canApproveReleases": false,
+        "canAccessReports": true,
+        "canManageTeams": false
+      }
     }
   ],
   "roles": {
