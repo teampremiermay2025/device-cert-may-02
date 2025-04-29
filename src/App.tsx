@@ -55,18 +55,8 @@ const AppContent = () => {
               <p className="text-gray-600 mt-2">AI-powered updates feed coming soon...</p>
             </div>
           } />
-          <Route path="/releases" element={
-            <div className="p-8">
-              <h1 className="text-2xl font-bold">Releases</h1>
-              <p className="text-gray-600 mt-2">Release management coming soon...</p>
-            </div>
-          } />
-          <Route path="/my-tasks" element={
-            <div className="p-8">
-              <h1 className="text-2xl font-bold">My Tasks</h1>
-              <p className="text-gray-600 mt-2">Personal task management coming soon...</p>
-            </div>
-          } />
+          <Route path="/releases"element={<Dashboard onNewCertification={handleNewCertification} />} />
+       
           <Route path="/tasks" element={<TasksPage />} />
           <Route path="/teams" element={
             <ProtectedRoute requiredPermission="canManageTeams">

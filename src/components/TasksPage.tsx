@@ -33,12 +33,45 @@ export const TasksPage = () => {
   });
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
   const [showFilters, setShowFilters] = useState(false);
+  const [quickFilter, setQuickFilter] = useState<'ALL' | 'MY_TASKS' | 'DUE_NOW' | 'DUE_SOON' | 'UPCOMING'>('ALL');
 
   // Get all tasks from all certifications
   const allTasks = useMemo(() => {
     const certifications = storage.getCertifications();
     return certifications.flatMap(cert => cert.tasks);
   }, []);
+
+  // Helper for quick filtering by due date and assignee
+  const quickFilterTasks = (tasks: CertificationTask[]) => {
+    if (quickFilter === 'ALL') return tasks;
+    if (quickFilter === 'MY_TASKS') {
+      return tasks.filter(task => task.assignee === user?.name);
+    }
+    const now = new Date();
+    const startOfToday = new Date(now);
+    startOfToday.setHours(0, 0, 0, 0);
+    const endOfToday = new Date(now);
+    endOfToday.setHours(23, 59, 59, 999);
+    const soonThreshold = new Date(now);
+    soonThreshold.setDate(now.getDate() + 3);
+    soonThreshold.setHours(23, 59, 59, 999);
+    
+    return tasks.filter(task => {
+      if (!task.dueDate) return false;
+      const due = new Date(task.dueDate);
+      if (quickFilter === 'DUE_NOW') {
+        // Due today or overdue and not done
+        return due <= endOfToday && task.status !== 'DONE';
+      } else if (quickFilter === 'DUE_SOON') {
+        // Due in next 3 days (excluding today)
+        return due > endOfToday && due <= soonThreshold && task.status !== 'DONE';
+      } else if (quickFilter === 'UPCOMING') {
+        // Due after 3 days
+        return due > soonThreshold && task.status !== 'DONE';
+      }
+      return true;
+    });
+  };
 
   // Filter and sort tasks
   const filteredTasks = useMemo(() => {
@@ -69,6 +102,9 @@ export const TasksPage = () => {
       );
     }
 
+    // Apply quick filter
+    tasks = quickFilterTasks(tasks);
+
     // Apply sorting
     if (sortConfig) {
       tasks.sort((a, b) => {
@@ -85,7 +121,7 @@ export const TasksPage = () => {
     }
 
     return tasks;
-  }, [allTasks, searchTerm, filters, sortConfig, user?.name]);
+  }, [allTasks, searchTerm, filters, sortConfig, user?.name, quickFilter]);
 
   const handleSort = (key: string) => {
     setSortConfig(current => ({
@@ -133,6 +169,30 @@ export const TasksPage = () => {
 
       {/* Search and Filters */}
       <div className="mb-6">
+        {/* Quick Filters */}
+        <div className="flex gap-2 mb-2">
+          <button
+            className={`px-3 py-1 rounded-full border text-xs font-medium ${quickFilter === 'ALL' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'}`}
+            onClick={() => setQuickFilter('ALL')}
+          >All</button>
+          <button
+            className={`px-3 py-1 rounded-full border text-xs font-medium ${quickFilter === 'MY_TASKS' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'}`}
+            onClick={() => setQuickFilter('MY_TASKS')}
+          >My Tasks</button>
+          <button
+            className={`px-3 py-1 rounded-full border text-xs font-medium ${quickFilter === 'DUE_NOW' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'}`}
+            onClick={() => setQuickFilter('DUE_NOW')}
+          >Due Now</button>
+          <button
+            className={`px-3 py-1 rounded-full border text-xs font-medium ${quickFilter === 'DUE_SOON' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'}`}
+            onClick={() => setQuickFilter('DUE_SOON')}
+          >Due Soon</button>
+          <button
+            className={`px-3 py-1 rounded-full border text-xs font-medium ${quickFilter === 'UPCOMING' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'}`}
+            onClick={() => setQuickFilter('UPCOMING')}
+          >Upcoming</button>
+        </div>
+
         <div className="flex gap-4 mb-4">
           <div className="flex-1 relative">
             <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
