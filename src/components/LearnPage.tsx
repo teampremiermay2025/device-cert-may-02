@@ -58,24 +58,21 @@ export const LearnPage = () => {
         {/* Floating Tags Background */}
         <div className="absolute inset-0 z-0">
           <div className="absolute left-[15%] top-40 animate-float-diagonal-right duration-2000">
-            <div className="w-8 h-8 border-2 border-dotted border-[#1E3A8A]/50 rounded mb-2" />
-            <div className="w-5 h-5 transform rotate-90 mx-auto mb-2 text-[#1E3A8A]">↑</div>
+          
             <div className="px-4 py-2.5 bg-gradient-to-r from-[#1E3A8A]/20 to-[#182D60]/20 backdrop-blur rounded-full flex items-center gap-2 shadow-sm">
               <span className="w-2 h-2 bg-[#1E3A8A] rounded-full" />
               Configurable Workflows
             </div>
           </div>
           <div className="absolute right-[15%] top-40 animate-float-diagonal-left duration-2000">
-            <div className="w-10 h-5 border-2 border-dotted border-[#1E3A8A]/50 rounded mb-2" />
-            <div className="w-5 h-5 transform rotate-90 mx-auto mb-2 text-[#1E3A8A]">↑</div>
+            
             <div className="px-4 py-2.5 bg-gradient-to-r from-[#1E3A8A]/20 to-[#182D60]/20 backdrop-blur rounded-full flex items-center gap-2 shadow-sm">
               <span className="w-2 h-2 bg-[#1E3A8A] rounded-full" />
               Dashboards
             </div>
           </div>
           <div className="absolute left-[15%] top-[400px] animate-float-diagonal-right-up duration-2000">
-            <div className="w-5 h-10 border-2 border-dotted border-[#1E3A8A]/50 rounded mb-2" />
-            <div className="w-5 h-5 transform rotate-90 mx-auto mb-2 text-[#1E3A8A]">↑</div>
+           
             <div className="px-4 py-2.5 bg-gradient-to-r from-[#1E3A8A]/20 to-[#182D60]/20 backdrop-blur rounded-full flex items-center gap-2 shadow-sm">
               <span className="w-2 h-2 bg-[#1E3A8A] rounded-full" />
               Real-time Insights
@@ -153,7 +150,7 @@ export const LearnPage = () => {
       <div className="py-16 sm:py-20 bg-gradient-to-br from-[#F5F7FA] to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl sm:text-4xl font-bold text-center text-[#1E3A8A] mb-12">
-            Trusted by Leading OEMs
+          Works with all OEMs
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-8">
             {oems.map((oem, index) => (
