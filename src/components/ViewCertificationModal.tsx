@@ -1,12 +1,9 @@
-import { FC, useState } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { Dialog } from '@headlessui/react';
 import { 
   ClockIcon, 
   ExclamationTriangleIcon,
   ChevronRightIcon,
-  CalendarIcon,
-  TagIcon,
-  CodeBracketIcon,
   UserIcon,
   CheckCircleIcon,
   XCircleIcon,
@@ -19,7 +16,7 @@ import {
   EyeIcon,
   StarIcon
 } from '@heroicons/react/24/outline';
-import { CertificationRequest, CertificationTask } from '../types';
+import { CertificationRequest, CertificationTask, CertificationStage } from '../types';
 import { TaskBoard } from './TaskBoard';
 import { getStageColor } from '../lib/workflow';
 import { storage } from '../lib/storage';
@@ -42,24 +39,173 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
   const [view, setView] = useState<'list' | 'board'>('board');
   const [showTimeTracking, setShowTimeTracking] = useState(false);
   const [newComment, setNewComment] = useState('');
+  const [workflow, setWorkflow] = useState<any>(null);
+
+  // Load the associated workflow from jiraWorkflows
+  useEffect(() => {
+    const saved = localStorage.getItem("jiraWorkflows");
+    if (saved) {
+      try {
+        const workflows = JSON.parse(saved);
+        if (!Array.isArray(workflows)) {
+          throw new Error("jiraWorkflows is not an array");
+        }
+        const matchedWorkflow = workflows.find(
+          (w: any) => w.id === certification.workflow
+        );
+        if (matchedWorkflow) {
+          if (!matchedWorkflow.id) throw new Error("Matched workflow missing 'id'");
+          if (!matchedWorkflow.name) throw new Error("Matched workflow missing 'name'");
+          if (!Array.isArray(matchedWorkflow.nodes)) {
+            matchedWorkflow.nodes = [];
+          }
+          if (!Array.isArray(matchedWorkflow.edges)) {
+            matchedWorkflow.edges = [];
+          }
+          if (typeof matchedWorkflow.tasks !== 'object' || matchedWorkflow.tasks === null) {
+            matchedWorkflow.tasks = {};
+          }
+
+          const transformedWorkflow = {
+            id: matchedWorkflow.id,
+            name: matchedWorkflow.name,
+            description: matchedWorkflow.description || '',
+            status: matchedWorkflow.status || 'active',
+            version: matchedWorkflow.version || 1,
+            nodes: matchedWorkflow.nodes,
+            edges: matchedWorkflow.edges,
+            createdAt: matchedWorkflow.createdAt || new Date().toISOString(),
+            updatedAt: matchedWorkflow.updatedAt || new Date().toISOString(),
+            stages: matchedWorkflow.nodes
+              .filter((node: any) => node && node.type === "customNode")
+              .map((node: any) => {
+                const label = node.data?.label || 'FORECAST';
+                const stageTasks = matchedWorkflow.tasks[label];
+                return {
+                  id: node.id || crypto.randomUUID(),
+                  name: label.toUpperCase() as CertificationStage,
+                  tasks: Array.isArray(stageTasks)
+                    ? stageTasks.map((task: any) => ({
+                        id: task?.id || crypto.randomUUID(),
+                        title: task?.title || 'Untitled Task',
+                        type: task?.type || 'task',
+                        description: task?.description || undefined,
+                        required: task?.required !== undefined ? task.required : false,
+                      }))
+                    : [],
+                };
+              }),
+            tasks: matchedWorkflow.tasks,
+          };
+          setWorkflow(transformedWorkflow);
+        } else {
+          // Fallback to a default workflow if none is found
+          setWorkflow({
+            id: 'default-workflow',
+            name: 'Default Workflow',
+            stages: [
+              { id: 'forecast', name: 'FORECAST', tasks: [] },
+              { id: 'in_progress', name: 'IN_PROGRESS', tasks: [] },
+              { id: 'lab_entry', name: 'LAB_ENTRY', tasks: [] },
+              { id: 'testing', name: 'TESTING', tasks: [] },
+              { id: 'approval', name: 'APPROVAL', tasks: [] },
+              { id: 'completed', name: 'COMPLETED', tasks: [] },
+            ],
+            tasks: {},
+          });
+        }
+      } catch (error) {
+        console.error("Error loading workflow:", error);
+        // Fallback to a default workflow
+        setWorkflow({
+          id: 'default-workflow',
+          name: 'Default Workflow',
+          stages: [
+            { id: 'forecast', name: 'FORECAST', tasks: [] },
+            { id: 'in_progress', name: 'IN_PROGRESS', tasks: [] },
+            { id: 'lab_entry', name: 'LAB_ENTRY', tasks: [] },
+            { id: 'testing', name: 'TESTING', tasks: [] },
+            { id: 'approval', name: 'APPROVAL', tasks: [] },
+            { id: 'completed', name: 'COMPLETED', tasks: [] },
+          ],
+          tasks: {},
+        });
+      }
+    }
+  }, [certification.workflow]);
 
   const handleTaskSelect = (task: CertificationTask) => {
     setSelectedTask(task);
     setEditedTask(task);
   };
 
-  const handleTaskUpdate = () => {
-    if (!editedTask) return;
+  const transformTasks = (jiraTasks: any[], stage: CertificationStage): CertificationTask[] => {
+    if (!Array.isArray(jiraTasks)) return [];
+    return jiraTasks.map((task) => ({
+      id: task?.id || crypto.randomUUID(),
+      name: task?.title || 'Untitled Task',
+      description: task?.description || undefined,
+      status: 'TODO' as TaskStatus,
+      isChecked: false,
+      assignee: certification.assignee || undefined,
+      priority: task?.priority || 'MEDIUM' as TaskPriority,
+      dueDate: certification.targetDate || undefined,
+      attachments: task?.attachments || [],
+      comments: task?.comments || [],
+      timeSpent: task?.timeSpent || undefined,
+      labels: task?.labels || [],
+      stage,
+    }));
+  };
+
+  const handleTaskUpdate = (updatedTask?: CertificationTask) => {
+    // Use updatedTask if provided (e.g., from TaskBoard), otherwise use editedTask
+    const taskToUpdate = updatedTask || editedTask;
+    if (!taskToUpdate) return;
 
     const updatedTasks = certification.tasks.map(task =>
-      task.id === editedTask.id ? editedTask : task
+      task.id === taskToUpdate.id ? taskToUpdate : task
     );
 
-    const updatedCertification = {
+    let updatedCertification = {
       ...certification,
       tasks: updatedTasks,
       lastUpdated: new Date().toISOString(),
     };
+
+    // Check if all tasks in the current stage are "Done"
+    const currentStageTasks = updatedCertification.tasks.filter(
+      task => task.stage === certification.status
+    );
+    const allTasksDone = currentStageTasks.every(task => task.status === 'DONE');
+
+    if (allTasksDone && workflow) {
+      // Determine the current stage index and the next stage
+      const stageOrder = workflow.stages.map((stage: any) => stage.name);
+      const currentStageIndex = stageOrder.indexOf(certification.status);
+      const nextStageIndex = currentStageIndex + 1;
+
+      if (nextStageIndex < stageOrder.length) {
+        const nextStage = stageOrder[nextStageIndex] as CertificationStage;
+
+        // Load tasks for the next stage from the workflow
+        const nextStageKey = Object.keys(workflow.tasks || {}).find(
+          (key) => key.toLowerCase() === nextStage.toLowerCase()
+        );
+        const nextStageTasks = nextStageKey ? workflow.tasks[nextStageKey] : [];
+        const newTasks = transformTasks(nextStageTasks, nextStage);
+
+        // Update the certification with the new status and tasks
+        updatedCertification = {
+          ...updatedCertification,
+          status: nextStage,
+          tasks: [
+            ...updatedCertification.tasks,
+            ...newTasks,
+          ],
+        };
+      }
+    }
 
     storage.updateCertification(updatedCertification);
     onUpdate(updatedCertification);
@@ -91,6 +237,11 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
   const timeSpent = certification.tasks.reduce((total, task) => total + (task.timeSpent || 0), 0);
   const estimatedTime = 480; // 8 hours in minutes (example)
   const remainingTime = Math.max(0, estimatedTime - timeSpent);
+
+  // Filter tasks to only show those matching the current certification.status
+  const currentStageTasks = certification.tasks.filter(
+    task => task.stage === certification.status
+  );
 
   return (
     <Dialog 
@@ -313,7 +464,7 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
                   Cancel
                 </button>
                 <button
-                  onClick={handleTaskUpdate}
+                  onClick={() => handleTaskUpdate()}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                 >
                   Save Changes
@@ -335,7 +486,7 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
                             <UserCircleIcon className="w-6 h-6 text-gray-400" />
                             <div>
                               <p className="text-sm font-medium">Assignee</p>
-                              <p className="text-sm text-gray-500">Alex Carter</p>
+                              <p className="text-sm text-gray-500">{certification.assignee}</p>
                             </div>
                           </div>
                           <button className="text-blue-600 hover:text-blue-700 text-sm">
@@ -347,7 +498,7 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
                             <UserCircleIcon className="w-6 h-6 text-gray-400" />
                             <div>
                               <p className="text-sm font-medium">Reporter</p>
-                              <p className="text-sm text-gray-500">Sarah Chen</p>
+                              <p className="text-sm text-gray-500">{certification.reporter}</p>
                             </div>
                           </div>
                         </div>
@@ -519,8 +670,8 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
                 <div className="flex-1 overflow-auto">
                   {view === 'board' ? (
                     <TaskBoard
-                      tasks={certification.tasks}
-                      onTaskUpdate={handleTaskUpdate}
+                      tasks={currentStageTasks}
+                      onTaskUpdate={handleTaskUpdate} // Pass the updated handleTaskUpdate
                       onTaskClick={handleTaskSelect}
                     />
                   ) : (
@@ -543,7 +694,8 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
                                       ...task,
                                       status: e.target.checked ? 'DONE' : 'TODO'
                                     };
-                                    handleTaskUpdate();
+                                    setEditedTask(updatedTask);
+                                    HANDLEtaskUpdate(updatedTask);
                                   }}
                                   onClick={(e) => e.stopPropagation()}
                                 />

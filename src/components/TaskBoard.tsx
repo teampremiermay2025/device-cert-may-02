@@ -5,7 +5,7 @@ import { getTaskStatusColor, getTaskPriorityIcon, getTaskPriorityColor } from '.
 
 interface TaskBoardProps {
   tasks: CertificationTask[];
-  onTaskUpdate: (task: CertificationTask) => void;
+  onTaskUpdate: (task: CertificationTask) => void; // Updated to match ViewCertificationModal
   onTaskClick: (task: CertificationTask) => void;
 }
 
@@ -83,10 +83,11 @@ export const TaskBoard: FC<TaskBoardProps> = ({ tasks, onTaskUpdate, onTaskClick
     if (over && active.id !== over.id) {
       const task = tasks.find(t => t.id === active.id);
       if (task) {
-        onTaskUpdate({
+        const updatedTask = {
           ...task,
           status: over.id as TaskStatus
-        });
+        };
+        onTaskUpdate(updatedTask); // Call onTaskUpdate with the updated task
       }
     }
     
