@@ -84,38 +84,38 @@ export const HomePage: FC = () => {
   };
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
-      <div className="flex justify-between items-center mb-8">
+    <div className="p-8  mx-auto bg-gradient-to-tr from-blue-50 to-gray-50 min-h-screen">
+      <div className="flex justify-between items-center mb-10">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboards</h1>
-          <p className="mt-1 text-sm text-gray-500">Select a dashboard to view or create a new one</p>
+          <h1 className="text-4xl font-extrabold text-blue-900 drop-shadow">Dashboards</h1>
+          <p className="mt-2 text-base text-blue-600">Select a dashboard to view, or create a new one for your team.</p>
         </div>
         <button 
           onClick={() => setShowNewDashboardModal(true)}
-          className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition duration-150 ease-in-out shadow-sm"
+          className="inline-flex items-center px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-bold rounded-xl shadow-lg transition duration-150 ease-in-out focus:ring-2 focus:ring-blue-400"
         >
           <PlusIcon className="w-5 h-5 mr-2" />
           Create Dashboard
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {dashboards.map((dashboard) => (
           <div
             key={dashboard.id}
             onClick={() => handleNavigate(dashboard.id)}
-            className="block bg-white rounded-lg border border-gray-200 hover:border-blue-500 transition-colors duration-150 ease-in-out cursor-pointer"
+            className="block bg-white rounded-2xl border border-gray-200 hover:border-blue-500 shadow-md hover:shadow-xl transition-all duration-200 ease-in-out cursor-pointer group"
           >
-            <div className="p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">{dashboard.title}</h3>
+            <div className="p-7">
+              <h3 className="text-xl font-bold text-blue-900 mb-2 group-hover:text-blue-700 transition">{dashboard.title}</h3>
               {dashboard.description && (
-                <p className="text-sm text-gray-500 mb-4">{dashboard.description}</p>
+                <p className="text-base text-gray-500 mb-4">{dashboard.description}</p>
               )}
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-500">
+              <div className="flex items-center justify-between text-sm mt-6">
+                <span className="text-gray-400">
                   Last updated: {new Date(dashboard.updatedAt).toLocaleDateString()}
                 </span>
-                <span className="text-blue-600 font-medium">View →</span>
+                <span className="text-blue-600 font-semibold group-hover:underline">View →</span>
               </div>
               {(dashboard.sharedWith || []).length > 0 && (
                 <div className="mt-4 pt-4 border-t">
@@ -132,6 +132,9 @@ export const HomePage: FC = () => {
             </div>
           </div>
         ))}
+        {dashboards.length === 0 && (
+          <div className="col-span-full text-center text-blue-400 text-lg py-16 italic">No dashboards found. Create one to get started!</div>
+        )}
       </div>
 
       {/* New Dashboard Modal */}

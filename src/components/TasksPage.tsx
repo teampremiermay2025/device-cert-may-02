@@ -161,38 +161,38 @@ export const TasksPage = () => {
   };
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Tasks</h1>
-        <p className="text-sm text-gray-500">Manage and track all tasks across certifications</p>
+    <div className="p-8 bg-gradient-to-tr from-blue-50 to-gray-50 min-h-screen">
+      <div className="mb-10">
+        <h1 className="text-4xl font-extrabold text-blue-900 drop-shadow mb-1">Tasks</h1>
+        <p className="text-base text-blue-600">Manage and track all tasks across certifications</p>
+      </div>
+
+      {/* Quick Filters */}
+      <div className="flex gap-2 mb-4">
+        <button
+          className={`px-3 py-1 rounded-full border text-xs font-medium shadow-sm transition-all duration-150 ${quickFilter === 'ALL' ? 'bg-blue-600 text-white border-blue-700 scale-105' : 'bg-white text-blue-700 border-blue-300 hover:bg-blue-50'}`}
+          onClick={() => setQuickFilter('ALL')}
+        >All</button>
+        <button
+          className={`px-3 py-1 rounded-full border text-xs font-medium shadow-sm transition-all duration-150 ${quickFilter === 'MY_TASKS' ? 'bg-blue-600 text-white border-blue-700 scale-105' : 'bg-white text-blue-700 border-blue-300 hover:bg-blue-50'}`}
+          onClick={() => setQuickFilter('MY_TASKS')}
+        >My Tasks</button>
+        <button
+          className={`px-3 py-1 rounded-full border text-xs font-medium shadow-sm transition-all duration-150 ${quickFilter === 'DUE_NOW' ? 'bg-blue-600 text-white border-blue-700 scale-105' : 'bg-white text-blue-700 border-blue-300 hover:bg-blue-50'}`}
+          onClick={() => setQuickFilter('DUE_NOW')}
+        >Due Now</button>
+        <button
+          className={`px-3 py-1 rounded-full border text-xs font-medium shadow-sm transition-all duration-150 ${quickFilter === 'DUE_SOON' ? 'bg-blue-600 text-white border-blue-700 scale-105' : 'bg-white text-blue-700 border-blue-300 hover:bg-blue-50'}`}
+          onClick={() => setQuickFilter('DUE_SOON')}
+        >Due Soon</button>
+        <button
+          className={`px-3 py-1 rounded-full border text-xs font-medium shadow-sm transition-all duration-150 ${quickFilter === 'UPCOMING' ? 'bg-blue-600 text-white border-blue-700 scale-105' : 'bg-white text-blue-700 border-blue-300 hover:bg-blue-50'}`}
+          onClick={() => setQuickFilter('UPCOMING')}
+        >Upcoming</button>
       </div>
 
       {/* Search and Filters */}
-      <div className="mb-6">
-        {/* Quick Filters */}
-        <div className="flex gap-2 mb-2">
-          <button
-            className={`px-3 py-1 rounded-full border text-xs font-medium ${quickFilter === 'ALL' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'}`}
-            onClick={() => setQuickFilter('ALL')}
-          >All</button>
-          <button
-            className={`px-3 py-1 rounded-full border text-xs font-medium ${quickFilter === 'MY_TASKS' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'}`}
-            onClick={() => setQuickFilter('MY_TASKS')}
-          >My Tasks</button>
-          <button
-            className={`px-3 py-1 rounded-full border text-xs font-medium ${quickFilter === 'DUE_NOW' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'}`}
-            onClick={() => setQuickFilter('DUE_NOW')}
-          >Due Now</button>
-          <button
-            className={`px-3 py-1 rounded-full border text-xs font-medium ${quickFilter === 'DUE_SOON' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'}`}
-            onClick={() => setQuickFilter('DUE_SOON')}
-          >Due Soon</button>
-          <button
-            className={`px-3 py-1 rounded-full border text-xs font-medium ${quickFilter === 'UPCOMING' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'}`}
-            onClick={() => setQuickFilter('UPCOMING')}
-          >Upcoming</button>
-        </div>
-
+      <div className="mb-8">
         <div className="flex gap-4 mb-4">
           <div className="flex-1 relative">
             <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -201,12 +201,12 @@ export const TasksPage = () => {
               placeholder="Search tasks..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border rounded-lg"
+              className="w-full pl-10 pr-4 py-2 border rounded-lg shadow-sm focus:ring-blue-400 focus:border-blue-400"
             />
           </div>
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="px-4 py-2 bg-white border rounded-lg hover:bg-gray-50 flex items-center gap-2"
+            className="px-4 py-2 bg-white border rounded-lg hover:bg-gray-50 flex items-center gap-2 shadow-sm"
           >
             <FunnelIcon className="w-5 h-5" />
             Filters
@@ -214,7 +214,7 @@ export const TasksPage = () => {
         </div>
 
         {showFilters && (
-          <div className="bg-white border rounded-lg p-4 mb-4">
+          <div className="bg-white border rounded-lg p-4 mb-4 shadow-md">
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -276,102 +276,53 @@ export const TasksPage = () => {
       </div>
 
       {/* Tasks Table */}
-      <div className="bg-white border rounded-lg overflow-hidden">
+      <div className="bg-white border rounded-2xl overflow-hidden shadow-lg">
         <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+          <thead className="bg-blue-50">
             <tr>
               {COLUMNS.map(column => (
                 <th
                   key={column.key}
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  onClick={() => handleSort(column.key)}
+                  className="px-6 py-3 text-left text-xs font-bold text-blue-700 uppercase tracking-wider cursor-pointer select-none hover:text-blue-900"
                 >
-                  <button
-                    className="flex items-center gap-1"
-                    onClick={() => column.sortable && handleSort(column.key)}
-                  >
+                  <span className="flex items-center gap-1">
                     {column.label}
-                    {column.sortable && <ChevronUpDownIcon className="w-4 h-4" />}
-                  </button>
+                    <ChevronUpDownIcon className="w-4 h-4 inline-block align-middle" />
+                  </span>
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-white divide-y divide-gray-100">
+            {filteredTasks.length === 0 && (
+              <tr>
+                <td colSpan={COLUMNS.length} className="text-center text-blue-300 py-8 text-lg italic">No tasks found.</td>
+              </tr>
+            )}
             {filteredTasks.map(task => (
               <tr
                 key={task.id}
+                className="hover:bg-blue-50 transition cursor-pointer"
                 onClick={() => setSelectedTask(task)}
-                className="hover:bg-gray-50 cursor-pointer"
               >
-                <td className="px-6 py-4">
-                  <div className="flex items-start gap-2">
-                    <input
-                      type="checkbox"
-                      checked={task.status === 'DONE'}
-                      onChange={(e) => {
-                        e.stopPropagation();
-                        handleTaskUpdate({
-                          ...task,
-                          status: e.target.checked ? 'DONE' : 'TODO'
-                        });
-                      }}
-                      className="mt-1"
-                    />
-                    <div>
-                      <div className="font-medium text-gray-900">{task.name}</div>
-                      {task.description && (
-                        <div className="text-sm text-gray-500">{task.description}</div>
-                      )}
-                    </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(task.status)}`}>
-                    {task.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4">
-                  <span className={`font-medium ${getPriorityColor(task.priority)}`}>
-                    {task.priority}
-                  </span>
-                </td>
-                <td className="px-6 py-4">
-                  {task.assignee ? (
-                    <div className="flex items-center gap-2">
-                      <UserCircleIcon className="w-5 h-5 text-gray-400" />
-                      <span>{task.assignee}</span>
-                    </div>
-                  ) : (
-                    <span className="text-gray-400">Unassigned</span>
-                  )}
-                </td>
-                <td className="px-6 py-4">
-                  {task.dueDate ? (
-                    <div className="flex items-center gap-2">
-                      <ClockIcon className="w-5 h-5 text-gray-400" />
-                      <span>{new Date(task.dueDate).toLocaleDateString()}</span>
-                      {new Date(task.dueDate) < new Date() && task.status !== 'DONE' && (
-                        <ExclamationCircleIcon className="w-5 h-5 text-red-500" />
-                      )}
-                    </div>
-                  ) : (
-                    <span className="text-gray-400">No due date</span>
-                  )}
-                </td>
-                <td className="px-6 py-4">
-                  <span className="text-gray-500">{task.stage}</span>
-                </td>
+                <td className="px-6 py-3 font-semibold text-blue-900 truncate max-w-xs">{task.name}</td>
+                <td className="px-6 py-3"><span className={`px-2 py-1 rounded text-xs font-bold ${getStatusColor(task.status)}`}>{task.status}</span></td>
+                <td className="px-6 py-3"><span className={`font-semibold ${getPriorityColor(task.priority)}`}>{task.priority}</span></td>
+                <td className="px-6 py-3 text-sm text-gray-700">{task.assignee || <span className="italic text-gray-400">Unassigned</span>}</td>
+                <td className="px-6 py-3 text-xs text-gray-600">{task.dueDate ? new Date(task.dueDate).toLocaleDateString() : '-'}</td>
+                <td className="px-6 py-3 text-xs text-blue-600 font-semibold">{task.stage}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
+      {/* Task Detail Modal */}
       {selectedTask && (
         <TaskDetailModal
-          isOpen={!!selectedTask}
-          onClose={() => setSelectedTask(null)}
           task={selectedTask}
+          onClose={() => setSelectedTask(null)}
           onUpdate={handleTaskUpdate}
         />
       )}

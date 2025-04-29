@@ -11,7 +11,8 @@ import { ToastContainer } from 'react-toastify';
 import { LoginPage } from './components/LoginPage';
 import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
- 
+import KanbanReleasesBoard from './components/KanbanReleasesBoard';
+
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 import { TasksPage } from './components/TasksPage';
@@ -55,7 +56,7 @@ const AppContent = () => {
               <p className="text-gray-600 mt-2">AI-powered updates feed coming soon...</p>
             </div>
           } />
-          <Route path="/releases"element={<Dashboard onNewCertification={handleNewCertification} />} />
+          <Route path="/releases" element={<KanbanReleasesBoard />} />
        
           <Route path="/tasks" element={<TasksPage />} />
           <Route path="/teams" element={
