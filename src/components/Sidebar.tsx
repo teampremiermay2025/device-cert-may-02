@@ -118,7 +118,7 @@ export const Sidebar: FC<SidebarProps> = ({ onNavigate, onNewCertification }) =>
                     }`}
                   >
                     <ClipboardDocumentListIcon className="w-5 h-5" />
-                    <span>Tasks</span>
+                    <span>My Tasks</span>
                   </button>
                 </li>
               </ul>

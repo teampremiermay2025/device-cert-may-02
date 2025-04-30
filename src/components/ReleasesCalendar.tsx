@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import { storage } from '../lib/storage';
 import { CertificationRequest } from '../types';
 import {
@@ -46,7 +46,22 @@ const getMonthMatrix = (year: number, month: number) => {
 export const ReleasesCalendar: React.FC = () => {
   const [selectedMonth, setSelectedMonth] = React.useState<number>(new Date().getMonth());
   const [selectedYear, setSelectedYear] = React.useState<number>(new Date().getFullYear());
-  const releases = useMemo<CertificationRequest[]>(() => storage.getCertifications(), []);
+  const [releases, setReleases] = useState<CertificationRequest[]>([]);
+
+  useEffect(() => {
+    // Load from localStorage using storage lib
+    setReleases(storage.getCertifications() || []);
+  }, []);
+
+  // Optionally, listen for storage events in other tabs
+  useEffect(() => {
+    const onStorage = () => {
+      setReleases(storage.getCertifications() || []);
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
+
   const releasesByDate = useMemo(() => groupByDate(releases), [releases]);
   const monthMatrix = useMemo(() => getMonthMatrix(selectedYear, selectedMonth), [selectedYear, selectedMonth]);
   const monthName = new Date(selectedYear, selectedMonth).toLocaleString('default', { month: 'long' });

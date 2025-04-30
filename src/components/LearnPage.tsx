@@ -8,27 +8,27 @@ export const LearnPage = () => {
   const oems = [
     {
       name: 'Apple',
-      url: 'https://upload.wikimedia.org/wikipedia/commons/a/ab/Apple-logo.png'
+      url: '/assets/apple-logo.svg'
     },
     {
       name: 'Samsung',
-      url: 'https://upload.wikimedia.org/wikipedia/commons/2/2e/Samsung_Logo.svg'
+      url: '/assets/Samsung_Logo.svg'
     },
     {
       name: 'Google',
-      url: 'https://upload.wikimedia.org/wikipedia/commons/2/24/Google_logo_2023.svg'
+      url: '/assets/Google_2015_logo.svg'
     },
     {
       name: 'Cisco',
-      url: 'https://upload.wikimedia.org/wikipedia/commons/0/08/Cisco_logo_blue_2016.svg'
+      url: '/assets/cisco-logo.svg'
     },
     {
       name: 'Bosch',
-      url: 'https://upload.wikimedia.org/wikipedia/commons/5/5e/Bosch-logo.svg'
+      url: '/assets/Bosch-logo.svg'
     },
     {
       name: 'Honeywell',
-      url: 'https://upload.wikimedia.org/wikipedia/commons/3/3f/Honeywell-Logo.svg'
+      url: '/assets/Honeywell_logo.svg'
     }
   ];
 
@@ -161,7 +161,8 @@ export const LearnPage = () => {
                 <img 
                   src={oem.url} 
                   alt={oem.name} 
-                  className="h-12 w-auto opacity-80 hover:opacity-100 transition-opacity"
+                  className="w-16 h-16 object-contain"
+                  onError={e => (e.currentTarget.src = '/assets/fallback.png')}
                 />
               </div>
             ))}
