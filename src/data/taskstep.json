@@ -309,7 +309,6 @@
     "grid_warning": "TABLE GRID WARNING: DO NOT DELETE ANY ROWS!!",
     "step": "PLANNING"
   },
-  // Device 2: ST0919B (Tablet, iOS, Pre-Paid, Retail)
   {
     "task_id": "TASK-011",
     "device_model": "ST0919B",
@@ -620,7 +619,6 @@
     "grid_warning": "TABLE GRID WARNING: DO NOT DELETE ANY ROWS!!",
     "step": "TA COMPLETE"
   },
-  // Device 3: ST0919C (Handset, Android, Post-Paid, Stock)
   {
     "task_id": "TASK-021",
     "device_model": "ST0919C",
@@ -931,7 +929,6 @@
     "grid_warning": "TABLE GRID WARNING: DO NOT DELETE ANY ROWS!!",
     "step": "FORECAST"
   },
-  // Device 4: ST0919D (Tablet, iOS, Pre-Paid, Retail)
   {
     "task_id": "TASK-031",
     "device_model": "ST0919D",
@@ -1242,7 +1239,6 @@
     "grid_warning": "TABLE GRID WARNING: DO NOT DELETE ANY ROWS!!",
     "step": "SUBMISSION REVIEW"
   },
-  // Device 5: ST0919E (Handset, Android, Post-Paid, Stock)
   {
     "task_id": "TASK-041",
     "device_model": "ST0919E",
@@ -1490,4 +1486,5 @@
     "ruleset_device_links": "OTO - One to One Devices",
     "grid_warning": "TABLE GRID WARNING: DO NOT DELETE ANY ROWS!!",
     "step": "TA COMPLETE"
-  }]
+  }
+]

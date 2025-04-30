@@ -198,6 +198,17 @@ export const Sidebar: FC<SidebarProps> = ({ onNavigate, onNewCertification }) =>
                     <span className="ml-auto text-xs bg-blue-700 px-2 py-1 rounded">AI</span>
                   </button>
                 </li>
+                <li>
+                  <button 
+                    onClick={() => onNavigate('/task-rules')}
+                    className={`flex items-center space-x-3 w-full px-3 py-2 text-blue-100 hover:bg-blue-800 rounded-lg transition-colors duration-150 ${
+                      isActive('/task-rules') ? 'bg-blue-800' : ''
+                    }`}
+                  >
+                    <ListBulletIcon className="w-5 h-5" />
+                    <span>Task Rules</span>
+                  </button>
+                </li>
               </ul>
             </div>
 

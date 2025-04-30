@@ -13,6 +13,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import KanbanReleasesBoard from './components/KanbanReleasesBoard';
 import ReleasesCalendar from './components/ReleasesCalendar';
+import { TaskRules } from './components/TaskRules';
 
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
@@ -65,6 +66,7 @@ const AppContent = () => {
           <Route path="/calendar" element={<ReleasesCalendar />} />
        
           <Route path="/tasks" element={<TasksPage />} />
+          <Route path="/task-rules" element={<TaskRules />} />
           <Route path="/teams" element={
             <ProtectedRoute requiredPermission="canManageTeams">
               <TeamManagement />
