@@ -35,11 +35,11 @@ const stageToCategoryMap = {
 
 // Initial nodes (states) for the workflow with category
 const initialNodes = [
-  { id: "start", type: "startNode", data: { label: "Start" }, position: { x: 50, y: 100 } },
+  { id: "start", type: "startNode", data: { label: "Start" }, position: { x: 50, y: 100 }, width: 40, height: 40 },
   { id: "1", type: "customNode", data: { label: "Forecast", category: stageToCategoryMap["Forecast"] }, position: { x: 150, y: 100 } },
   { id: "2", type: "customNode", data: { label: "Planning", category: stageToCategoryMap["Planning"] }, position: { x: 300, y: 100 } },
   { id: "3", type: "customNode", data: { label: "Submitted", category: stageToCategoryMap["Submitted"] }, position: { x: 450, y: 100 } },
-  {id: "4", type: "customNode", data: { label: "Device Testing", category: stageToCategoryMap["Device Testing"] }, position: { x: 600, y: 100 } },
+  { id: "4", type: "customNode", data: { label: "Device Testing", category: stageToCategoryMap["Device Testing"] }, position: { x: 600, y: 100 } },
   { id: "5", type: "customNode", data: { label: "Done", category: stageToCategoryMap["Done"] }, position: { x: 750, y: 100 } },
 ];
 
@@ -193,7 +193,7 @@ function JiraWorkflowEditorContent() {
       setSavedWorkflows(workflows);
       // If there's a workflow, load the first one by default
       if (workflows.length > 0) {
-        loadWorkflow(workflows[0]);
+        loadWorkflow(workflows[0].id);
       } else {
         // Initialize tasks for the initial nodes using taskStepsData
         const initialTasks = {};
@@ -223,27 +223,30 @@ function JiraWorkflowEditorContent() {
   }, []);
 
   // Load a saved workflow
-  const loadWorkflow = (workflow) => {
-    setNodes(workflow.nodes);
-    setEdges(workflow.edges);
-    setWorkflowName(workflow.name);
-    setSelectedWorkflowId(workflow.id);
-    setSelectedElement(null); // Reset selected element when loading a new workflow
-    // Load tasks from the selected workflow, or initialize using taskStepsData
-    if (workflow.tasks) {
-      setTasks(workflow.tasks);
-    } else {
-      // Initialize tasks using taskStepsData for the workflow's stages
-      const workflowStages = workflow.nodes
-        .filter((node) => node.type === "customNode")
-        .map((node) => node.data.label);
-      const initialTasks = {};
-      workflowStages.forEach((stage) => {
-        initialTasks[stage] = taskStepsData.filter(
-          (task) => task.stage.toUpperCase() === stage.toUpperCase()
-        );
-      });
-      setTasks(initialTasks);
+  const loadWorkflow = (workflowId) => {
+    const workflow = savedWorkflows.find((w) => w.id === workflowId);
+    if (workflow) {
+      setNodes(workflow.nodes);
+      setEdges(workflow.edges);
+      setWorkflowName(workflow.name);
+      setSelectedWorkflowId(workflow.id);
+      setSelectedElement(null); // Reset selected element when loading a new workflow
+      // Load tasks from the selected workflow, or initialize using taskStepsData
+      if (workflow.tasks) {
+        setTasks(workflow.tasks);
+      } else {
+        // Initialize tasks using taskStepsData for the workflow's stages
+        const workflowStages = workflow.nodes
+          .filter((node) => node.type === "customNode")
+          .map((node) => node.data.label);
+        const initialTasks = {};
+        workflowStages.forEach((stage) => {
+          initialTasks[stage] = taskStepsData.filter(
+            (task) => task.stage.toUpperCase() === stage.toUpperCase()
+          );
+        });
+        setTasks(initialTasks);
+      }
     }
   };
 
@@ -267,6 +270,7 @@ function JiraWorkflowEditorContent() {
     (params) => {
       const newEdge = {
         ...params,
+        id: `reactflow__edge-${params.source}-${params.target}`,
         label: "Any",
         data: { label: "Any", anyStatus: true },
         style: { stroke: "#2563eb", strokeWidth: 2 },
@@ -344,8 +348,19 @@ function JiraWorkflowEditorContent() {
     );
 
     let updatedWorkflows;
+    let workflowId;
+
+    // If this is a new workflow, generate a new ID; otherwise, use the existing ID
+    if (existingWorkflowIndex !== -1) {
+      // Updating an existing workflow
+      workflowId = savedWorkflows[existingWorkflowIndex].id;
+    } else {
+      // Creating a new workflow
+      workflowId = crypto.randomUUID();
+    }
+
     const newWorkflow = {
-      id: selectedWorkflowId || crypto.randomUUID(), // Use existing ID if updating
+      id: workflowId,
       name: workflowName,
       nodes,
       edges,
@@ -357,14 +372,13 @@ function JiraWorkflowEditorContent() {
       // Update existing workflow if name matches
       updatedWorkflows = [...savedWorkflows];
       updatedWorkflows[existingWorkflowIndex] = newWorkflow;
-      setSelectedWorkflowId(newWorkflow.id);
     } else {
       // Add new workflow
       updatedWorkflows = [...savedWorkflows, newWorkflow];
-      setSelectedWorkflowId(newWorkflow.id);
     }
 
     setSavedWorkflows(updatedWorkflows);
+    setSelectedWorkflowId(workflowId);
     localStorage.setItem("jiraWorkflows", JSON.stringify(updatedWorkflows));
     alert("Workflow saved!");
   };
@@ -634,7 +648,7 @@ function JiraWorkflowEditorContent() {
                   }`}
                 >
                   <div
-                    onClick={() => loadWorkflow(workflow)}
+                    onClick={() => loadWorkflow(workflow.id)}
                     className="flex justify-between items-start"
                   >
                     <div>
