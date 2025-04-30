@@ -85,22 +85,19 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
   };
 
   return (
-<Dialog open={isOpen} onClose={onClose} className="relative z-50">
-  <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-    <Dialog.Overlay className="fixed inset-0 bg-black/30" />
-    
-    <Dialog.Panel className="relative z-50 w-full max-w-4xl bg-white rounded-lg shadow-xl">
+    <Dialog open={isOpen} onClose={onClose} className="relative z-50">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <Dialog.Overlay className="fixed inset-0 bg-black/30" />
+        
+        <Dialog.Panel className="relative z-50 w-full max-w-4xl bg-white rounded-lg shadow-xl">
           <div className="flex flex-col h-[80vh]">
             {/* Header */}
             <div className="p-6 border-b">
               <div className="flex justify-between items-start">
-                <div>
+                <div className="flex items-center gap-2">
                   <Dialog.Title className="text-xl font-bold">
                     {editedTask.name}
                   </Dialog.Title>
-                  <p className="text-sm text-gray-500 mt-1">
-                    Task ID: {editedTask.id}
-                  </p>
                 </div>
                 <button
                   onClick={onClose}

@@ -128,7 +128,7 @@ export const TaskBoard: FC<TaskBoardProps> = ({ tasks, onTaskUpdate, onTaskClick
 
   return (
     <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd} onDragOver={handleDragOver}>
-      <div className="flex gap-4 p-4 h-full" style={{ position: 'relative', zIndex: 1000, overflow: 'visible' }}>
+      <div className="flex gap-4 p-4 h-full" style={{ position: 'relative', zIndex: 50, overflow: 'visible' }}>
         {columns.map(column => {
           const { setNodeRef } = useDroppable({
             id: column.id
@@ -138,7 +138,7 @@ export const TaskBoard: FC<TaskBoardProps> = ({ tasks, onTaskUpdate, onTaskClick
           
           return (
             <div key={column.id} className="flex-1 min-w-[300px] flex flex-col">
-              <div className="bg-gray-100 rounded-lg p-4 h-full flex flex-col" style={{ position: 'relative', zIndex: 100, overflow: 'visible' }}>
+              <div className="bg-gray-100 rounded-lg p-4 h-full flex flex-col" style={{ position: 'relative', zIndex: 10 }}>
                 <h3 className="font-semibold mb-4 flex items-center justify-between">
                   {column.title}
                   <span className="text-sm text-gray-500">
@@ -150,7 +150,7 @@ export const TaskBoard: FC<TaskBoardProps> = ({ tasks, onTaskUpdate, onTaskClick
                   ref={setNodeRef}
                   className="space-y-2 flex-1 overflow-y-auto border-2 border-dashed border-gray-300"
                   onMouseEnter={() => console.log(`Mouse entered column: ${column.id}`)}
-                  style={{ position: 'relative', zIndex: 200, minHeight: '200px', overflow: 'visible' }}
+                  style={{ position: 'relative', zIndex: 20, minHeight: '200px' }}
                 >
                   {columnTasks.map((task) => {
                     const { attributes, listeners, setNodeRef, transform } = useDraggable({
@@ -166,8 +166,7 @@ export const TaskBoard: FC<TaskBoardProps> = ({ tasks, onTaskUpdate, onTaskClick
                           transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
                           userSelect: 'none', // Prevent text selection during drag
                           position: 'relative',
-                          zIndex: transform ? 300 : 100,
-                          overflow: 'visible'
+                          zIndex: transform ? 30 : 10,
                         }}
                         {...listeners}
                         {...attributes}
@@ -184,7 +183,7 @@ export const TaskBoard: FC<TaskBoardProps> = ({ tasks, onTaskUpdate, onTaskClick
           );
         })}
       </div>
-      <DragOverlay style={{ zIndex: 10000 }}>
+      <DragOverlay style={{ zIndex: 100 }}>
         {activeTask && <TaskCard task={activeTask} />}
       </DragOverlay>
     </DndContext>
