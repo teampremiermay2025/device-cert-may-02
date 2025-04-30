@@ -272,9 +272,18 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
             <div className="flex justify-between items-start">
               {selectedTask ? (
                 <div>
-                  <h2 className="text-xl font-bold">{selectedTask.name}
-                    
-                  </h2>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-xl font-bold">{selectedTask.name}</h2>
+                    <button
+                      onClick={handleAITestCaseClick}
+                      className="p-1 bg-pink-500 text-white rounded hover:bg-blue-600 flex items-center"
+                      title="Generate AI Test Case"
+                      disabled={showAITestCaseSection}
+                    >
+                      <SparklesIcon className="w-5 h-5 mr-2 text-white" />
+                      <span className="inline-block align-middle">Generate Test Cases</span>
+                    </button>
+                  </div>
                   <p className="text-sm text-gray-500">Task ID: {selectedTask.id}</p>
                 </div>
               ) : (
@@ -542,8 +551,7 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
                                   onClick={(e) => e.stopPropagation()}
                                 />
                                 <div>
-                                  <h4 className="font-medium">{task.name}
-                                  </h4>
+                                  <h4 className="font-medium">{task.name}</h4>
                                   {task.description && (
                                     <p className="text-sm text-gray-600 mt-1">
                                       {task.description}
@@ -598,18 +606,6 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
                       >
                         Add Comment
                       </button>
-
-                    
-                      <button
-                        onClick={handleAITestCaseClick}
-                        className="ml-2 mt-4 p-1 bg-pink-500 text-white rounded hover:bg-blue-600 flex items-center"
-                        title="Generate AI Test Case"
-                        disabled={showAITestCaseSection}
-                      >
-                        <SparklesIcon className="w-5 h-5 mr-2 text-white" />
-                        <span className="inline-block align-middle">Generate Test Cases</span>
-                      </button>
-
                     </div>
                     <div className="space-y-4">
                       {editedTask.comments.map((comment) => (
@@ -736,65 +732,73 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
                   Save Changes
                 </button>
               </div>
-            </div>
-          )}
-          {selectedTask && showAITestCaseSection && (
-            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              {aiStep === 'idle' && (
-                <div
-                  className="flex flex-col items-center justify-center border-2 border-dashed border-blue-400 rounded-lg p-6 cursor-pointer hover:bg-blue-100 transition"
-                  onDrop={handleFileDrop}
-                  onDragOver={handleDragOver}
-                  onClick={handleBrowseClick}
-                  style={{ minHeight: 120 }}
-                >
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept=".pdf,.doc,.docx,.txt"
-                    className="hidden"
-                    onChange={handleFileChange}
-                  />
-                  <div className="text-blue-500 font-semibold text-lg">Drag & Drop requirement file here</div>
-                  <div className="text-gray-500 mt-2">or <span className="underline cursor-pointer text-blue-700">Browse</span></div>
-                </div>
-              )}
-              {uploadedFile && aiStep !== 'done' && (
-                <div className="flex flex-col items-center py-8">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="font-medium text-blue-600">{uploadedFile.name}</span>
-                  </div>
-                  {aiStep === 'processing' && (
-                    <div className="flex flex-col items-center">
-                      <div className="loader mb-2"></div>
-                      <span className="text-blue-700 font-medium animate-pulse">Processing...</span>
+
+              {selectedTask && showAITestCaseSection && (
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  {aiStep === 'idle' && (
+                    <div
+                      className="flex flex-col items-center justify-center border-2 border-dashed border-blue-400 rounded-lg p-6 cursor-pointer hover:bg-blue-100 transition"
+                      onDrop={handleFileDrop}
+                      onDragOver={handleDragOver}
+                      onClick={handleBrowseClick}
+                      style={{ minHeight: 120 }}
+                    >
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept=".pdf,.doc,.docx,.txt"
+                        className="hidden"
+                        onChange={handleFileChange}
+                      />
+                      <div className="text-blue-500 font-semibold text-lg">Drag & Drop requirement file here</div>
+                      <div className="text-gray-500 mt-2">or <span className="underline cursor-pointer text-blue-700">Browse</span></div>
                     </div>
                   )}
-                  {aiStep === 'understanding' && (
-                    <div className="flex flex-col items-center">
-                      <div className="loader mb-2"></div>
-                      <span className="text-blue-700 font-medium animate-pulse">Understanding Requirement...</span>
+                  {uploadedFile && aiStep !== 'done' && (
+                    <div className="flex flex-col items-center py-8">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="font-medium text-blue-600">{uploadedFile.name}</span>
+                      </div>
+                      {aiStep === 'processing' && (
+                        <div className="flex flex-col items-center">
+                          <div className="loader mb-2"></div>
+                          <span className="text-blue-700 font-medium animate-pulse">Processing...</span>
+                        </div>
+                      )}
+                      {aiStep === 'understanding' && (
+                        <div className="flex flex-col items-center">
+                          <div className="loader mb-2"></div>
+                          <span className="text-blue-700 font-medium animate-pulse">Understanding Requirement...</span>
+                        </div>
+                      )}
+                      {aiStep === 'typing' && (
+                        <div className="flex flex-col items-center">
+                          <div className="loader mb-2"></div>
+                          <span className="text-blue-700 font-medium animate-pulse">Creating Test Cases...</span>
+                          <div className="mt-4 w-full max-w-md bg-white border border-gray-200 rounded-lg p-4 h-24 overflow-y-auto animate-pulse">
+                            <span className="typing">Generating test cases...</span>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
-                  {aiStep === 'typing' && (
-                    <div className="flex flex-col items-center">
-                      <div className="loader mb-2"></div>
-                      <span className="text-blue-700 font-medium animate-pulse">Creating Test Cases...</span>
-                      <div className="mt-4 w-full max-w-md bg-white border border-gray-200 rounded-lg p-4 h-24 overflow-y-auto animate-pulse">
-                        <span className="typing">Generating test cases...</span>
+                  {aiStep === 'done' && (
+                    <div className="mt-4">
+                      <div className="text-green-700 font-semibold mb-2">Test Cases Generated:</div>
+                      <div className="bg-white rounded-lg border">
+                        {aiTestCases.map((tc, idx) => (
+                          <div
+                            key={idx}
+                            className="p-4 border-b last:border-b-0 hover:bg-gray-50 animate-fade-in-up"
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="text-gray-700">{tc}</span>
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   )}
-                </div>
-              )}
-              {aiStep === 'done' && (
-                <div className="mt-4">
-                  <div className="text-green-700 font-semibold mb-2">Test Cases Generated:</div>
-                  <ul className="list-disc pl-6 space-y-1">
-                    {aiTestCases.map((tc, idx) => (
-                      <li key={idx} className="animate-fade-in-up">{tc}</li>
-                    ))}
-                  </ul>
                 </div>
               )}
             </div>
