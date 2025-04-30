@@ -4,7 +4,7 @@
     "deliverable": "SYSTEM USE",
     "requirement_tag": "ALL CHAPTERS",
     "issue_types": ["DA IR", "DA MR", "E DA MR", "DA ADAPT IR"],
-    "device_channels": ["CRICKET IETA", "CRICKET VITA","Stock"],
+    "device_channels": ["CRICKET IETA", "CRICKET VITA","PLANNING"],
     "device": "ALL DEV",
     "stage": "PLANNING"
   },

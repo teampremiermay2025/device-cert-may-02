@@ -35,30 +35,7 @@ export const HomePage: FC = () => {
     };
   }, []);
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-  
-    // 1) configure the Watson options
-    window.watsonAssistantChatOptions = {
-      integrationID: '7432575c-a66e-46f5-9ed1-49837139786a',
-      region: 'eu-de',
-      serviceInstanceID: 'c179921e-0270-4834-8ef4-fc5b288a3a17',
-      onLoad: async (instance: any) => { await instance.render(); }
-    };
-  
-    // 2) dynamically inject the chat script
-    const script = document.createElement('script');
-    script.src = `https://web-chat.global.assistant.watson.appdomain.cloud/versions/${
-      window.watsonAssistantChatOptions.clientVersion || 'latest'
-    }/WatsonAssistantChatEntry.js`;
-    script.async = true;
-    document.head.appendChild(script);
-  
-    // clean up on unmount (optional)
-    return () => {
-      document.head.removeChild(script);
-    };
-  }, []);  // ← note: no raw <script> tag—everything stays in JS
+
   
   const handleCreateDashboard = () => {
     const newDashboard: Dashboard = {

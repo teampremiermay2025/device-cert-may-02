@@ -244,10 +244,10 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
         setTimeout(() => {
           setAIStep('done');
           setAITestCases([
-            'Test Case 1: Validate login with valid credentials',
-            'Test Case 2: Validate login with invalid credentials',
-            'Test Case 3: Check password reset flow',
-            'Test Case 4: Ensure session timeout after inactivity',
+            'Test Case 1: Verify MO VoLTE call initiation during active data session in LTE RAN',
+            'Test Case 2: Verify MT VoLTE call reception during active data session in LTE RAN',
+            'Test Case 3: Verify that MO 5G device can send SMS over NAS in 5G SA mode',
+            'Test Case 4: Verify that a User can receive group chat messages with data toggle off',
           ]);
         }, 2500);
       }, 2000);
