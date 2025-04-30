@@ -6,6 +6,7 @@ import { storage } from '../lib/storage';
 import { useWorkflowStore } from '../store/workflowStore';
 import { createTasksForStage } from '../lib/workflow';
 import deviceData from '../data/devices.json';
+import taskStepsData from '../data/ruleset.json';
 
 interface NewCertificationModalProps {
   isOpen: boolean;
@@ -61,7 +62,6 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
       setFormData(prev => ({
         ...prev,
         deviceModel: deviceIssueKey,
-        // Update other device-related fields
         vendor: selectedDevice['Device Vendor'],
         deviceType: selectedDevice['Device Type'],
         deviceMarketingName: selectedDevice['Device Marketing Name'],
@@ -138,23 +138,11 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
             updatedAt: matchedWorkflow.updatedAt || new Date().toISOString(),
             stages: matchedWorkflow.nodes
               .filter((node: any) => node && node.type === "customNode")
-              .map((node: any) => {
-                const label = node.data?.label || 'FORECAST';
-                const stageTasks = matchedWorkflow.tasks[label];
-                return {
-                  id: node.id || crypto.randomUUID(),
-                  name: label.toUpperCase() as CertificationStage,
-                  tasks: Array.isArray(stageTasks)
-                    ? stageTasks.map((task: any) => ({
-                        id: task?.id || crypto.randomUUID(),
-                        title: task?.title || 'Untitled Task',
-                        type: task?.type || 'task',
-                        description: task?.description || undefined,
-                        required: task?.required !== undefined ? task.required : false,
-                      }))
-                    : [],
-                };
-              }),
+              .map((node: any) => ({
+                id: node.id || crypto.randomUUID(),
+                name: node.data?.label.toUpperCase() || 'FORECAST',
+                tasks: [], // We'll populate tasks from ruleset.json
+              })),
             tasks: matchedWorkflow.tasks,
           };
 
@@ -231,37 +219,42 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
     }
   };
 
-  const transformTasks = (jiraTasks: any[]): CertificationTask[] => {
-    if (!Array.isArray(jiraTasks)) return [];
-    return jiraTasks.map((task) => ({
-      id: task?.id || crypto.randomUUID(),
-      name: task?.title || 'Untitled Task',
-      description: task?.description || undefined,
-      status: mapTaskStatus(task?.status),
-      isChecked: task?.isChecked || false,
+  // Function to filter tasks from ruleset.json based on projectType, deviceChannel, and stage
+  const filterTasksFromRuleset = (stage: string, projectType: string, deviceChannel: string): CertificationTask[] => {
+    const filteredTasks = taskStepsData.filter((task) => {
+      const matchesIssueType = task.issue_types.includes(projectType);
+      const matchesDeviceChannel = task.device_channels.includes(deviceChannel);
+      const matchesStage = task.stage.toUpperCase() === stage.toUpperCase();
+      return matchesIssueType && matchesDeviceChannel && matchesStage;
+    });
+
+    return filteredTasks.map((task) => ({
+      id: crypto.randomUUID(),
+      name: `${task.chapter} (${task.requirement_tag})`,
+      description: `Deliverable: ${task.deliverable}`,
+      status: 'TODO' as TaskStatus,
+      isChecked: false,
       assignee: formData.assignee || undefined,
-      priority: task?.priority || 'MEDIUM' as TaskPriority,
+      priority: 'MEDIUM' as TaskPriority,
       dueDate: formData.targetDate || undefined,
-      attachments: task?.attachments || [],
-      comments: task?.comments || [],
-      timeSpent: task?.timeSpent || undefined,
-      labels: task?.labels || [],
-      stage: 'FORECAST' as CertificationStage,
+      attachments: [],
+      comments: [],
+      timeSpent: undefined,
+      labels: [],
+      stage: stage.toUpperCase() as CertificationStage,
     }));
   };
 
   const handleConfirm = () => {
     if (!selectedWorkflow) return;
 
-    const forecastKey = Object.keys(selectedWorkflow.tasks || {}).find(
-      (key) => key.toLowerCase() === 'forecast'
-    );
-    const forecastStageTasks = forecastKey ? selectedWorkflow.tasks[forecastKey] : [];
-    const tasks = forecastStageTasks.length > 0
-      ? transformTasks(forecastStageTasks)
-      : createTasksForStage(memoizedDefaultWorkflow.stages.find((stage) => stage.name === 'FORECAST')!);
-
     const selectedDevice = deviceData.find(device => device['Device Issue Key'] === formData.deviceModel);
+    const deviceChannel = selectedDevice?.['Device Channel'] || '';
+    const projectType = formData.projectType;
+
+    // Get initial tasks for the "FORECAST" stage from ruleset.json
+    const initialStage = 'FORECAST';
+    const tasks = filterTasksFromRuleset(initialStage, projectType, deviceChannel);
 
     const now = new Date().toISOString();
     const newCertification: CertificationRequest = {
@@ -269,7 +262,7 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
       darpKey: formData.darpKey,
       projectName: formData.projectName,
       type: formData.projectType,
-      status: 'FORECAST',
+      status: initialStage.toUpperCase() as CertificationStage,
       targetDate: formData.targetDate,
       softwareVersion: formData.softwareVersion,
       lastUpdated: now,
@@ -286,7 +279,7 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
       deviceOSVersion: selectedDevice?.['Device OS Version'] || '',
       deviceHardwareVersion: selectedDevice?.['Device Hardware Version'] || '',
       devicePaymentType: selectedDevice?.['Device Payment Type'] || '',
-      deviceChannel: selectedDevice?.['Device Channel'] || '',
+      deviceChannel: deviceChannel,
       securityLevel: '',
       reporter: '',
       primaryPC: '',
@@ -323,26 +316,10 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
     }));
   };
 
-  const forecastKey = selectedWorkflow?.tasks
-    ? Object.keys(selectedWorkflow.tasks).find((key) => key.toLowerCase() === 'forecast')
-    : undefined;
-  const initialTasks = forecastKey && selectedWorkflow?.tasks[forecastKey]
-    ? transformTasks(selectedWorkflow.tasks[forecastKey])
-    : memoizedDefaultWorkflow?.stages.find((stage) => stage.name === 'FORECAST')?.tasks.map((task) => ({
-        id: task.id,
-        name: task.title,
-        description: task.description,
-        status: 'TODO' as TaskStatus,
-        isChecked: false,
-        assignee: formData.assignee || undefined,
-        priority: 'MEDIUM' as TaskPriority,
-        dueDate: formData.targetDate || undefined,
-        attachments: [],
-        comments: [],
-        timeSpent: undefined,
-        labels: [],
-        stage: 'FORECAST' as CertificationStage,
-      })) || [];
+  // Get initial tasks for display in the review step
+  const selectedDevice = deviceData.find(device => device['Device Issue Key'] === formData.deviceModel);
+  const deviceChannel = selectedDevice?.['Device Channel'] || '';
+  const initialTasks = filterTasksFromRuleset('FORECAST', formData.projectType, deviceChannel);
 
   return (
     <Dialog open={isOpen} onClose={onClose} className="relative z-50">

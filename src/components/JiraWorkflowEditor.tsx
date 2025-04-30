@@ -10,41 +10,36 @@ import ReactFlow, {
   Controls,
 } from "reactflow";
 import "reactflow/dist/style.css";
+import taskStepsData from '../data/ruleset.json';
 
-// Sample JSON data for tasks associated with states
-const tasksData = {
-  "To Do": [
-    { id: "t1", title: "Define project scope", status: "Not Started" },
-    { id: "t2", title: "Gather requirements", status: "In Progress" },
-  ],
-  "In Progress": [
-    { id: "t3", title: "Develop feature A", status: "In Progress" },
-    { id: "t4", title: "Write unit tests", status: "Not Started" },
-  ],
-  "In Review": [
-    { id: "t5", title: "Code review for feature A", status: "In Progress" },
-    { id: "t6", title: "Fix review comments", status: "Not Started" },
-  ],
-  "Done": [
-    { id: "t7", title: "Deploy feature A", status: "Completed" },
-  ],
-  "Planning": [
-    { id: "t8", title: "Create project timeline", status: "Not Started" },
-    { id: "t9", title: "Assign team roles", status: "In Progress" },
-  ],
-  "Forecast": [
-    { id: "t10", title: "Estimate resource needs", status: "Not Started" },
-    { id: "t11", title: "Predict project risks", status: "In Progress" },
-  ],
+// Map stages to categories for coloring purposes
+const stageToCategoryMap = {
+  "To Do": "To Do",
+  "In Progress": "In Progress",
+  "In Review": "In Progress",
+  "Done": "Done",
+  "Planning": "To Do",
+  "Forecast": "To Do",
+  "Cancelled": "Done",
+  "OEM Resubmit": "In Progress",
+  "Submitted": "In Progress",
+  "Submission Rejected": "In Progress",
+  "Submission Review": "In Progress",
+  "DA Applied": "In Progress",
+  "Device Entry": "In Progress",
+  "Device Testing": "In Progress",
+  "TAQ Review": "In Progress",
+  "TAQ Complete": "Done",
+  "Complete": "Done",
 };
 
 // Initial nodes (states) for the workflow with category
 const initialNodes = [
   { id: "start", type: "startNode", data: { label: "Start" }, position: { x: 50, y: 100 } },
-  { id: "1", type: "customNode", data: { label: "To Do", category: "To Do" }, position: { x: 150, y: 100 } },
-  { id: "2", type: "customNode", data: { label: "In Progress", category: "In Progress" }, position: { x: 300, y: 200 } },
-  { id: "3", type: "customNode", data: { label: "In Review", category: "In Progress" }, position: { x: 450, y: 100 } },
-  { id: "4", type: "customNode", data: { label: "Done", category: "Done" }, position: { x: 600, y: 100 } },
+  { id: "1", type: "customNode", data: { label: "Forecast", category: stageToCategoryMap["Forecast"] }, position: { x: 150, y: 100 } },
+  { id: "2", type: "customNode", data: { label: "Planning", category: stageToCategoryMap["Planning"] }, position: { x: 300, y: 100 } },
+  { id: "3", type: "customNode", data: { label: "Submitted", category: stageToCategoryMap["Submitted"] }, position: { x: 450, y: 100 } },
+  { id: "4", type: "customNode", data: { label: "Done", category: stageToCategoryMap["Done"] }, position: { x: 600, y: 100 } },
 ];
 
 // Initial edges (transitions)
@@ -54,6 +49,9 @@ const initialEdges = [
   { id: "e2-3", source: "2", target: "3", label: "Any", data: { label: "Any", anyStatus: true } },
   { id: "e3-4", source: "3", target: "4", label: "Any", data: { label: "Any", anyStatus: true } },
 ];
+
+// Get unique stages from taskStepsData for the dropdown
+const uniqueStages = [...new Set(taskStepsData.map(task => task.stage.toUpperCase()))];
 
 // Custom Start Node
 const StartNode = ({ data, selected }) => {
@@ -95,7 +93,7 @@ const nodeTypes = { customNode: CustomNode, startNode: StartNode };
 // Modal Component for Creating a New Task
 const CreateTaskModal = ({ isOpen, onClose, onSave, stateLabel }) => {
   const [taskTitle, setTaskTitle] = useState("");
-  const [taskStatus, setTaskStatus] = useState("Not Started");
+  const [taskStatus, setTaskStatus] = useState("To Do");
 
   const handleSave = () => {
     if (!taskTitle.trim()) {
@@ -104,7 +102,7 @@ const CreateTaskModal = ({ isOpen, onClose, onSave, stateLabel }) => {
     }
     onSave({ id: crypto.randomUUID(), title: taskTitle, status: taskStatus });
     setTaskTitle("");
-    setTaskStatus("Not Started");
+    setTaskStatus("To Do");
     onClose();
   };
 
@@ -135,9 +133,10 @@ const CreateTaskModal = ({ isOpen, onClose, onSave, stateLabel }) => {
             onChange={(e) => setTaskStatus(e.target.value)}
             className="w-full px-3 py-2 border rounded-md text-sm"
           >
-            <option value="Not Started">Not Started</option>
+            <option value="To Do">To Do</option>
             <option value="In Progress">In Progress</option>
-            <option value="Completed">Completed</option>
+            <option value="Review">Review</option>
+            <option value="Done">Done</option>
           </select>
         </div>
         <div className="flex justify-end space-x-2">
@@ -178,8 +177,9 @@ function JiraWorkflowEditorContent() {
   const [savedWorkflows, setSavedWorkflows] = useState([]); // State for saved workflows
   const [workflowName, setWorkflowName] = useState(""); // State for workflow name
   const [selectedWorkflowId, setSelectedWorkflowId] = useState(null); // Track selected saved workflow
-  const [tasks, setTasks] = useState(tasksData); // State for tasks data
+  const [tasks, setTasks] = useState({}); // State for tasks data, initially empty
   const [showCreateTaskModal, setShowCreateTaskModal] = useState(false); // State for create task modal
+  const [selectedStage, setSelectedStage] = useState(uniqueStages[0] || ""); // State for dropdown selection
 
   const { zoomIn, zoomOut } = useReactFlow();
 
@@ -189,10 +189,34 @@ function JiraWorkflowEditorContent() {
     if (saved) {
       const workflows = JSON.parse(saved);
       setSavedWorkflows(workflows);
-      // Load tasks from the first workflow if available
-      if (workflows.length > 0 && workflows[0].tasks) {
-        setTasks(workflows[0].tasks);
+      // If there's a workflow, load the first one by default
+      if (workflows.length > 0) {
+        loadWorkflow(workflows[0]);
+      } else {
+        // Initialize tasks for the initial nodes using taskStepsData
+        const initialTasks = {};
+        nodes
+          .filter((node) => node.type === "customNode")
+          .forEach((node) => {
+            const label = node.data.label;
+            initialTasks[label] = taskStepsData.filter(
+              (task) => task.stage.toUpperCase() === label.toUpperCase()
+            );
+          });
+        setTasks(initialTasks);
       }
+    } else {
+      // Initialize tasks for the initial nodes if no workflows exist
+      const initialTasks = {};
+      nodes
+        .filter((node) => node.type === "customNode")
+        .forEach((node) => {
+          const label = node.data.label;
+          initialTasks[label] = taskStepsData.filter(
+            (task) => task.stage.toUpperCase() === label.toUpperCase()
+          );
+        });
+      setTasks(initialTasks);
     }
   }, []);
 
@@ -203,11 +227,21 @@ function JiraWorkflowEditorContent() {
     setWorkflowName(workflow.name);
     setSelectedWorkflowId(workflow.id);
     setSelectedElement(null); // Reset selected element when loading a new workflow
-    // Load tasks from the selected workflow
+    // Load tasks from the selected workflow, or initialize using taskStepsData
     if (workflow.tasks) {
       setTasks(workflow.tasks);
     } else {
-      setTasks(tasksData); // Fallback to default tasks
+      // Initialize tasks using taskStepsData for the workflow's stages
+      const workflowStages = workflow.nodes
+        .filter((node) => node.type === "customNode")
+        .map((node) => node.data.label);
+      const initialTasks = {};
+      workflowStages.forEach((stage) => {
+        initialTasks[stage] = taskStepsData.filter(
+          (task) => task.stage.toUpperCase() === stage.toUpperCase()
+        );
+      });
+      setTasks(initialTasks);
     }
   };
 
@@ -240,15 +274,11 @@ function JiraWorkflowEditorContent() {
     [setEdges]
   );
 
-  // Add a new status based on the category clicked
-  const addStatus = (category) => {
+  // Add a new status based on the selected stage
+  const addStatus = () => {
     const newId = (nodes.length + 1).toString();
-    const newLabel =
-      category === "To Do"
-        ? `To Do ${newId}`
-        : category === "In Progress"
-        ? `In Progress ${newId}`
-        : `Done ${newId}`;
+    const newLabel = selectedStage;
+    const category = stageToCategoryMap[selectedStage] || "To Do";
     const newPosition = { x: 150 + (nodes.length - 1) * 150, y: category === "In Progress" ? 200 : 100 };
     const newNode = {
       id: newId,
@@ -257,6 +287,35 @@ function JiraWorkflowEditorContent() {
       position: newPosition,
     };
     setNodes((nds) => [...nds, newNode]);
+    // Add tasks for the new state from taskStepsData
+    setTasks((prevTasks) => ({
+      ...prevTasks,
+      [newLabel]: taskStepsData.filter(
+        (task) => task.stage.toUpperCase() === newLabel.toUpperCase()
+      ),
+    }));
+    // Update savedWorkflows to reflect the new node and tasks
+    setSavedWorkflows((prevWorkflows) => {
+      const updatedWorkflows = prevWorkflows.map((workflow) => {
+        if (workflow.id === selectedWorkflowId) {
+          const updatedNodes = [...workflow.nodes, newNode];
+          const updatedTasks = {
+            ...workflow.tasks,
+            [newLabel]: taskStepsData.filter(
+              (task) => task.stage.toUpperCase() === newLabel.toUpperCase()
+            ),
+          };
+          return {
+            ...workflow,
+            nodes: updatedNodes,
+            tasks: updatedTasks,
+          };
+        }
+        return workflow;
+      });
+      localStorage.setItem("jiraWorkflows", JSON.stringify(updatedWorkflows));
+      return updatedWorkflows;
+    });
   };
 
   // Save workflow to localStorage
@@ -266,6 +325,17 @@ function JiraWorkflowEditorContent() {
       return;
     }
 
+    // Get the stages (labels) present in the current workflow
+    const workflowStages = nodes
+      .filter((node) => node.type === "customNode")
+      .map((node) => node.data.label);
+
+    // Filter tasks to only include those for the stages in the current workflow
+    const filteredTasks = {};
+    workflowStages.forEach((stage) => {
+      filteredTasks[stage] = tasks[stage] || [];
+    });
+
     // Check if a workflow with the same name already exists
     const existingWorkflowIndex = savedWorkflows.findIndex(
       (w) => w.name.toLowerCase() === workflowName.toLowerCase()
@@ -273,11 +343,11 @@ function JiraWorkflowEditorContent() {
 
     let updatedWorkflows;
     const newWorkflow = {
-      id: crypto.randomUUID(), // Always generate a new ID for a new workflow
+      id: selectedWorkflowId || crypto.randomUUID(), // Use existing ID if updating
       name: workflowName,
       nodes,
       edges,
-      tasks, // Include tasks in the saved workflow
+      tasks: filteredTasks, // Save only the tasks for the stages in this workflow
       createdAt: new Date().toISOString(),
     };
 
@@ -289,7 +359,7 @@ function JiraWorkflowEditorContent() {
     } else {
       // Add new workflow
       updatedWorkflows = [...savedWorkflows, newWorkflow];
-      setSelectedWorkflowId(null); // Reset selectedWorkflowId for new workflow
+      setSelectedWorkflowId(newWorkflow.id);
     }
 
     setSavedWorkflows(updatedWorkflows);
@@ -304,11 +374,25 @@ function JiraWorkflowEditorContent() {
     setSelectedElement(null);
     setWorkflowName("");
     setSelectedWorkflowId(null);
-    setTasks(tasksData); // Reset tasks to initial data
+    // Reset tasks to only include those for the initial nodes using taskStepsData
+    const initialTasks = {};
+    initialNodes
+      .filter((node) => node.type === "customNode")
+      .forEach((node) => {
+        const label = node.data.label;
+        initialTasks[label] = taskStepsData.filter(
+          (task) => task.stage.toUpperCase() === label.toUpperCase()
+        );
+      });
+    setTasks(initialTasks);
   };
 
   // Update status (node) name or category
   const updateStatus = (updatedData) => {
+    const oldLabel = selectedElement.data.data.label;
+    const newLabel = updatedData.label || oldLabel;
+
+    // Update the node
     setNodes((nds) =>
       nds.map((node) =>
         node.id === selectedElement.data.id
@@ -316,6 +400,48 @@ function JiraWorkflowEditorContent() {
           : node
       )
     );
+
+    // Update tasks if the label has changed
+    if (oldLabel !== newLabel) {
+      setTasks((prevTasks) => {
+        const updatedTasks = { ...prevTasks };
+        // Pull tasks from taskStepsData for the new label, or migrate existing tasks
+        updatedTasks[newLabel] = taskStepsData.filter(
+          (task) => task.stage.toUpperCase() === newLabel.toUpperCase()
+        );
+        // Remove tasks for the old label
+        delete updatedTasks[oldLabel];
+        return updatedTasks;
+      });
+
+      // Update the selected workflow in savedWorkflows to reflect the task migration
+      setSavedWorkflows((prevWorkflows) => {
+        const updatedWorkflows = prevWorkflows.map((workflow) => {
+          if (workflow.id === selectedWorkflowId) {
+            const updatedNodes = workflow.nodes.map((node) =>
+              node.id === selectedElement.data.id
+                ? { ...node, data: { ...node.data, ...updatedData } }
+                : node
+            );
+            const updatedTasks = { ...workflow.tasks };
+            updatedTasks[newLabel] = taskStepsData.filter(
+              (task) => task.stage.toUpperCase() === newLabel.toUpperCase()
+            );
+            delete updatedTasks[oldLabel];
+            return {
+              ...workflow,
+              nodes: updatedNodes,
+              tasks: updatedTasks,
+            };
+          }
+          return workflow;
+        });
+        // Persist the updated workflows to localStorage
+        localStorage.setItem("jiraWorkflows", JSON.stringify(updatedWorkflows));
+        return updatedWorkflows;
+      });
+    }
+
     setSelectedElement((prev) => ({
       ...prev,
       data: { ...prev.data, data: { ...prev.data.data, ...updatedData } },
@@ -325,10 +451,42 @@ function JiraWorkflowEditorContent() {
   // Delete status (node) and related edges
   const deleteStatus = () => {
     const nodeId = selectedElement.data.id;
+    const nodeLabel = selectedElement.data.data.label;
+
+    // Remove the node
     setNodes((nds) => nds.filter((node) => node.id !== nodeId));
+    // Remove related edges
     setEdges((eds) =>
       eds.filter((edge) => edge.source !== nodeId && edge.target !== nodeId)
     );
+    // Remove tasks associated with the deleted node
+    setTasks((prevTasks) => {
+      const updatedTasks = { ...prevTasks };
+      delete updatedTasks[nodeLabel];
+      return updatedTasks;
+    });
+    // Update savedWorkflows to reflect the deletion
+    setSavedWorkflows((prevWorkflows) => {
+      const updatedWorkflows = prevWorkflows.map((workflow) => {
+        if (workflow.id === selectedWorkflowId) {
+          const updatedNodes = workflow.nodes.filter((node) => node.id !== nodeId);
+          const updatedEdges = workflow.edges.filter(
+            (edge) => edge.source !== nodeId && edge.target !== nodeId
+          );
+          const updatedTasks = { ...workflow.tasks };
+          delete updatedTasks[nodeLabel];
+          return {
+            ...workflow,
+            nodes: updatedNodes,
+            edges: updatedEdges,
+            tasks: updatedTasks,
+          };
+        }
+        return workflow;
+      });
+      localStorage.setItem("jiraWorkflows", JSON.stringify(updatedWorkflows));
+      return updatedWorkflows;
+    });
     setSelectedElement(null);
   };
 
@@ -349,11 +507,46 @@ function JiraWorkflowEditorContent() {
         data: { ...prev.data.data, label: newLabel },
       },
     }));
+    // Update savedWorkflows to reflect the edge label change
+    setSavedWorkflows((prevWorkflows) => {
+      const updatedWorkflows = prevWorkflows.map((workflow) => {
+        if (workflow.id === selectedWorkflowId) {
+          const updatedEdges = workflow.edges.map((edge) =>
+            edge.id === selectedElement.data.id
+              ? { ...edge, label: newLabel, data: { ...edge.data, label: newLabel } }
+              : edge
+          );
+          return {
+            ...workflow,
+            edges: updatedEdges,
+          };
+        }
+        return workflow;
+      });
+      localStorage.setItem("jiraWorkflows", JSON.stringify(updatedWorkflows));
+      return updatedWorkflows;
+    });
   };
 
   // Delete transition (edge)
   const deleteTransition = () => {
-    setEdges((eds) => eds.filter((edge) => edge.id !== selectedElement.data.id));
+    const edgeId = selectedElement.data.id;
+    setEdges((eds) => eds.filter((edge) => edge.id !== edgeId));
+    // Update savedWorkflows to reflect the edge deletion
+    setSavedWorkflows((prevWorkflows) => {
+      const updatedWorkflows = prevWorkflows.map((workflow) => {
+        if (workflow.id === selectedWorkflowId) {
+          const updatedEdges = workflow.edges.filter((edge) => edge.id !== edgeId);
+          return {
+            ...workflow,
+            edges: updatedEdges,
+          };
+        }
+        return workflow;
+      });
+      localStorage.setItem("jiraWorkflows", JSON.stringify(updatedWorkflows));
+      return updatedWorkflows;
+    });
     setSelectedElement(null);
   };
 
@@ -368,23 +561,52 @@ function JiraWorkflowEditorContent() {
       setSelectedElement(null);
       setWorkflowName("");
       setSelectedWorkflowId(null);
-      setTasks(tasksData); // Reset tasks when deleting the selected workflow
+      // Reset tasks to initial nodes using taskStepsData
+      const initialTasks = {};
+      initialNodes
+        .filter((node) => node.type === "customNode")
+        .forEach((node) => {
+          const label = node.data.label;
+          initialTasks[label] = taskStepsData.filter(
+            (task) => task.stage.toUpperCase() === label.toUpperCase()
+          );
+        });
+      setTasks(initialTasks);
     }
   };
 
   // Handle task click
   const handleTaskClick = (task) => {
-    alert("Task clicked: " + task.title + " (To be enhanced)");
+    alert("Task clicked: " + (task.title || task.chapter) + " (To be enhanced)");
   };
 
   // Handle adding a new task
   const handleAddTask = (newTask) => {
     if (selectedElement && selectedElement.type === "node") {
       const stateLabel = selectedElement.data.data.label;
-      setTasks((prevTasks) => ({
-        ...prevTasks,
-        [stateLabel]: [...(prevTasks[stateLabel] || []), newTask],
-      }));
+      setTasks((prevTasks) => {
+        const updatedTasks = {
+          ...prevTasks,
+          [stateLabel]: [...(prevTasks[stateLabel] || []), newTask],
+        };
+        return updatedTasks;
+      });
+      // Update savedWorkflows to reflect the new task
+      setSavedWorkflows((prevWorkflows) => {
+        const updatedWorkflows = prevWorkflows.map((workflow) => {
+          if (workflow.id === selectedWorkflowId) {
+            const updatedTasks = { ...workflow.tasks };
+            updatedTasks[stateLabel] = [...(updatedTasks[stateLabel] || []), newTask];
+            return {
+              ...workflow,
+              tasks: updatedTasks,
+            };
+          }
+          return workflow;
+        });
+        localStorage.setItem("jiraWorkflows", JSON.stringify(updatedWorkflows));
+        return updatedWorkflows;
+      });
     }
   };
 
@@ -458,23 +680,22 @@ function JiraWorkflowEditorContent() {
               Workflow Editor
             </h1>
             <div className="flex space-x-2">
+              <select
+                value={selectedStage}
+                onChange={(e) => setSelectedStage(e.target.value)}
+                className="px-3 py-1 border rounded-md text-sm"
+              >
+                {uniqueStages.map((stage) => (
+                  <option key={stage} value={stage}>
+                    {stage}
+                  </option>
+                ))}
+              </select>
               <button
-                onClick={() => addStatus("To Do")}
+                onClick={addStatus}
                 className="px-3 py-1 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 text-sm transition-colors"
               >
-                To-do status
-              </button>
-              <button
-                onClick={() => addStatus("In Progress")}
-                className="px-3 py-1 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 text-sm transition-colors"
-              >
-                In-progress status
-              </button>
-              <button
-                onClick={() => addStatus("Done")}
-                className="px-3 py-1 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 text-sm transition-colors"
-              >
-                Done status
+                Add Status
               </button>
               <button
                 onClick={() => alert("Drag between statuses to create a transition")}
@@ -648,22 +869,54 @@ function JiraWorkflowEditorContent() {
                 {/* Tasks Section */}
                 <div className="border-t pt-4">
                   <h3 className="text-lg font-semibold text-gray-700 mb-4">Tasks</h3>
-                  {tasks[selectedElement.data.data.label]?.length > 0 ? (
-                    <div className="space-y-2 mb-4">
-                      {tasks[selectedElement.data.data.label].map((task) => (
-                        <div
-                          key={task.id}
-                          onClick={() => handleTaskClick(task)}
-                          className="p-2 bg-gray-50 rounded-md hover:bg-gray-100 cursor-pointer"
-                        >
-                          <p className="text-sm font-medium">{task.title}</p>
-                          <p className="text-xs text-gray-500">{task.status}</p>
+                  {(() => {
+                    const stateLabel = selectedElement.data.data.label;
+                    const stateTasks = tasks[stateLabel] || [];
+                    const stateTasksFromSteps = taskStepsData.filter(
+                      (task) => task.stage.toUpperCase() === stateLabel.toUpperCase()
+                    );
+                    const combinedTasks = [...stateTasks, ...stateTasksFromSteps];
+
+                    // Remove duplicates by chapter to avoid showing the same task twice
+                    const uniqueTasks = Array.from(
+                      new Map(combinedTasks.map(task => [task.chapter || task.id, task])).values()
+                    );
+
+                    if (uniqueTasks.length > 0) {
+                      return (
+                        <div className="space-y-2 mb-4">
+                          {uniqueTasks.map((task, index) => (
+                            <div
+                              key={task.id || `ruleset-${index}`}
+                              onClick={() => handleTaskClick(task)}
+                              className="p-2 bg-gray-50 rounded-md hover:bg-gray-100 cursor-pointer"
+                            >
+                              {/* Display for tasks created via modal */}
+                              {task.title && (
+                                <>
+                                  <p className="text-sm font-medium">{task.title}</p>
+                                  <p className="text-xs text-gray-500">{task.status}</p>
+                                </>
+                              )}
+                              {/* Display for tasks from taskStepsData (ruleset.json) */}
+                              {task.chapter && (
+                                <>
+                                  <p className="text-sm font-medium">
+                                    {task.chapter} ({task.requirement_tag})
+                                  </p>
+                                  <p className="text-xs text-gray-500">
+                                    Deliverable: {task.deliverable}
+                                  </p>
+                                </>
+                              )}
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-sm text-gray-500 mb-4">No tasks for this status.</p>
-                  )}
+                      );
+                    } else {
+                      return <p className="text-sm text-gray-500 mb-4">No tasks for this status.</p>;
+                    }
+                  })()}
                   <button
                     onClick={() => setShowCreateTaskModal(true)}
                     className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"

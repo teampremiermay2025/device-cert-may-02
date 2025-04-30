@@ -1,4 +1,4 @@
-import { FC, useState, useCallback } from 'react';
+import { FC, useState, useCallback, useEffect } from 'react';
 import { Dialog } from '@headlessui/react';
 import { 
   ClockIcon, 
@@ -13,17 +13,17 @@ import {
   ArrowPathIcon,
   EllipsisHorizontalIcon,
   UserCircleIcon,
-  EyeIcon,
   StarIcon,
   ChevronDownIcon,
   ChevronUpIcon,
   DevicePhoneMobileIcon,
   CalendarIcon,
 } from '@heroicons/react/24/outline';
-import { CertificationRequest, CertificationTask, CertificationStage } from '../types';
+import { CertificationRequest, CertificationTask, CertificationStage, TaskStatus, TaskPriority } from '../types';
 import { TaskBoard } from './TaskBoard';
 import { getStageColor } from '../lib/workflow';
 import { storage } from '../lib/storage';
+import taskStepsData from '../data/ruleset.json';
 
 interface ViewCertificationModalProps {
   isOpen: boolean;
@@ -41,7 +41,6 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
   const [selectedTask, setSelectedTask] = useState<CertificationTask | null>(null);
   const [editedTask, setEditedTask] = useState<CertificationTask | null>(null);
   const [view, setView] = useState<'list' | 'board'>('board');
-  const [showTimeTracking, setShowTimeTracking] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [workflow, setWorkflow] = useState<any>(null);
   
@@ -50,6 +49,41 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
     deviceDetails: false,
     forecastedDates: false,
   });
+
+  // Load the workflow associated with the certification
+  useEffect(() => {
+    const saved = localStorage.getItem("jiraWorkflows");
+    if (saved) {
+      try {
+        const workflows = JSON.parse(saved);
+        const matchedWorkflow = workflows.find((w: any) => w.id === certification.workflow);
+        if (matchedWorkflow) {
+          const transformedWorkflow = {
+            id: matchedWorkflow.id,
+            name: matchedWorkflow.name,
+            description: matchedWorkflow.description || '',
+            status: matchedWorkflow.status || 'active',
+            version: matchedWorkflow.version || 1,
+            nodes: matchedWorkflow.nodes,
+            edges: matchedWorkflow.edges,
+            createdAt: matchedWorkflow.createdAt || new Date().toISOString(),
+            updatedAt: matchedWorkflow.updatedAt || new Date().toISOString(),
+            stages: matchedWorkflow.nodes
+              .filter((node: any) => node && node.type === "customNode")
+              .map((node: any) => ({
+                id: node.id || crypto.randomUUID(),
+                name: node.data?.label.toUpperCase() || 'FORECAST',
+                tasks: [],
+              })),
+            tasks: matchedWorkflow.tasks,
+          };
+          setWorkflow(transformedWorkflow);
+        }
+      } catch (error) {
+        console.error("Error loading workflow:", error);
+      }
+    }
+  }, [certification.workflow]);
 
   const toggleSection = (section: keyof typeof expandedSections) => {
     setExpandedSections(prev => ({
@@ -61,6 +95,32 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
   const handleTaskSelect = (task: CertificationTask) => {
     setSelectedTask(task);
     setEditedTask(task);
+  };
+
+  // Function to filter tasks from ruleset.json based on projectType, deviceChannel, and stage
+  const filterTasksFromRuleset = (stage: string, projectType: string, deviceChannel: string): CertificationTask[] => {
+    const filteredTasks = taskStepsData.filter((task) => {
+      const matchesIssueType = task.issue_types.includes(projectType);
+      const matchesDeviceChannel = task.device_channels.includes(deviceChannel);
+      const matchesStage = task.stage.toUpperCase() === stage.toUpperCase();
+      return matchesIssueType && matchesDeviceChannel && matchesStage;
+    });
+
+    return filteredTasks.map((task) => ({
+      id: crypto.randomUUID(),
+      name: `${task.chapter} (${task.requirement_tag})`,
+      description: `Deliverable: ${task.deliverable}`,
+      status: 'TODO' as TaskStatus,
+      isChecked: false,
+      assignee: certification.assignee || undefined,
+      priority: 'MEDIUM' as TaskPriority,
+      dueDate: certification.targetDate || undefined,
+      attachments: [],
+      comments: [],
+      timeSpent: undefined,
+      labels: [],
+      stage: stage.toUpperCase() as CertificationStage,
+    }));
   };
 
   const handleTaskUpdate = (updatedTask?: CertificationTask) => {
@@ -89,11 +149,7 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
 
       if (nextStageIndex < stageOrder.length) {
         const nextStage = stageOrder[nextStageIndex] as CertificationStage;
-        const nextStageKey = Object.keys(workflow.tasks || {}).find(
-          (key) => key.toLowerCase() === nextStage.toLowerCase()
-        );
-        const nextStageTasks = nextStageKey ? workflow.tasks[nextStageKey] : [];
-        const newTasks = transformTasks(nextStageTasks, nextStage);
+        const newTasks = filterTasksFromRuleset(nextStage, certification.type, certification.deviceChannel);
 
         updatedCertification = {
           ...updatedCertification,
