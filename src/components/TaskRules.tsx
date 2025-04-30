@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ruleset from '../data/ruleset.json';
 import { getDevicesByType, getAllDevices, DeviceItem } from '../data/devices';
+import ReactSelect, { GroupBase, OptionsOrGroups } from 'react-select';
 
 interface RuleSet {
   chapter: string;
@@ -85,6 +86,45 @@ export const TaskRules: React.FC = () => {
     }
   };
 
+  // Prepare grouped device options for react-select
+  const iotOptions = iotDevices.map(dev => ({
+    value: dev["Device Marketing Name"],
+    label: dev["Device Marketing Name"],
+    group: 'IoT Devices',
+  }));
+  const nonIotOptions = nonIotDevices.map(dev => ({
+    value: dev["Device Marketing Name"],
+    label: dev["Device Marketing Name"],
+    group: 'Non-IoT Devices',
+  }));
+  const groupedDeviceOptions: OptionsOrGroups<any, GroupBase<any>> = [
+    { label: 'IoT Devices', options: iotOptions },
+    { label: 'Non-IoT Devices', options: nonIotOptions },
+  ];
+
+  const [tryOutDevice, setTryOutDevice] = React.useState<string>('');
+  const [tryOutStage, setTryOutStage] = React.useState<string>('');
+  const [tryOutResults, setTryOutResults] = React.useState<RuleSet[]>([]);
+
+  React.useEffect(() => {
+    if (!tryOutDevice && !tryOutStage) {
+      setTryOutResults([]);
+      return;
+    }
+    // Find selected device
+    const selectedDevice = [...iotDevices, ...nonIotDevices].find(d => d["Device Marketing Name"] === tryOutDevice);
+    if (!selectedDevice) {
+      setTryOutResults([]);
+      return;
+    }
+    const deviceChannel = selectedDevice["Device Channel"];
+    let filtered = rules.filter(r => r.device_channels.includes(deviceChannel));
+    if (tryOutStage) {
+      filtered = filtered.filter(r => r.stage === tryOutStage);
+    }
+    setTryOutResults(filtered);
+  }, [tryOutDevice, tryOutStage, rules, iotDevices, nonIotDevices]);
+
   return (
     <div className="p-2 sm:p-4 w-full mx-auto">
       <h1 className="text-3xl font-bold mb-8 text-blue-900">Task Rules</h1>
@@ -98,8 +138,8 @@ export const TaskRules: React.FC = () => {
         </button>
       </div>
       {/* Quick Filters */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-6">
-        <div className="flex-1">
+      <div className="flex flex-row gap-2 mb-4" style={{width: '70%'}}>
+        <div className="w-40">
           <label className="block text-xs font-semibold mb-1">Issue Type</label>
           <select
             className="border rounded p-2 w-full"
@@ -112,7 +152,7 @@ export const TaskRules: React.FC = () => {
             ))}
           </select>
         </div>
-        <div className="flex-1">
+        <div className="w-40">
           <label className="block text-xs font-semibold mb-1">Device Channel</label>
           <select
             className="border rounded p-2 w-full"
@@ -125,7 +165,7 @@ export const TaskRules: React.FC = () => {
             ))}
           </select>
         </div>
-        <div className="flex-1">
+        <div className="w-40">
           <label className="block text-xs font-semibold mb-1">Stage</label>
           <select
             className="border rounded p-2 w-full"
@@ -165,9 +205,9 @@ export const TaskRules: React.FC = () => {
           </div>
         </div>
       )}
-      <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-8 items-start w-full">
-        <div className="w-full">
-          <div className="overflow-x-auto rounded-2xl shadow-xl border border-blue-100 bg-white w-full">
+      <div className="grid grid-cols-1 md:grid-cols-[70%_1fr] gap-8 items-start w-full" style={{height: '80vh'}}>
+        <div className="w-full" style={{width: '100%', maxWidth: '100%', height: '80vh'}}>
+          <div className="overflow-x-auto overflow-y-auto rounded-2xl shadow-xl border border-blue-100 bg-white w-full h-full" style={{height: '100%'}}>
             <table className="min-w-full text-sm text-left">
               <thead className="bg-gradient-to-r from-blue-100 to-blue-200 text-blue-900 sticky top-0 z-10">
                 <tr>
@@ -206,6 +246,61 @@ export const TaskRules: React.FC = () => {
                 ))}
               </tbody>
             </table>
+          </div>
+        </div>
+        <div className="w-full md:w-auto">
+          <div className="mb-8 border p-4 rounded-lg bg-blue-50">
+            <h2 className="text-lg font-semibold mb-3 text-blue-800">Try Out</h2>
+            <label className="block text-sm font-medium mb-1">Device</label>
+            <ReactSelect
+              options={groupedDeviceOptions}
+              classNamePrefix="react-select"
+              placeholder="Select device..."
+              isClearable
+              onChange={option => setTryOutDevice(option ? option.value : '')}
+              value={tryOutDevice ? groupedDeviceOptions.flatMap(g => g.options).find(opt => opt.value === tryOutDevice) : null}
+              formatGroupLabel={data => (
+                <div style={{ fontWeight: 'bold', color: '#2563eb' }}>{data.label}</div>
+              )}
+              styles={{
+                menu: provided => ({ ...provided, zIndex: 9999 }),
+                control: provided => ({ ...provided, minHeight: '40px' }),
+              }}
+            />
+            <label className="block text-sm font-medium mb-1 mt-4">Stage</label>
+            <select
+              className="border rounded p-2 w-full mb-4"
+              value={tryOutStage}
+              onChange={e => setTryOutStage(e.target.value)}
+            >
+              <option value="">-- Select Stage --</option>
+              {allStages.map(stage => (
+                <option key={stage} value={stage}>{stage}</option>
+              ))}
+            </select>
+            {/* Results */}
+            <div className="mt-4">
+              {tryOutDevice && tryOutResults.length === 0 && (
+                <div className="text-blue-500 italic">No tasks found for this device/channel and stage.</div>
+              )}
+              {tryOutResults.length > 0 && (
+                <div className="space-y-4">
+                  {tryOutResults.map((rule, idx) => (
+                    <div key={idx} className="bg-white border border-blue-200 rounded-xl shadow p-4 flex flex-col items-start hover:shadow-lg transition w-full">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-lg font-bold text-blue-800">{rule.deliverable}</span>
+                        <span className="ml-2 px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-700 font-semibold">{rule.stage}</span>
+                      </div>
+                      <div className="text-sm text-gray-500 mb-1"><span className="font-semibold">Chapter:</span> {rule.chapter}</div>
+                      <div className="text-sm text-gray-500 mb-1"><span className="font-semibold">Requirement:</span> {rule.requirement_tag}</div>
+                      <div className="text-xs text-blue-600 mb-1"><span className="font-semibold">Issue Types:</span> {Array.isArray(rule.issue_types) ? rule.issue_types.join(', ') : rule.issue_types}</div>
+                      <div className="text-xs text-blue-600 mb-1"><span className="font-semibold">Device Channels:</span> {Array.isArray(rule.device_channels) ? rule.device_channels.join(', ') : rule.device_channels}</div>
+                      <div className="text-xs text-blue-600"><span className="font-semibold">Device:</span> {rule.device}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
