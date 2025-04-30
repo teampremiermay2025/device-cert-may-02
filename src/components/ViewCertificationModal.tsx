@@ -543,7 +543,7 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
                                 />
                                 <div>
                                   <h4 className="font-medium">{task.name}
-                                    {task.name === '2005.2 (PTN-20006 Monitoring Results)' && (
+                                    {/* {task.name === '2005.2 (PTN-20006 Monitoring Results)' && ( */}
                                       <button
                                         onClick={handleAITestCaseClick}
                                         className="ml-2 p-1 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center"
@@ -554,7 +554,7 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
                                         </svg>
                                         <span className="inline-block align-middle">Generate Test Cases</span>
                                       </button>
-                                    )}
+                                    {/* )} */}
                                   </h4>
                                   {task.description && (
                                     <p className="text-sm text-gray-600 mt-1">
