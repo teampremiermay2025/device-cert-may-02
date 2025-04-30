@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import ruleset from '../data/ruleset.json';
+import { getDevicesByType, getAllDevices, DeviceItem } from '../data/devices';
 
 interface RuleSet {
   chapter: string;
@@ -30,25 +31,25 @@ export const TaskRules: React.FC = () => {
     issue_type: '',
     device_channel: '',
     stage: '',
-    device: '',
   });
   const [filtered, setFiltered] = useState<RuleSet[]>([]);
   const [hasSelected, setHasSelected] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newRule, setNewRule] = useState<RuleSet>(emptyRule);
 
+  const [iotDevices, setIotDevices] = useState<DeviceItem[]>([]);
+  const [nonIotDevices, setNonIotDevices] = useState<DeviceItem[]>([]);
+
   useEffect(() => {
     setRules(Array.isArray(ruleset) ? ruleset : []);
+    const { iot, nonIot } = getDevicesByType();
+    setIotDevices(iot);
+    setNonIotDevices(nonIot);
   }, []);
 
-  // Try Out filter logic (separate from grid)
   useEffect(() => {
     const hasAny = Object.values(filter).some(v => v);
     setHasSelected(hasAny);
-    if (!hasAny) {
-      setFiltered([]);
-      return;
-    }
     let result = rules;
     if (filter.issue_type) {
       result = result.filter(r => r.issue_types.includes(filter.issue_type));
@@ -59,23 +60,17 @@ export const TaskRules: React.FC = () => {
     if (filter.stage) {
       result = result.filter(r => r.stage === filter.stage);
     }
-    if (filter.device) {
-      result = result.filter(r => r.device === filter.device);
-    }
     setFiltered(result);
   }, [filter, rules]);
 
-  // Collect all unique filter values
   const allIssueTypes = getUnique(rules.flatMap(r => r.issue_types || []));
-  const allDeviceChannels = getUnique(rules.flatMap(r => r.device_channels || []));
   const allStages = getUnique(rules.map(r => r.stage));
-  const allDevices = getUnique(rules.map(r => r.device));
+  const allDeviceChannels = getUnique(rules.flatMap(r => r.device_channels || []));
 
   const handleClear = () => {
-    setFilter({ issue_type: '', device_channel: '', stage: '', device: '' });
+    setFilter({ issue_type: '', device_channel: '', stage: '' });
   };
 
-  // Add Rule Modal Logic
   const handleAddRule = () => {
     setRules(prev => [...prev, newRule]);
     setShowAddModal(false);
@@ -83,7 +78,6 @@ export const TaskRules: React.FC = () => {
   };
 
   const handleChange = (field: keyof RuleSet, value: string) => {
-    // For multi-value fields, split by comma and trim
     if (field === 'issue_types' || field === 'device_channels') {
       setNewRule(r => ({ ...r, [field]: value.split(',').map(s => s.trim()).filter(Boolean) }));
     } else {
@@ -94,7 +88,6 @@ export const TaskRules: React.FC = () => {
   return (
     <div className="p-2 sm:p-4 w-full mx-auto">
       <h1 className="text-3xl font-bold mb-8 text-blue-900">Task Rules</h1>
-      {/* Add Button */}
       <div className="flex flex-col sm:flex-row justify-end items-center mb-4 gap-2">
         <button
           className="inline-flex items-center justify-center px-6 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition font-semibold text-base w-full sm:w-auto"
@@ -104,7 +97,48 @@ export const TaskRules: React.FC = () => {
           Add Task Rule
         </button>
       </div>
-      {/* Modal for Add Task Rule */}
+      {/* Quick Filters */}
+      <div className="flex flex-col sm:flex-row gap-4 mb-6">
+        <div className="flex-1">
+          <label className="block text-xs font-semibold mb-1">Issue Type</label>
+          <select
+            className="border rounded p-2 w-full"
+            value={filter.issue_type}
+            onChange={e => setFilter(f => ({ ...f, issue_type: e.target.value }))}
+          >
+            <option value="">All</option>
+            {allIssueTypes.map(type => (
+              <option key={type} value={type}>{type}</option>
+            ))}
+          </select>
+        </div>
+        <div className="flex-1">
+          <label className="block text-xs font-semibold mb-1">Device Channel</label>
+          <select
+            className="border rounded p-2 w-full"
+            value={filter.device_channel || ''}
+            onChange={e => setFilter(f => ({ ...f, device_channel: e.target.value }))}
+          >
+            <option value="">All</option>
+            {allDeviceChannels.map(channel => (
+              <option key={channel} value={channel}>{channel}</option>
+            ))}
+          </select>
+        </div>
+        <div className="flex-1">
+          <label className="block text-xs font-semibold mb-1">Stage</label>
+          <select
+            className="border rounded p-2 w-full"
+            value={filter.stage}
+            onChange={e => setFilter(f => ({ ...f, stage: e.target.value }))}
+          >
+            <option value="">All</option>
+            {allStages.map(stage => (
+              <option key={stage} value={stage}>{stage}</option>
+            ))}
+          </select>
+        </div>
+      </div>
       {showAddModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
           <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-lg mx-auto relative animate-fadeIn">
@@ -132,7 +166,6 @@ export const TaskRules: React.FC = () => {
         </div>
       )}
       <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-8 items-start w-full">
-        {/* Data Grid on the left, now 2/3 width */}
         <div className="w-full">
           <div className="overflow-x-auto rounded-2xl shadow-xl border border-blue-100 bg-white w-full">
             <table className="min-w-full text-sm text-left">
@@ -148,12 +181,12 @@ export const TaskRules: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {rules.length === 0 && (
+                {filtered.length === 0 && (
                   <tr>
                     <td colSpan={7} className="py-10 text-center text-gray-400 italic">No rules available.</td>
                   </tr>
                 )}
-                {rules.map((rule, idx) => (
+                {filtered.map((rule, idx) => (
                   <tr
                     key={idx}
                     className={
@@ -173,89 +206,6 @@ export const TaskRules: React.FC = () => {
                 ))}
               </tbody>
             </table>
-          </div>
-        </div>
-        {/* Try Out Section on the right, now 1/3 width and expands */}
-        <div className="w-full">
-          <div className="bg-gradient-to-tr from-blue-50 to-blue-100 rounded-2xl shadow-lg p-4 sm:p-8 flex flex-col items-center w-full border border-blue-200 relative">
-            <h2 className="text-2xl font-semibold mb-4 text-blue-800">🎯 Try Out Quick Filters</h2>
-            <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-4 sm:gap-5 w-full mb-4">
-              <select
-                className="border-2 border-blue-200 rounded-lg p-2 min-w-[160px] focus:ring-2 focus:ring-blue-300 w-full sm:w-auto"
-                value={filter.issue_type}
-                onChange={e => setFilter(f => ({ ...f, issue_type: e.target.value }))}
-              >
-                <option value="">Issue Type</option>
-                {allIssueTypes.map(type => (
-                  <option key={type} value={type}>{type}</option>
-                ))}
-              </select>
-              <select
-                className="border-2 border-blue-200 rounded-lg p-2 min-w-[160px] focus:ring-2 focus:ring-blue-300 w-full sm:w-auto"
-                value={filter.device_channel}
-                onChange={e => setFilter(f => ({ ...f, device_channel: e.target.value }))}
-              >
-                <option value="">Device Channel</option>
-                {allDeviceChannels.map(channel => (
-                  <option key={channel} value={channel}>{channel}</option>
-                ))}
-              </select>
-              <select
-                className="border-2 border-blue-200 rounded-lg p-2 min-w-[160px] focus:ring-2 focus:ring-blue-300 w-full sm:w-auto"
-                value={filter.stage}
-                onChange={e => setFilter(f => ({ ...f, stage: e.target.value }))}
-              >
-                <option value="">Stage</option>
-                {allStages.map(stage => (
-                  <option key={stage} value={stage}>{stage}</option>
-                ))}
-              </select>
-              <select
-                className="border-2 border-blue-200 rounded-lg p-2 min-w-[160px] focus:ring-2 focus:ring-blue-300 w-full sm:w-auto"
-                value={filter.device}
-                onChange={e => setFilter(f => ({ ...f, device: e.target.value }))}
-              >
-                <option value="">Device</option>
-                {allDevices.map(device => (
-                  <option key={device} value={device}>{device}</option>
-                ))}
-              </select>
-            </div>
-            <div className="flex gap-4 mt-2">
-              <button
-                className="px-5 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition font-semibold"
-                onClick={handleClear}
-                type="button"
-                disabled={!hasSelected}
-              >
-                Clear Filters
-              </button>
-            </div>
-            <div className="mt-6 w-full text-center">
-              {!hasSelected && (
-                <span className="text-gray-400 italic">Select at least one filter to see rules...</span>
-              )}
-              {hasSelected && filtered.length === 0 && (
-                <span className="text-blue-500 italic">No rules found for selected criteria.</span>
-              )}
-              {hasSelected && filtered.length > 0 && (
-                <div className="grid grid-cols-1 gap-5 mt-4">
-                  {filtered.map((rule, idx) => (
-                    <div key={idx} className="bg-white border border-blue-200 rounded-xl shadow p-5 flex flex-col items-start hover:shadow-lg transition w-full">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-lg font-bold text-blue-800">{rule.deliverable}</span>
-                        <span className="ml-2 px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-700 font-semibold">{rule.stage}</span>
-                      </div>
-                      <div className="text-sm text-gray-500 mb-1"><span className="font-semibold">Chapter:</span> {rule.chapter}</div>
-                      <div className="text-sm text-gray-500 mb-1"><span className="font-semibold">Requirement:</span> {rule.requirement_tag}</div>
-                      <div className="text-xs text-blue-600 mb-1"><span className="font-semibold">Issue Types:</span> {Array.isArray(rule.issue_types) ? rule.issue_types.join(', ') : rule.issue_types}</div>
-                      <div className="text-xs text-blue-600 mb-1"><span className="font-semibold">Device Channels:</span> {Array.isArray(rule.device_channels) ? rule.device_channels.join(', ') : rule.device_channels}</div>
-                      <div className="text-xs text-blue-600"><span className="font-semibold">Device:</span> {rule.device}</div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
           </div>
         </div>
       </div>
