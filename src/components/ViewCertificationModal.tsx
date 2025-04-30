@@ -1,4 +1,4 @@
-import { FC, useState, useCallback, useEffect } from 'react';
+import { FC, useState, useCallback, useEffect, useRef } from 'react';
 import { Dialog } from '@headlessui/react';
 import { 
   ClockIcon, 
@@ -18,6 +18,7 @@ import {
   ChevronUpIcon,
   DevicePhoneMobileIcon,
   CalendarIcon,
+  SparklesIcon,
 } from '@heroicons/react/24/outline';
 import { CertificationRequest, CertificationTask, CertificationStage, TaskStatus, TaskPriority } from '../types';
 import { TaskBoard } from './TaskBoard';
@@ -197,6 +198,67 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
     task => task.stage === certification.status
   );
 
+  // Add state for AI test case generation UI
+  const [showAITestCaseSection, setShowAITestCaseSection] = useState(false);
+  const [aiStep, setAIStep] = useState<'idle' | 'processing' | 'understanding' | 'typing' | 'done'>('idle');
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [aiTestCases, setAITestCases] = useState<string[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Handler for AI Test Case button
+  const handleAITestCaseClick = () => {
+    setShowAITestCaseSection(true);
+    setAIStep('idle');
+    setUploadedFile(null);
+    setAITestCases([]);
+  };
+
+  // Handler for file drop
+  const handleFileDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      setUploadedFile(e.dataTransfer.files[0]);
+      startAIProcessing();
+    }
+  };
+
+  const handleBrowseClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setUploadedFile(e.target.files[0]);
+      startAIProcessing();
+    }
+  };
+
+  // Simulate AI processing steps
+  const startAIProcessing = () => {
+    setAIStep('processing');
+    setTimeout(() => {
+      setAIStep('understanding');
+      setTimeout(() => {
+        setAIStep('typing');
+        // Simulate typing/scrolling animation, then show test cases
+        setTimeout(() => {
+          setAIStep('done');
+          setAITestCases([
+            'Test Case 1: Validate login with valid credentials',
+            'Test Case 2: Validate login with invalid credentials',
+            'Test Case 3: Check password reset flow',
+            'Test Case 4: Ensure session timeout after inactivity',
+          ]);
+        }, 2500);
+      }, 2000);
+    }, 2000);
+  };
+
+  // Drag & drop helpers
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+  };
+
   return (
     <Dialog 
       open={isOpen} 
@@ -210,7 +272,9 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
             <div className="flex justify-between items-start">
               {selectedTask ? (
                 <div>
-                  <h2 className="text-xl font-bold">{selectedTask.name}</h2>
+                  <h2 className="text-xl font-bold">{selectedTask.name}
+                    
+                  </h2>
                   <p className="text-sm text-gray-500">Task ID: {selectedTask.id}</p>
                 </div>
               ) : (
@@ -478,7 +542,20 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
                                   onClick={(e) => e.stopPropagation()}
                                 />
                                 <div>
-                                  <h4 className="font-medium">{task.name}</h4>
+                                  <h4 className="font-medium">{task.name}
+                                    {task.name === '2005.2 (PTN-20006 Monitoring Results)' && (
+                                      <button
+                                        onClick={handleAITestCaseClick}
+                                        className="ml-2 p-1 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center"
+                                        title="Generate AI Test Case"
+                                      >
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                        </svg>
+                                        <span className="inline-block align-middle">Generate Test Cases</span>
+                                      </button>
+                                    )}
+                                  </h4>
                                   {task.description && (
                                     <p className="text-sm text-gray-600 mt-1">
                                       {task.description}
@@ -533,6 +610,18 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
                       >
                         Add Comment
                       </button>
+
+                      {selectedTask.name === '2005.2 (PTN-20006 Monitoring Results)' && (
+                      <button
+                        onClick={handleAITestCaseClick}
+                        className="ml-2 mt-4 p-1 bg-pink-500 text-white rounded hover:bg-blue-600 flex items-center"
+                        title="Generate AI Test Case"
+                        disabled={showAITestCaseSection}
+                      >
+                        <SparklesIcon className="w-5 h-5 mr-2 text-white" />
+                        <span className="inline-block align-middle">Generate Test Cases</span>
+                      </button>
+                    )}
                     </div>
                     <div className="space-y-4">
                       {editedTask.comments.map((comment) => (
@@ -661,8 +750,114 @@ export const ViewCertificationModal: FC<ViewCertificationModalProps> = ({
               </div>
             </div>
           )}
+          {selectedTask && showAITestCaseSection && (
+            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              {aiStep === 'idle' && (
+                <div
+                  className="flex flex-col items-center justify-center border-2 border-dashed border-blue-400 rounded-lg p-6 cursor-pointer hover:bg-blue-100 transition"
+                  onDrop={handleFileDrop}
+                  onDragOver={handleDragOver}
+                  onClick={handleBrowseClick}
+                  style={{ minHeight: 120 }}
+                >
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".pdf,.doc,.docx,.txt"
+                    className="hidden"
+                    onChange={handleFileChange}
+                  />
+                  <div className="text-blue-500 font-semibold text-lg">Drag & Drop requirement file here</div>
+                  <div className="text-gray-500 mt-2">or <span className="underline cursor-pointer text-blue-700">Browse</span></div>
+                </div>
+              )}
+              {uploadedFile && aiStep !== 'done' && (
+                <div className="flex flex-col items-center py-8">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="font-medium text-blue-600">{uploadedFile.name}</span>
+                  </div>
+                  {aiStep === 'processing' && (
+                    <div className="flex flex-col items-center">
+                      <div className="loader mb-2"></div>
+                      <span className="text-blue-700 font-medium animate-pulse">Processing...</span>
+                    </div>
+                  )}
+                  {aiStep === 'understanding' && (
+                    <div className="flex flex-col items-center">
+                      <div className="loader mb-2"></div>
+                      <span className="text-blue-700 font-medium animate-pulse">Understanding Requirement...</span>
+                    </div>
+                  )}
+                  {aiStep === 'typing' && (
+                    <div className="flex flex-col items-center">
+                      <div className="loader mb-2"></div>
+                      <span className="text-blue-700 font-medium animate-pulse">Creating Test Cases...</span>
+                      <div className="mt-4 w-full max-w-md bg-white border border-gray-200 rounded-lg p-4 h-24 overflow-y-auto animate-pulse">
+                        <span className="typing">Generating test cases...</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+              {aiStep === 'done' && (
+                <div className="mt-4">
+                  <div className="text-green-700 font-semibold mb-2">Test Cases Generated:</div>
+                  <ul className="list-disc pl-6 space-y-1">
+                    {aiTestCases.map((tc, idx) => (
+                      <li key={idx} className="animate-fade-in-up">{tc}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
         </Dialog.Panel>
       </div>
     </Dialog>
   );
 };
+
+/* Add simple loader, typing, and fade-in animations */
+<style jsx>{`
+.loader {
+  border: 4px solid #e0e7ef;
+  border-top: 4px solid #3b82f6;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.typing {
+  display: inline-block;
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 2px solid #3b82f6;
+  animation: typing 2s steps(24, end), blink-caret 0.75s step-end infinite;
+}
+@keyframes typing {
+  from { width: 0 }
+  to { width: 100% }
+}
+@keyframes blink-caret {
+  from, to { border-color: transparent }
+  50% { border-color: #3b82f6; }
+}
+.animate-fade-in-up {
+  animation: fadeInUp 0.7s ease;
+}
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 20px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+`}</style>
