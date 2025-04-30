@@ -54,6 +54,15 @@
     "stage": "DEVICE TESTING"
   },
   {
+    "chapter": "2001.1",
+    "deliverable": "Test Cases",
+    "requirement_tag": "Create Test Cases",
+    "issue_types": ["DA IR","E DA MR", "NDAP IR"],
+    "device_channels": ["CRICKET IETA"],
+    "device": "ST0919B",
+    "stage": "DEVICE TESTING"
+  },
+  {
     "chapter": "2001.2",
     "deliverable": "PreAuth-Testing",
     "requirement_tag": "PTN-20002 Deployment Validation",
