@@ -159,285 +159,257 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
   );
 
   return (
-    <div className="view-certification-panel bg-white rounded-lg shadow p-8 w-full mx-auto min-h-[60vh]">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Certification Details</h2>
+    <div className="view-certification-panel bg-white rounded-2xl shadow-xl p-10 w-full mx-auto min-h-[70vh] flex flex-col gap-8">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-2 border-b pb-4">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-3xl font-extrabold text-blue-900 flex items-center gap-3">
+            {certification.darpKey}
+            <span className={`px-3 py-1 rounded-full text-base font-semibold ${getStageColor(certification.status)}`}>{certification.status}</span>
+          </h2>
+          <span className="text-lg text-gray-600">{certification.projectName}</span>
+        </div>
+        <div className="flex gap-2 flex-wrap">
+          <button className="p-2 hover:bg-blue-50 rounded-lg" title="Star">
+            <StarIcon className="w-6 h-6 text-blue-400" />
+          </button>
+          <button className="p-2 hover:bg-blue-50 rounded-lg" title="Add User">
+            <UserPlusIcon className="w-6 h-6 text-blue-400" />
+          </button>
+          <button className="p-2 hover:bg-blue-50 rounded-lg" title="Comments">
+            <ChatBubbleLeftIcon className="w-6 h-6 text-blue-400" />
+          </button>
+          <button className="p-2 hover:bg-blue-50 rounded-lg" title="Edit">
+            <PencilIcon className="w-6 h-6 text-blue-400" />
+          </button>
+          <button className="p-2 hover:bg-blue-50 rounded-lg" title="Refresh">
+            <ArrowPathIcon className="w-6 h-6 text-blue-400" />
+          </button>
+          <button className="p-2 hover:bg-blue-50 rounded-lg" title="More">
+            <EllipsisHorizontalIcon className="w-6 h-6 text-blue-400" />
+          </button>
+          <button
+            className="px-5 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg font-semibold text-gray-700 ml-4"
+            onClick={onCancel}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+
+      {/* Basic Details Section (already improved) */}
+      <div className="bg-gradient-to-tr from-blue-50 to-white rounded-xl border border-blue-100 p-6 shadow-sm">
+        <h3 className="text-lg font-bold mb-6 text-blue-900 flex items-center gap-2">
+          <span className="inline-block w-2 h-6 bg-blue-500 rounded-full mr-2"></span>
+          Basic Details
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="flex flex-col">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">DARP Key</span>
+            <span className="text-base font-medium text-gray-900 mt-1 break-all">{certification.darpKey}</span>
+          </div>
+          <div className="flex flex-col">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Project Name</span>
+            <span className="text-base font-medium text-gray-900 mt-1">{certification.projectName}</span>
+          </div>
+          <div className="flex flex-col">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Type</span>
+            <span className="inline-block mt-1 px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold shadow-sm">{certification.type}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Device Details Section */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
         <button
-          className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded"
-          onClick={onCancel}
+          className="w-full p-5 flex justify-between items-center hover:bg-blue-50 rounded-t-xl transition"
+          onClick={() => toggleSection('deviceDetails')}
         >
-          Cancel
+          <div className="flex items-center">
+            <DevicePhoneMobileIcon className="w-6 h-6 mr-2 text-blue-400" />
+            <h3 className="text-lg font-semibold">Device Details</h3>
+          </div>
+          {expandedSections.deviceDetails ? (
+            <ChevronUpIcon className="w-6 h-6 text-blue-400" />
+          ) : (
+            <ChevronDownIcon className="w-6 h-6 text-blue-400" />
+          )}
         </button>
-      </div>
-      <div className="p-4 border-b flex-shrink-0">
-        <div className="flex justify-between items-start">
-          <div>
-            <h2 className="text-xl font-bold flex items-center gap-3">
-              {certification.darpKey}
-              <span className={`px-2 py-1 rounded-full text-sm ${getStageColor(certification.status)}`}>
-                {certification.status}
-              </span>
-            </h2>
-            <p className="text-gray-600 mt-1">{certification.projectName}</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <button className="p-2 hover:bg-gray-100 rounded-lg">
-              <StarIcon className="w-5 h-5 text-gray-500" />
-            </button>
-            <button className="p-2 hover:bg-gray-100 rounded-lg">
-              <UserPlusIcon className="w-5 h-5 text-gray-500" />
-            </button>
-            <button className="p-2 hover:bg-gray-100 rounded-lg">
-              <ChatBubbleLeftIcon className="w-5 h-5 text-gray-500" />
-            </button>
-            <button className="p-2 hover:bg-gray-100 rounded-lg">
-              <PencilIcon className="w-5 h-5 text-gray-500" />
-            </button>
-            <button className="p-2 hover:bg-gray-100 rounded-lg">
-              <ArrowPathIcon className="w-5 h-5 text-gray-500" />
-            </button>
-            <button className="p-2 hover:bg-gray-100 rounded-lg">
-              <EllipsisHorizontalIcon className="w-5 h-5 text-gray-500" />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex-1 overflow-hidden flex flex-col min-h-0">
-        <div className="bg-gray-50 border-b flex-shrink-0">
-          <div className="max-w-7xl mx-auto p-4">
-            <div className="space-y-4">
-              <div className="bg-white rounded-lg border p-4">
-                <h3 className="text-lg font-semibold mb-4">Basic Details</h3>
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">DARP Key</p>
-                    <p className="mt-1">{certification.darpKey}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Project Name</p>
-                    <p className="mt-1">{certification.projectName}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Type</p>
-                    <p className="mt-1">{certification.type}</p>
-                  </div>
-                </div>
+        {expandedSections.deviceDetails && (
+          <div className="px-6 pb-6 pt-2">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Vendor</p>
+                <p className="text-base text-gray-800">{certification.vendor}</p>
               </div>
-
-              <div className="bg-white rounded-lg border">
-                <button
-                  className="w-full p-4 flex justify-between items-center"
-                  onClick={() => toggleSection('deviceDetails')}
-                >
-                  <div className="flex items-center">
-                    <DevicePhoneMobileIcon className="w-5 h-5 mr-2 text-gray-500" />
-                    <h3 className="text-lg font-semibold">Device Details</h3>
-                  </div>
-                  {expandedSections.deviceDetails ? (
-                    <ChevronUpIcon className="w-5 h-5 text-gray-500" />
-                  ) : (
-                    <ChevronDownIcon className="w-5 h-5 text-gray-500" />
-                  )}
-                </button>
-                {expandedSections.deviceDetails && (
-                  <div className="px-4 pb-4">
-                    <div className="grid grid-cols-3 gap-4">
-                      <div>
-                        <p className="text-sm font-medium text-gray-500">Vendor</p>
-                        <p className="mt-1">{certification.vendor}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-500">Device Type</p>
-                        <p className="mt-1">{certification.deviceType}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-500">Model</p>
-                        <p className="mt-1">{certification.deviceModel}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-500">Marketing Name</p>
-                        <p className="mt-1">{certification.deviceMarketingName}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-500">Code Name</p>
-                        <p className="mt-1">{certification.deviceCodeName}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-500">OS</p>
-                        <p className="mt-1">{certification.deviceOS} {certification.deviceOSVersion}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-500">Hardware Version</p>
-                        <p className="mt-1">{certification.deviceHardwareVersion}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-500">Payment Type</p>
-                        <p className="mt-1">{certification.devicePaymentType}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-500">Channel</p>
-                        <p className="mt-1">{certification.deviceChannel}</p>
-                      </div>
-                    </div>
-                  </div>
-                )}
+              <div>
+                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Device Type</p>
+                <p className="text-base text-gray-800">{certification.deviceType}</p>
               </div>
-
-              <div className="bg-white rounded-lg border">
-                <button
-                  className="w-full p-4 flex justify-between items-center"
-                  onClick={() => toggleSection('forecastedDates')}
-                >
-                  <div className="flex items-center">
-                    <CalendarIcon className="w-5 h-5 mr-2 text-gray-500" />
-                    <h3 className="text-lg font-semibold">Forecasted Dates</h3>
-                  </div>
-                  {expandedSections.forecastedDates ? (
-                    <ChevronUpIcon className="w-5 h-5 text-gray-500" />
-                  ) : (
-                    <ChevronDownIcon className="w-5 h-5 text-gray-500" />
-                  )}
-                </button>
-                {expandedSections.forecastedDates && (
-                  <div className="px-4 pb-4">
-                    <div className="grid grid-cols-4 gap-4">
-                      <div>
-                        <p className="text-sm font-medium text-gray-500">Device Entry (DE) Date</p>
-                        <p className="mt-1">{certification.forecastedDEDate || 'Not specified'}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-500">FFW Date</p>
-                        <p className="mt-1">{certification.forecastedFFWDate || 'Not specified'}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-500">TA Date</p>
-                        <p className="mt-1">{certification.forecastedTADate || 'Not specified'}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-500">Launch Date</p>
-                        <p className="mt-1">{certification.forecastedLaunchDate || 'Not specified'}</p>
-                      </div>
-                    </div>
-                  </div>
-                )}
+              <div>
+                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Model</p>
+                <p className="text-base text-gray-800">{certification.deviceModel}</p>
               </div>
-            </div>
-          </div>
-        </div>
-
-        {certification.issues.length > 0 && (
-          <div className="border-b flex-shrink-0">
-            <div className="max-w-7xl mx-auto p-4">
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <div className="flex items-center mb-2">
-                  <ExclamationTriangleIcon className="w-5 h-5 text-yellow-600 mr-2" />
-                  <h3 className="font-semibold text-yellow-900">
-                    {certification.issues.length} issues require your attention
-                  </h3>
-                </div>
-                <div className="space-y-2">
-                  {certification.issues.map((issue, index) => (
-                    <div key={index} className="flex items-start">
-                      <div className="flex-shrink-0 mt-1">
-                        <ExclamationTriangleIcon className="w-4 h-4 text-yellow-600" />
-                      </div>
-                      <div className="ml-2">
-                        <p className="text-sm font-medium">{issue.title}</p>
-                        <p className="text-sm text-gray-600">{issue.description}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+              <div>
+                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Marketing Name</p>
+                <p className="text-base text-gray-800">{certification.deviceMarketingName}</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Code Name</p>
+                <p className="text-base text-gray-800">{certification.deviceCodeName}</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">OS</p>
+                <p className="text-base text-gray-800">{certification.deviceOS} {certification.deviceOSVersion}</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Hardware Version</p>
+                <p className="text-base text-gray-800">{certification.deviceHardwareVersion}</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Payment Type</p>
+                <p className="text-base text-gray-800">{certification.devicePaymentType}</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Channel</p>
+                <p className="text-base text-gray-800">{certification.deviceChannel}</p>
               </div>
             </div>
           </div>
         )}
+      </div>
 
-        <div className="flex-1 min-h-0 flex flex-col">
-          <div className="p-4 border-b bg-white flex-shrink-0">
-            <div className="flex justify-between items-center">
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setView('list')}
-                  className={`px-3 py-1 rounded ${
-                    view === 'list' 
-                      ? 'bg-blue-100 text-blue-700' 
-                      : 'bg-gray-100 hover:bg-gray-200'
-                  }`}
-                >
-                  List
-                </button>
-                <button
-                  onClick={() => setView('board')}
-                  className={`px-3 py-1 rounded ${
-                    view === 'board' 
-                      ? 'bg-blue-100 text-blue-700' 
-                      : 'bg-gray-100 hover:bg-gray-200'
-                  }`}
-                >
-                  Board
-                </button>
+      {/* Forecasted Dates Section */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+        <button
+          className="w-full p-5 flex justify-between items-center hover:bg-blue-50 rounded-t-xl transition"
+          onClick={() => toggleSection('forecastedDates')}
+        >
+          <div className="flex items-center">
+            <CalendarIcon className="w-6 h-6 mr-2 text-blue-400" />
+            <h3 className="text-lg font-semibold">Forecasted Dates</h3>
+          </div>
+          {expandedSections.forecastedDates ? (
+            <ChevronUpIcon className="w-6 h-6 text-blue-400" />
+          ) : (
+            <ChevronDownIcon className="w-6 h-6 text-blue-400" />
+          )}
+        </button>
+        {expandedSections.forecastedDates && (
+          <div className="px-6 pb-6 pt-2">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              <div>
+                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Device Entry (DE) Date</p>
+                <p className="text-base text-gray-800">{certification.forecastedDEDate || 'Not specified'}</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">FFW Date</p>
+                <p className="text-base text-gray-800">{certification.forecastedFFWDate || 'Not specified'}</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">TA Date</p>
+                <p className="text-base text-gray-800">{certification.forecastedTADate || 'Not specified'}</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Launch Date</p>
+                <p className="text-base text-gray-800">{certification.forecastedLaunchDate || 'Not specified'}</p>
               </div>
             </div>
           </div>
-          
-          <div className="flex-1 overflow-auto">
-            {view === 'board' ? (
-              <TaskBoard
-                tasks={currentStageTasks}
-                onTaskUpdate={handleTaskUpdate}
-                onTaskClick={handleTaskSelect}
-              />
-            ) : (
-              <div className="max-w-7xl mx-auto p-4">
-                <div className="bg-white rounded-lg border">
-                  {certification.tasks.map((task) => (
-                    <div
-                      key={task.id}
-                      className="p-4 border-b last:border-b-0 hover:bg-gray-50 cursor-pointer"
-                      onClick={() => handleTaskSelect(task)}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <input
-                            type="checkbox"
-                            checked={task.status === 'DONE'}
-                            className="rounded border-gray-300"
-                            onChange={(e) => {
-                              const updatedTask = {
-                                ...task,
-                                status: e.target.checked ? 'DONE' as TaskStatus : 'TODO' as TaskStatus
-                              };
-                              handleTaskUpdate(updatedTask);
-                            }}
-                            onClick={(e) => e.stopPropagation()}
-                          />
-                          <div>
-                            <h4 className="font-medium">{task.name}</h4>
-                            {task.description && (
-                              <p className="text-sm text-gray-600 mt-1">
-                                {task.description}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <span className={`px-2 py-1 rounded-full text-xs ${getStageColor(task.stage)}`}>
-                            {task.stage}
-                          </span>
-                          <ChevronRightIcon className="w-4 h-4 text-gray-400" />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+        )}
+      </div>
+
+      {/* Issues Section */}
+      {certification.issues && certification.issues.length > 0 && (
+        <div className="bg-white rounded-xl border border-yellow-200 shadow-sm p-6">
+          <h3 className="text-lg font-bold mb-4 text-yellow-700 flex items-center gap-2">
+            <ExclamationTriangleIcon className="w-5 h-5 text-yellow-600" />
+            Issues
+          </h3>
+          <div className="space-y-2">
+            {certification.issues.map((issue, index) => (
+              <div key={index} className="flex items-start gap-2">
+                <ExclamationTriangleIcon className="w-4 h-4 text-yellow-600 mt-1" />
+                <div>
+                  <p className="text-sm font-semibold text-yellow-900">{issue.title}</p>
+                  <p className="text-sm text-yellow-700">{issue.description}</p>
                 </div>
               </div>
-            )}
+            ))}
           </div>
+        </div>
+      )}
+
+      {/* Task View Switcher & List/Board */}
+      <div className="flex flex-col gap-4">
+        <div className="flex justify-between items-center">
+          <div className="flex gap-2">
+            <button
+              onClick={() => setView('list')}
+              className={`px-4 py-2 rounded-lg font-semibold transition-all ${view === 'list' ? 'bg-blue-600 text-white shadow' : 'bg-gray-100 text-gray-700 hover:bg-blue-50'}`}
+            >
+              List
+            </button>
+            <button
+              onClick={() => setView('board')}
+              className={`px-4 py-2 rounded-lg font-semibold transition-all ${view === 'board' ? 'bg-blue-600 text-white shadow' : 'bg-gray-100 text-gray-700 hover:bg-blue-50'}`}
+            >
+              Board
+            </button>
+          </div>
+        </div>
+        <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-4">
+          {view === 'board' ? (
+            <TaskBoard
+              tasks={currentStageTasks}
+              onTaskUpdate={handleTaskUpdate}
+              onTaskClick={handleTaskSelect}
+            />
+          ) : (
+            <div className="divide-y divide-gray-100">
+              {certification.tasks.map((task) => (
+                <div
+                  key={task.id}
+                  className="py-4 flex items-center justify-between hover:bg-blue-50 px-2 cursor-pointer transition"
+                  onClick={() => handleTaskSelect(task)}
+                >
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      checked={task.status === 'DONE'}
+                      className="rounded border-gray-300"
+                      onChange={(e) => {
+                        const updatedTask = {
+                          ...task,
+                          status: e.target.checked ? 'DONE' as TaskStatus : 'TODO' as TaskStatus
+                        };
+                        handleTaskUpdate(updatedTask);
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                    <div>
+                      <h4 className="font-semibold text-base text-gray-900">{task.name}</h4>
+                      {task.description && (
+                        <p className="text-xs text-gray-500 mt-1">
+                          {task.description}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getStageColor(task.stage)}`}>
+                      {task.stage}
+                    </span>
+                    <ChevronRightIcon className="w-4 h-4 text-gray-400" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
+      {/* Task Detail Modal (inline) */}
       {selectedTask && (
         <TaskDetailModal
           isOpen={true}
