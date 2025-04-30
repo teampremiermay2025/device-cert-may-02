@@ -118,7 +118,7 @@ export const TaskRules: React.FC = () => {
       return;
     }
     const deviceChannel = selectedDevice["Device Channel"];
-    let filtered = rules.filter(r => r.device_channels.includes(deviceChannel));
+    let filtered = rules.filter(r => r.device_channels.some(channel => channel.toLowerCase() === deviceChannel.toLowerCase()));
     if (tryOutStage) {
       filtered = filtered.filter(r => r.stage === tryOutStage);
     }

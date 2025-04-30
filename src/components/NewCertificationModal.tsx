@@ -224,8 +224,12 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
   // Function to filter tasks from ruleset.json based on projectType, deviceChannel, and stage
   const filterTasksFromRuleset = (stage: string, projectType: string, deviceChannel: string): CertificationTask[] => {
     const filteredTasks = taskStepsData.filter((task) => {
-      const matchesIssueType = task.issue_types.includes(projectType);
-      const matchesDeviceChannel = task.device_channels.includes(deviceChannel);
+      const matchesIssueType = task.issue_types.some(
+        (type: string) => type.toLowerCase() === projectType.toLowerCase()
+      );
+      const matchesDeviceChannel = task.device_channels.some(
+        (channel: string) => channel.toLowerCase() === deviceChannel.toLowerCase()
+      );
       const matchesStage = task.stage.toUpperCase() === stage.toUpperCase();
       return matchesIssueType && matchesDeviceChannel && matchesStage;
     });
