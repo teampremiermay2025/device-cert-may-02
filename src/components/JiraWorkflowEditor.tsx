@@ -39,7 +39,8 @@ const initialNodes = [
   { id: "1", type: "customNode", data: { label: "Forecast", category: stageToCategoryMap["Forecast"] }, position: { x: 150, y: 100 } },
   { id: "2", type: "customNode", data: { label: "Planning", category: stageToCategoryMap["Planning"] }, position: { x: 300, y: 100 } },
   { id: "3", type: "customNode", data: { label: "Submitted", category: stageToCategoryMap["Submitted"] }, position: { x: 450, y: 100 } },
-  { id: "4", type: "customNode", data: { label: "Done", category: stageToCategoryMap["Done"] }, position: { x: 600, y: 100 } },
+  {id: "4", type: "customNode", data: { label: "Device Testing", category: stageToCategoryMap["Device Testing"] }, position: { x: 600, y: 100 } },
+  { id: "5", type: "customNode", data: { label: "Done", category: stageToCategoryMap["Done"] }, position: { x: 750, y: 100 } },
 ];
 
 // Initial edges (transitions)
@@ -48,6 +49,7 @@ const initialEdges = [
   { id: "e1-2", source: "1", target: "2", label: "Any", data: { label: "Any", anyStatus: true } },
   { id: "e2-3", source: "2", target: "3", label: "Any", data: { label: "Any", anyStatus: true } },
   { id: "e3-4", source: "3", target: "4", label: "Any", data: { label: "Any", anyStatus: true } },
+  { id: "e4-5", source: "4", target: "5", label: "Any", data: { label: "Any", anyStatus: true } },
 ];
 
 // Get unique stages from taskStepsData for the dropdown
