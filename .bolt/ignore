@@ -1,0 +1,96 @@
+# Core Configuration & Project Setup
+.gitignore
+.gitkeep
+README.md
+eslint.config.js
+postcss.config.js
+tailwind.config.js
+vite.config.ts
+tsconfig.json
+tsconfig.app.json
+tsconfig.node.json
+index.html
+package.json
+package-lock.json
+
+# Node Modules and Build Output
+node_modules/
+dist/
+build/
+
+# Source Code (src/)
+src/App.css
+src/App.tsx
+src/assets/
+
+
+src/contexts/
+
+src/data/devices.json
+src/data/users.json
+src/data/ruleset_all.json
+src/data/ruleset.json
+src/data/taskstep.json
+
+
+src/index.css
+src/lib/
+src/localStorageInit.ts
+src/main.tsx
+#src/store/
+src/types.ts
+src/vite-env.d.ts
+
+# Components by Functionality
+# --- Main Pages ---
+src/components/HomePage.tsx
+src/components/LearnPage.tsx
+src/components/LoginPage.tsx
+src/components/TasksPage.tsx
+
+# --- Certification Management ---
+#src/components/CertificationCard.tsx
+#src/components/NewCertificationModal.tsx
+# src/components/ViewCertificationModal.tsx
+# src/components/TaskDetailModal.tsx
+# src/components/TaskBoard.tsx
+
+# --- Releases & Calendar ---
+src/components/ReleasesCalendar.tsx
+src/components/ReleaseDetails.tsx
+src/components/KanbanReleasesBoard.tsx
+
+# --- Task Management ---
+
+src/components/TaskRules.tsx
+
+# --- Workflow ---
+src/components/JiraWorkflowEditor.tsx
+src/components/WorkflowDesigner.tsx
+src/components/WorkflowEditor.tsx
+src/components/WorkflowList.tsx
+src/components/WorkflowModal.tsx
+
+# --- Dashboard ---
+src/components/Dashboard.tsx
+src/components/Sidebar.tsx
+src/components/TeamManagement.tsx
+src/components/dashboard/AddWidgetModal.tsx
+src/components/dashboard/DashboardContainer.tsx
+src/components/dashboard/DashboardView.tsx
+src/components/dashboard/widgets/ActivityStream.tsx
+src/components/dashboard/widgets/ChartWidget.tsx
+src/components/dashboard/widgets/TasksWidget.tsx
+
+# --- Routing & Auth ---
+src/components/ProtectedRoute.tsx
+
+# Public Assets
+public/
+
+# Supabase
+supabase/
+
+# Bolt & Ignore
+.bolt/
+.bolt/ignore
