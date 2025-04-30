@@ -115,7 +115,7 @@ export const KanbanReleasesBoard: React.FC = () => {
           </select>
         </div>
       </div>
-      <div className="flex gap-6 overflow-x-auto pb-4">
+      <div className="flex gap-6 overflow-x-auto pb-4" style={{ height: '70vh' }}>
         {STAGE_ORDER.map(stage => (
           <div
             key={stage}

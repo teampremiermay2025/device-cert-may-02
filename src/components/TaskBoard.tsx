@@ -1,5 +1,5 @@
 import { FC, useState } from 'react';
-import { DndContext, DragOverlay, useDraggable, useDroppable } from '@dnd-kit/core';
+import { DndContext, DragOverlay, useDraggable, useDroppable, useSensor, useSensors, MouseSensor, TouchSensor, KeyboardSensor } from '@dnd-kit/core';
 import { CertificationTask, TaskStatus } from '../types';
 import { getTaskStatusColor, getTaskPriorityIcon, getTaskPriorityColor } from '../lib/workflow';
 
@@ -72,31 +72,63 @@ const TaskCard: FC<{ task: CertificationTask; isDragging?: boolean }> = ({ task,
 export const TaskBoard: FC<TaskBoardProps> = ({ tasks, onTaskUpdate, onTaskClick }) => {
   const [activeTask, setActiveTask] = useState<CertificationTask | null>(null);
 
+  // Setup sensors for drag detection
+  const sensors = useSensors(
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 5, // Require a minimum drag distance to start
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250, // Small delay for touch
+        tolerance: 5,
+      },
+    }),
+    useSensor(KeyboardSensor)
+  );
+
   const handleDragStart = (event: any) => {
     const task = tasks.find(t => t.id === event.active.id);
     if (task) setActiveTask(task);
+    console.log('Drag started:', event.active.id);
   };
 
   const handleDragEnd = (event: any) => {
     const { active, over } = event;
+    console.log('Drag ended:', { active, over });
     
-    if (over && active.id !== over.id) {
-      const task = tasks.find(t => t.id === active.id);
-      if (task) {
+    if (over) {
+      const taskId = active.id;
+      const targetColumnId = over.id;
+      const task = tasks.find(t => t.id === taskId);
+      console.log('Attempting update:', { taskId, targetColumnId, taskExists: !!task, isColumn: columns.some(col => col.id === targetColumnId) });
+      if (task && columns.some(col => col.id === targetColumnId) && task.status !== targetColumnId) {
+        // Only update if status actually changes
         const updatedTask = {
           ...task,
-          status: over.id as TaskStatus
+          status: targetColumnId as TaskStatus
         };
+        console.log('Updating task status to:', targetColumnId);
         onTaskUpdate(updatedTask); // Call onTaskUpdate with the updated task
+      } else {
+        console.log('Update skipped: Task not found, target is not a column, or status unchanged');
       }
+    } else {
+      console.log('No over target found');
     }
     
     setActiveTask(null);
   };
 
+  const handleDragOver = (event: any) => {
+    const { active, over } = event;
+    console.log('Drag over:', { activeId: active.id, overId: over?.id });
+  };
+
   return (
-    <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      <div className="flex gap-4 p-4 h-full">
+    <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd} onDragOver={handleDragOver}>
+      <div className="flex gap-4 p-4 h-full" style={{ position: 'relative', zIndex: 1000, overflow: 'visible' }}>
         {columns.map(column => {
           const { setNodeRef } = useDroppable({
             id: column.id
@@ -106,7 +138,7 @@ export const TaskBoard: FC<TaskBoardProps> = ({ tasks, onTaskUpdate, onTaskClick
           
           return (
             <div key={column.id} className="flex-1 min-w-[300px] flex flex-col">
-              <div className="bg-gray-100 rounded-lg p-4 h-full flex flex-col">
+              <div className="bg-gray-100 rounded-lg p-4 h-full flex flex-col" style={{ position: 'relative', zIndex: 100, overflow: 'visible' }}>
                 <h3 className="font-semibold mb-4 flex items-center justify-between">
                   {column.title}
                   <span className="text-sm text-gray-500">
@@ -116,12 +148,14 @@ export const TaskBoard: FC<TaskBoardProps> = ({ tasks, onTaskUpdate, onTaskClick
                 
                 <div
                   ref={setNodeRef}
-                  className="space-y-2 flex-1 overflow-y-auto"
+                  className="space-y-2 flex-1 overflow-y-auto border-2 border-dashed border-gray-300"
+                  onMouseEnter={() => console.log(`Mouse entered column: ${column.id}`)}
+                  style={{ position: 'relative', zIndex: 200, minHeight: '200px', overflow: 'visible' }}
                 >
                   {columnTasks.map((task) => {
                     const { attributes, listeners, setNodeRef, transform } = useDraggable({
                       id: task.id,
-                      data: task
+                      data: task,
                     });
                     
                     return (
@@ -130,10 +164,15 @@ export const TaskBoard: FC<TaskBoardProps> = ({ tasks, onTaskUpdate, onTaskClick
                         ref={setNodeRef}
                         style={{
                           transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
+                          userSelect: 'none', // Prevent text selection during drag
+                          position: 'relative',
+                          zIndex: transform ? 300 : 100,
+                          overflow: 'visible'
                         }}
                         {...listeners}
                         {...attributes}
                         onClick={() => onTaskClick(task)}
+                        onMouseDown={() => console.log(`Mouse down on task: ${task.id}`)}
                       >
                         <TaskCard task={task} isDragging={activeTask?.id === task.id} />
                       </div>
@@ -145,7 +184,7 @@ export const TaskBoard: FC<TaskBoardProps> = ({ tasks, onTaskUpdate, onTaskClick
           );
         })}
       </div>
-      <DragOverlay>
+      <DragOverlay style={{ zIndex: 10000 }}>
         {activeTask && <TaskCard task={activeTask} />}
       </DragOverlay>
     </DndContext>

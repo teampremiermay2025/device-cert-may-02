@@ -6,12 +6,25 @@ import {
   RocketLaunchIcon,
 } from '@heroicons/react/24/outline';
 
+interface Release {
+  id: string;
+  projectName: string;
+  forecastedLaunchDate: string;
+}
+
+interface Certification {
+  id: string;
+  projectName: string;
+  forecastedLaunchDate: string;
+  // Other fields as needed
+}
+
 // Helper for grouping releases by date
-function groupByDate(releases: CertificationRequest[]) {
-  const map: { [date: string]: CertificationRequest[] } = {};
+function groupByDate(releases: Release[]) {
+  const map: { [date: string]: Release[] } = {};
   releases.forEach(release => {
-    if (release.targetDate) {
-      const date = new Date(release.targetDate);
+    if (release.forecastedLaunchDate) {
+      const date = new Date(release.forecastedLaunchDate);
       const key = date.toISOString().slice(0, 10);
       if (!map[key]) map[key] = [];
       map[key].push(release);
@@ -44,30 +57,33 @@ const getMonthMatrix = (year: number, month: number) => {
 };
 
 export const ReleasesCalendar: React.FC = () => {
-  const [selectedMonth, setSelectedMonth] = React.useState<number>(new Date().getMonth());
-  const [selectedYear, setSelectedYear] = React.useState<number>(new Date().getFullYear());
-  const [releases, setReleases] = useState<CertificationRequest[]>([]);
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [releases, setReleases] = useState<Release[]>([]);
+  const [releasesByDate, setReleasesByDate] = useState<{ [key: string]: Release[] }>({});
 
   useEffect(() => {
-    // Load from localStorage using storage lib
-    setReleases(storage.getCertifications() || []);
+    // Read certifications from local storage
+    const certificationsData = localStorage.getItem('certifications');
+    if (certificationsData) {
+      const certifications = JSON.parse(certificationsData) as Certification[];
+      const formattedReleases = certifications
+        .filter(cert => cert.forecastedLaunchDate)
+        .map(cert => ({
+          id: cert.id,
+          projectName: cert.projectName,
+          forecastedLaunchDate: cert.forecastedLaunchDate,
+        }));
+      setReleases(formattedReleases);
+    }
   }, []);
 
-  // Optionally, listen for storage events in other tabs
   useEffect(() => {
-    const onStorage = () => {
-      setReleases(storage.getCertifications() || []);
-    };
-    window.addEventListener('storage', onStorage);
-    return () => window.removeEventListener('storage', onStorage);
-  }, []);
+    const releasesByDate = groupByDate(releases);
+    setReleasesByDate(releasesByDate);
+  }, [releases]);
 
-  const releasesByDate = useMemo(() => groupByDate(releases), [releases]);
-  const monthMatrix = useMemo(() => getMonthMatrix(selectedYear, selectedMonth), [selectedYear, selectedMonth]);
-  const monthName = new Date(selectedYear, selectedMonth).toLocaleString('default', { month: 'long' });
-
-  // Month/year navigation
-  const handlePrev = () => {
+  const handlePrevMonth = () => {
     if (selectedMonth === 0) {
       setSelectedMonth(11);
       setSelectedYear(y => y - 1);
@@ -75,7 +91,8 @@ export const ReleasesCalendar: React.FC = () => {
       setSelectedMonth(m => m - 1);
     }
   };
-  const handleNext = () => {
+
+  const handleNextMonth = () => {
     if (selectedMonth === 11) {
       setSelectedMonth(0);
       setSelectedYear(y => y + 1);
@@ -84,6 +101,9 @@ export const ReleasesCalendar: React.FC = () => {
     }
   };
 
+  const monthMatrix = useMemo(() => getMonthMatrix(selectedYear, selectedMonth), [selectedYear, selectedMonth]);
+  const monthName = new Date(selectedYear, selectedMonth).toLocaleString('default', { month: 'long' });
+
   return (
     <div className="p-8 bg-gradient-to-tr from-blue-50 to-gray-50 min-h-screen">
       <div className="flex items-center justify-between mb-8">
@@ -91,9 +111,9 @@ export const ReleasesCalendar: React.FC = () => {
           <CalendarIcon className="w-8 h-8 text-blue-400" /> Releases Calendar
         </h1>
         <div className="flex items-center gap-2">
-          <button onClick={handlePrev} className="px-3 py-1 rounded bg-white border shadow hover:bg-blue-50 text-blue-700 font-bold">{'<'}</button>
+          <button onClick={handlePrevMonth} className="px-3 py-1 rounded bg-white border shadow hover:bg-blue-50 text-blue-700 font-bold">{'<'}</button>
           <span className="text-lg font-bold text-blue-900 mx-2">{monthName} {selectedYear}</span>
-          <button onClick={handleNext} className="px-3 py-1 rounded bg-white border shadow hover:bg-blue-50 text-blue-700 font-bold">{'>'}</button>
+          <button onClick={handleNextMonth} className="px-3 py-1 rounded bg-white border shadow hover:bg-blue-50 text-blue-700 font-bold">{'>'}</button>
         </div>
       </div>
       <div className="overflow-x-auto">
