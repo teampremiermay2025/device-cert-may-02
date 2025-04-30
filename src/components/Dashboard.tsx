@@ -2,7 +2,7 @@ import { FC, useState, useEffect } from 'react';
 import { PlusIcon, FunnelIcon, Bars4Icon, TableCellsIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 import { CertificationCard } from './CertificationCard';
 import { CertificationRequest, CertificationStage } from '../types';
-import { ViewCertificationModal } from './ViewCertificationModal';
+import { ViewCertificationPanel } from './ViewCertificationPanel';
 import { storage } from '../lib/storage';
 
 interface DashboardProps {
@@ -143,279 +143,287 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
   const statusCounts = getFilteredStatusCounts(filteredCertifications);
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
-      <div className="flex justify-between items-center mb-8">
+    <div className="p-8  mx-auto">
+      {/* Only show the heading and dashboard top right icons if not viewing a certification */}
+      {!selectedCertification && (
+        <>
+          <div className="flex justify-between items-center mb-8">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Device Certification Dashboard</h1>
+              <p className="text-sm text-gray-500">Manage and track your device certification requests</p>
+            </div>
+            <div className="flex space-x-3">
+              <div className="flex items-center space-x-2 bg-white rounded-lg border p-1">
+                <button
+                  className={`p-2 rounded ${viewMode === 'card' ? 'bg-gray-100' : ''}`}
+                  onClick={() => setViewMode('card')}
+                >
+                  <Bars4Icon className="w-5 h-5" />
+                </button>
+                <button
+                  className={`p-2 rounded ${viewMode === 'grid' ? 'bg-gray-100' : ''}`}
+                  onClick={() => setViewMode('grid')}
+                >
+                  <TableCellsIcon className="w-5 h-5" />
+                </button>
+              </div>
+              <button
+                className="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                onClick={() => setShowFilters(!showFilters)}
+              >
+                <FunnelIcon className="w-5 h-5 mr-2 text-gray-500" />
+                Filters
+              </button>
+              <button 
+                className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition duration-150 ease-in-out shadow-sm"
+                onClick={onNewCertification}
+              >
+                <PlusIcon className="w-5 h-5 mr-2" />
+                New Certification
+              </button>
+            </div>
+          </div>
+
+          {/* Project Type Filters */}
+          <div className="mb-6 flex flex-wrap gap-2 items-center">
+            <button
+              onClick={selectAllTypes}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                filters.types.length === projectTypes.length
+                  ? 'bg-gray-800 text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              All Types
+            </button>
+            {projectTypeCounts.map(({ type, count }) => (
+              <button
+                key={type}
+                onClick={() => toggleTypeFilter(type)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  filters.types.includes(type)
+                    ? getTypeColor(type)
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                {type} ({count})
+              </button>
+            ))}
+          </div>
+
+          {showFilters && (
+            <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+              <h3 className="text-sm font-medium text-gray-700 mb-4">Filter Certifications</h3>
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm text-gray-700 mb-1">Status</label>
+                  <select
+                    value={filters.status}
+                    onChange={(e) => setFilters(f => ({ ...f, status: e.target.value as CertificationStage | '' }))}
+                    className="w-full border rounded-lg px-3 py-2"
+                  >
+                    <option value="">All Statuses</option>
+                    {statusOrder.map((stage) => (
+                      <option key={stage} value={stage}>
+                        {stage.split('_').map(word => word.charAt(0) + word.slice(1).toLowerCase()).join(' ')}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-700 mb-1">Device Type</label>
+                  <select
+                    value={filters.deviceType}
+                    onChange={(e) => setFilters(f => ({ ...f, deviceType: e.target.value }))}
+                    className="w-full border rounded-lg px-3 py-2"
+                  >
+                    <option value="">All Device Types</option>
+                    {deviceTypes.map(type => (
+                      <option key={type} value={type}>{type}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="mt-4 grid grid-cols-4 gap-4">
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={filters.showActive}
+                    onChange={(e) => setFilters(f => ({ ...f, showActive: e.target.checked }))}
+                    className="mr-2"
+                  />
+                  Show Active Only
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={filters.currentWeek}
+                    onChange={(e) => setFilters(f => ({ ...f, currentWeek: e.target.checked }))}
+                    className="mr-2"
+                  />
+                  Current Week
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={filters.nextWeek}
+                    onChange={(e) => setFilters(f => ({ ...f, nextWeek: e.target.checked }))}
+                    className="mr-2"
+                  />
+                  Next Week
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={filters.hideTest}
+                    onChange={(e) => setFilters(f => ({ ...f, hideTest: e.target.checked }))}
+                    className="mr-2"
+                  />
+                  Hide Test Devices
+                </label>
+              </div>
+              <div className="mt-4 flex justify-end">
+                <button
+                  onClick={() => setFilters(initialFilterState)}
+                  className="text-sm text-gray-600 hover:text-gray-900"
+                >
+                  Clear All Filters
+                </button>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+      {/* Only show the cards/grid if no certification is selected */}
+      {!selectedCertification && (
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Device Certification Dashboard</h1>
-          <p className="text-sm text-gray-500">Manage and track your device certification requests</p>
-        </div>
-        <div className="flex space-x-3">
-          <div className="flex items-center space-x-2 bg-white rounded-lg border p-1">
-            <button
-              className={`p-2 rounded ${viewMode === 'card' ? 'bg-gray-100' : ''}`}
-              onClick={() => setViewMode('card')}
-            >
-              <Bars4Icon className="w-5 h-5" />
-            </button>
-            <button
-              className={`p-2 rounded ${viewMode === 'grid' ? 'bg-gray-100' : ''}`}
-              onClick={() => setViewMode('grid')}
-            >
-              <TableCellsIcon className="w-5 h-5" />
-            </button>
-          </div>
-          <button
-            className="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
-            onClick={() => setShowFilters(!showFilters)}
-          >
-            <FunnelIcon className="w-5 h-5 mr-2 text-gray-500" />
-            Filters
-          </button>
-          <button 
-            className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition duration-150 ease-in-out shadow-sm"
-            onClick={onNewCertification}
-          >
-            <PlusIcon className="w-5 h-5 mr-2" />
-            New Certification
-          </button>
-        </div>
-      </div>
-
-      {/* Project Type Filters */}
-      <div className="mb-6 flex flex-wrap gap-2 items-center">
-        <button
-          onClick={selectAllTypes}
-          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-            filters.types.length === projectTypes.length
-              ? 'bg-gray-800 text-white'
-              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-          }`}
-        >
-          All Types
-        </button>
-        {projectTypeCounts.map(({ type, count }) => (
-          <button
-            key={type}
-            onClick={() => toggleTypeFilter(type)}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-              filters.types.includes(type)
-                ? getTypeColor(type)
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
-          >
-            {type} ({count})
-          </button>
-        ))}
-      </div>
-
-      {showFilters && (
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-          <h3 className="text-sm font-medium text-gray-700 mb-4">Filter Certifications</h3>
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm text-gray-700 mb-1">Status</label>
-              <select
-                value={filters.status}
-                onChange={(e) => setFilters(f => ({ ...f, status: e.target.value as CertificationStage | '' }))}
-                className="w-full border rounded-lg px-3 py-2"
-              >
-                <option value="">All Statuses</option>
-                {statusOrder.map((stage) => (
-                  <option key={stage} value={stage}>
-                    {stage.split('_').map(word => word.charAt(0) + word.slice(1).toLowerCase()).join(' ')}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm text-gray-700 mb-1">Device Type</label>
-              <select
-                value={filters.deviceType}
-                onChange={(e) => setFilters(f => ({ ...f, deviceType: e.target.value }))}
-                className="w-full border rounded-lg px-3 py-2"
-              >
-                <option value="">All Device Types</option>
-                {deviceTypes.map(type => (
-                  <option key={type} value={type}>{type}</option>
-                ))}
-              </select>
+          <div className="bg-white rounded-lg shadow-sm mb-8">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <h2 className="text-lg font-semibold">Status Overview</h2>
+                  <span className="text-sm text-gray-500">
+                    {totalActive} Active Certifications
+                  </span>
+                </div>
+                <button
+                  onClick={() => setIsStatusOverviewExpanded(!isStatusOverviewExpanded)}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <ChevronDownIcon
+                    className={`w-5 h-5 transform transition-transform ${
+                      isStatusOverviewExpanded ? 'rotate-180' : ''
+                    }`}
+                  />
+                </button>
+              </div>
+              
+              {isStatusOverviewExpanded && (
+                <div className="grid grid-cols-3 gap-4">
+                  {statusCounts.map(({ stage, total }) => (
+                    <button
+                      key={stage}
+                      onClick={() => setFilters(f => ({ ...f, status: f.status === stage ? '' : stage }))}
+                      className={`p-4 rounded-lg border transition-all ${
+                        getStatusColor(stage)
+                      } ${
+                        filters.status === stage ? 'ring-2 ring-blue-500' : ''
+                      }`}
+                    >
+                      <div className="flex justify-between items-center">
+                        <span className="font-medium">
+                          {stage.split('_').map(word => word.charAt(0) + word.slice(1).toLowerCase()).join(' ')}
+                        </span>
+                        <span className="text-2xl font-bold">{total}</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
-          <div className="mt-4 grid grid-cols-4 gap-4">
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={filters.showActive}
-                onChange={(e) => setFilters(f => ({ ...f, showActive: e.target.checked }))}
-                className="mr-2"
-              />
-              Show Active Only
-            </label>
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={filters.currentWeek}
-                onChange={(e) => setFilters(f => ({ ...f, currentWeek: e.target.checked }))}
-                className="mr-2"
-              />
-              Current Week
-            </label>
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={filters.nextWeek}
-                onChange={(e) => setFilters(f => ({ ...f, nextWeek: e.target.checked }))}
-                className="mr-2"
-              />
-              Next Week
-            </label>
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={filters.hideTest}
-                onChange={(e) => setFilters(f => ({ ...f, hideTest: e.target.checked }))}
-                className="mr-2"
-              />
-              Hide Test Devices
-            </label>
-          </div>
-          <div className="mt-4 flex justify-end">
-            <button
-              onClick={() => setFilters(initialFilterState)}
-              className="text-sm text-gray-600 hover:text-gray-900"
-            >
-              Clear All Filters
-            </button>
+
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold text-gray-900">Certification Requests</h2>
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                {filteredCertifications.length} Shown
+              </span>
+            </div>
+
+            {viewMode === 'card' ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredCertifications.map((cert) => (
+                  <CertificationCard 
+                    key={cert.id} 
+                    certification={cert}
+                    onClick={() => setSelectedCertification(cert)}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Key
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Summary
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Project Type
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Software Version
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Target Date
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {filteredCertifications.map((cert) => (
+                      <tr
+                        key={cert.id}
+                        className="hover:bg-gray-50 cursor-pointer"
+                        onClick={() => setSelectedCertification(cert)}
+                      >
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {cert.darpKey}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {cert.projectName}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {cert.type}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {cert.status}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {cert.softwareVersion}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {cert.targetDate}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
       )}
 
-      <div className="bg-white rounded-lg shadow-sm mb-8">
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <h2 className="text-lg font-semibold">Status Overview</h2>
-              <span className="text-sm text-gray-500">
-                {totalActive} Active Certifications
-              </span>
-            </div>
-            <button
-              onClick={() => setIsStatusOverviewExpanded(!isStatusOverviewExpanded)}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-            >
-              <ChevronDownIcon
-                className={`w-5 h-5 transform transition-transform ${
-                  isStatusOverviewExpanded ? 'rotate-180' : ''
-                }`}
-              />
-            </button>
-          </div>
-          
-          {isStatusOverviewExpanded && (
-            <div className="grid grid-cols-3 gap-4">
-              {statusCounts.map(({ stage, total }) => (
-                <button
-                  key={stage}
-                  onClick={() => setFilters(f => ({ ...f, status: f.status === stage ? '' : stage }))}
-                  className={`p-4 rounded-lg border transition-all ${
-                    getStatusColor(stage)
-                  } ${
-                    filters.status === stage ? 'ring-2 ring-blue-500' : ''
-                  }`}
-                >
-                  <div className="flex justify-between items-center">
-                    <span className="font-medium">
-                      {stage.split('_').map(word => word.charAt(0) + word.slice(1).toLowerCase()).join(' ')}
-                    </span>
-                    <span className="text-2xl font-bold">{total}</span>
-                  </div>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold text-gray-900">Certification Requests</h2>
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-            {filteredCertifications.length} Shown
-          </span>
-        </div>
-
-        {viewMode === 'card' ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredCertifications.map((cert) => (
-              <CertificationCard 
-                key={cert.id} 
-                certification={cert}
-                onClick={() => setSelectedCertification(cert)}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Key
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Summary
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Project Type
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Software Version
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Target Date
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredCertifications.map((cert) => (
-                  <tr
-                    key={cert.id}
-                    className="hover:bg-gray-50 cursor-pointer"
-                    onClick={() => setSelectedCertification(cert)}
-                  >
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {cert.darpKey}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {cert.projectName}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {cert.type}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {cert.status}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {cert.softwareVersion}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {cert.targetDate}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-
+      {/* Show the inline panel and hide other sections when selectedCertification is set */}
       {selectedCertification && (
-        <ViewCertificationModal
-          isOpen={!!selectedCertification}
-          onClose={() => setSelectedCertification(null)}
+        <ViewCertificationPanel
           certification={selectedCertification}
           onUpdate={(updated) => {
             const updatedCertifications = certifications.map(cert =>
@@ -423,8 +431,9 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
             );
             storage.saveCertifications(updatedCertifications);
             setCertifications(updatedCertifications);
-            setSelectedCertification(updated);
+            setSelectedCertification(null); // Hide panel and show dashboard again after save
           }}
+          onCancel={() => setSelectedCertification(null)}
         />
       )}
     </div>
