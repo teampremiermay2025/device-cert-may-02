@@ -37,7 +37,7 @@ src/index.css
 src/lib/
 src/localStorageInit.ts
 src/main.tsx
-#src/store/
+src/store/
 src/types.ts
 src/vite-env.d.ts
 
