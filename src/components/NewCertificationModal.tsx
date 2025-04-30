@@ -83,13 +83,16 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
 
   // Load saved workflows from localStorage
   useEffect(() => {
+    console.log('Loading jiraWorkflows from localStorage');
     const saved = localStorage.getItem("jiraWorkflows");
+    console.log('Raw jiraWorkflows:', saved);
     if (saved) {
       try {
         const workflows = JSON.parse(saved);
         if (!Array.isArray(workflows)) {
           throw new Error("jiraWorkflows is not an array");
         }
+        console.log('Parsed workflows:', workflows);
         setSavedWorkflows(workflows);
       } catch (error) {
         console.error("Error parsing jiraWorkflows from localStorage:", error);
@@ -97,18 +100,21 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
         setErrorMessage("Error loading workflows. Using default workflow.");
       }
     }
-  }, []);
+  }, [isOpen]); // Reload when modal opens
 
   // Memoize defaultWorkflow to prevent unnecessary re-renders
   const memoizedDefaultWorkflow = useMemo(() => defaultWorkflow, [defaultWorkflow]);
 
   // Match project type to a workflow when projectType changes
   useEffect(() => {
+    console.log('Matching workflow for projectType:', formData.projectType);
+    console.log('Current savedWorkflows:', savedWorkflows);
     if (formData.projectType) {
       try {
         const matchedWorkflow = savedWorkflows.find(
           (w) => w.name && w.name.toLowerCase() === formData.projectType.toLowerCase()
         );
+        console.log('Matched workflow:', matchedWorkflow);
 
         if (matchedWorkflow) {
           if (!matchedWorkflow.id) throw new Error("Matched workflow missing 'id'");
@@ -156,6 +162,7 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
 
           setErrorMessage('');
         } else {
+          console.warn(`No workflow found for project type "${formData.projectType}". Using default workflow.`);
           if (JSON.stringify(selectedWorkflow) !== JSON.stringify(memoizedDefaultWorkflow)) {
             setSelectedWorkflow(memoizedDefaultWorkflow);
           }
@@ -564,189 +571,188 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
                 </button>
                 <button
                   type="submit"
-                  form=""
+                  onClick={handleSubmit}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                 >
                   Continue
                 </button>
               </div>
             </div>
-
           )}
 
-      {currentStep === 'processing' && (
-        <div className="p-6">
-          <Dialog.Title className="text-xl font-bold mb-4">
-            Processing Request
-          </Dialog.Title>
-          <div className="mt-4">
-            <p className="font-semibold mb-2">{processingStep}</p>
-            <div className="w-full bg-gray-200 rounded">
-              <div className="bg-blue-600 h-4 rounded doc-progress" />
+          {currentStep === 'processing' && (
+            <div className="p-6">
+              <Dialog.Title className="text-xl font-bold mb-4">
+                Processing Request
+              </Dialog.Title>
+              <div className="mt-4">
+                <p className="font-semibold mb-2">{processingStep}</p>
+                <div className="w-full bg-gray-200 rounded">
+                  <div className="bg-blue-600 h-4 rounded doc-progress" />
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          )}
 
-      {currentStep === 'review' && (
-        <div className="flex flex-col h-full">
-          <div className="p-6 border-b">
-            <Dialog.Title className="text-xl font-bold mb-4">
-              Review Certification Request
-            </Dialog.Title>
+          {currentStep === 'review' && (
+            <div className="flex flex-col h-full">
+              <div className="p-6 border-b">
+                <Dialog.Title className="text-xl font-bold mb-4">
+                  Review Certification Request
+                </Dialog.Title>
 
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-lg font-semibold mb-2">Project Information</h3>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-6">
                   <div>
-                    <p className="text-sm text-gray-600">DARP Key</p>
-                    <p className="font-medium">{formData.darpKey || 'Not specified'}</p>
+                    <h3 className="text-lg font-semibold mb-2">Project Information</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm text-gray-600">DARP Key</p>
+                        <p className="font-medium">{formData.darpKey || 'Not specified'}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Project Name</p>
+                        <p className="font-medium">{formData.projectName}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Project Type</p>
+                        <p className="font-medium">{formData.projectType || 'Not specified'}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Workflow</p>
+                        <p className="font-medium">{selectedWorkflow?.name || 'Default Workflow'}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Device Model</p>
+                        <p className="font-medium">
+                          {deviceData.find(d => d['Device Issue Key'] === formData.deviceModel)?.['Device Model'] || 'Not specified'}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Software Version</p>
+                        <p className="font-medium">{formData.softwareVersion || 'Not specified'}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Status</p>
+                        <p className="font-medium">FORECAST</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Assignee</p>
+                        <p className="font-medium">{formData.assignee || 'Not specified'}</p>
+                      </div>
+                    </div>
                   </div>
+
                   <div>
-                    <p className="text-sm text-gray-600">Project Name</p>
-                    <p className="font-medium">{formData.projectName}</p>
+                    <h3 className="text-lg font-semibold mb-2">Forecasted Dates</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm text-gray-600">DE Date</p>
+                        <p className="font-medium">{formData.forecastedDEDate || 'Not specified'}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">FFW Date</p>
+                        <p className="font-medium">{formData.forecastedFFWDate || 'Not specified'}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">TA Date</p>
+                        <p className="font-medium">{formData.forecastedTADate || 'Not specified'}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Launch Date</p>
+                        <p className="font-medium">{formData.forecastedLaunchDate || 'Not specified'}</p>
+                      </div>
+                    </div>
                   </div>
+
                   <div>
-                    <p className="text-sm text-gray-600">Project Type</p>
-                    <p className="font-medium">{formData.projectType || 'Not specified'}</p>
+                    <h3 className="text-lg font-semibold mb-2">OEM Documents</h3>
+                    <div className="border rounded-lg divide-y">
+                      {formData.oemDocuments.map((file, index) => (
+                        <div key={index} className="p-3 flex items-center justify-between">
+                          <div className="flex items-center">
+                            <DocumentTextIcon className="h-5 w-5 text-gray-400 mr-2" />
+                            <span className="text-sm">{file.name}</span>
+                            <span className="ml-2 text-sm text-gray-500">
+                              ({Math.round(file.size / 1024)} KB)
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                      {formData.oemDocuments.length == 0 && (
+                        <div className="p-3 text-sm text-gray-500">
+                          No documents uploaded
+                        </div>
+                      )}
+                    </div>
                   </div>
+
                   <div>
-                    <p className="text-sm text-gray-600">Workflow</p>
-                    <p className="font-medium">{selectedWorkflow?.name || 'Default Workflow'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Device Model</p>
-                    <p className="font-medium">
-                      {deviceData.find(d => d['Device Issue Key'] === formData.deviceModel)?.['Device Model'] || 'Not specified'}
+                    <h3 className="text-lg font-semibold mb-2">Initial Tasks</h3>
+                    <div className="border rounded-lg divide-y">
+                      {initialTasks.length === 0 ? (
+                        <div className="p-3 text-sm text-gray-500">
+                          No initial tasks available.
+                        </div>
+                      ) : (
+                        initialTasks.map((task: CertificationTask) => (
+                          <div key={task.id} className="p-3 flex items-center justify-between hover:bg-gray-50">
+                            <div className="flex items-center">
+                              <div className="w-6 h-6 flex items-center justify-center">
+                                <input
+                                  type="checkbox"
+                                  className="rounded border-gray-300"
+                                  checked={task.isChecked}
+                                  disabled
+                                />
+                              </div>
+                              <span className="ml-3">{task.name}</span>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <span className="text-sm text-gray-500">{task.status}</span>
+                              {task.priority === 'HIGH' && (
+                                <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs">
+                                  High Priority
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                    <p className="text-sm text-gray-500 mt-2">
+                      These tasks will be created automatically when the certification request is created.
+                      Additional tasks will be added as the certification progresses through different stages.
                     </p>
                   </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Software Version</p>
-                    <p className="font-medium">{formData.softwareVersion || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Status</p>
-                    <p className="font-medium">FORECAST</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Assignee</p>
-                    <p className="font-medium">{formData.assignee || 'Not specified'}</p>
-                  </div>
                 </div>
               </div>
 
-              <div>
-                <h3 className="text-lg font-semibold mb-2">Forecasted Dates</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-gray-600">DE Date</p>
-                    <p className="font-medium">{formData.forecastedDEDate || 'Not specified'}</p>
+              <div className="p-6 bg-gray-50 mt-auto">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center text-sm text-gray-600">
+                    <ClockIcon className="w-4 h-4 mr-1" />
+                    <span>Estimated completion time: 2-3 weeks</span>
                   </div>
-                  <div>
-                    <p className="text-sm text-gray-600">FFW Date</p>
-                    <p className="font-medium">{formData.forecastedFFWDate || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">TA Date</p>
-                    <p className="font-medium">{formData.forecastedTADate || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Launch Date</p>
-                    <p className="font-medium">{formData.forecastedLaunchDate || 'Not specified'}</p>
+                  <div className="flex space-x-3">
+                    <button
+                      onClick={() => setCurrentStep('form')}
+                      className="px-4 py-2 text-gray-700 bg-white border rounded-lg hover:bg-gray-50"
+                    >
+                      Back to Edit
+                    </button>
+                    <button
+                      onClick={handleConfirm}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    >
+                      Confirm & Create
+                    </button>
                   </div>
                 </div>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-semibold mb-2">OEM Documents</h3>
-                <div className="border rounded-lg divide-y">
-                  {formData.oemDocuments.map((file, index) => (
-                    <div key={index} className="p-3 flex items-center justify-between">
-                      <div className="flex items-center">
-                        <DocumentTextIcon className="h-5 w-5 text-gray-400 mr-2" />
-                        <span className="text-sm">{file.name}</span>
-                        <span className="ml-2 text-sm text-gray-500">
-                          ({Math.round(file.size / 1024)} KB)
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                  {formData.oemDocuments.length === 0 && (
-                    <div className="p-3 text-sm text-gray-500">
-                      No documents uploaded
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-semibold mb-2">Initial Tasks</h3>
-                <div className="border rounded-lg divide-y">
-                  {initialTasks.length === 0 ? (
-                    <div className="p-3 text-sm text-gray-500">
-                      No initial tasks available.
-                    </div>
-                  ) : (
-                    initialTasks.map((task: CertificationTask) => (
-                      <div key={task.id} className="p-3 flex items-center justify-between hover:bg-gray-50">
-                        <div className="flex items-center">
-                          <div className="w-6 h-6 flex items-center justify-center">
-                            <input
-                              type="checkbox"
-                              className="rounded border-gray-300"
-                              checked={task.isChecked}
-                              disabled
-                            />
-                          </div>
-                          <span className="ml-3">{task.name}</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <span className="text-sm text-gray-500">{task.status}</span>
-                          {task.priority === 'HIGH' && (
-                            <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs">
-                              High Priority
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-                <p className="text-sm text-gray-500 mt-2">
-                  These tasks will be created automatically when the certification request is created.
-                  Additional tasks will be added as the certification progresses through different stages.
-                </p>
               </div>
             </div>
-          </div>
-
-          <div className="p-6 bg-gray-50 mt-auto">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center text-sm text-gray-600">
-                <ClockIcon className="w-4 h-4 mr-1" />
-                <span>Estimated completion time: 2-3 weeks</span>
-              </div>
-              <div className="flex space-x-3">
-                <button
-                  onClick={() => setCurrentStep('form')}
-                  className="px-4 py-2 text-gray-700 bg-white border rounded-lg hover:bg-gray-50"
-                >
-                  Back to Edit
-                </button>
-                <button
-                  onClick={handleConfirm}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                >
-                  Confirm & Create
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </Dialog.Panel>
-      </div >
-    </Dialog >
+          )}
+        </Dialog.Panel>
+      </div>
+    </Dialog>
   );
 };

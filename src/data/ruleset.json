@@ -162,6 +162,15 @@
     "stage": "FORECAST"
   },
   {
+    "chapter": "2004.0",
+    "deliverable": "SYSTEM RELEASE",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": ["DA IR", "DA ADAPT IR","DA EMR"],
+    "device_channels": ["CRICKET IETA"],
+    "device": "ST0919E",
+    "stage": "FORECAST"
+  },
+  {
     "chapter": "2004.1",
     "deliverable": "PreAuth",
     "requirement_tag": "Subtask Chapter Master",
