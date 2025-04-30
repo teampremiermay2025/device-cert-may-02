@@ -29,7 +29,7 @@ src/contexts/
 src/data/devices.json
 src/data/users.json
 src/data/ruleset_all.json
-src/data/ruleset.json
+#src/data/ruleset.json
 src/data/taskstep.json
 
 
