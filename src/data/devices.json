@@ -10,7 +10,7 @@
     "Device OS Version": "20",
     "Device Hardware Version": "1.0",
     "Device Payment Type": "Post-Paid",
-    "Device Channel": "Stock",
+    "Device Channel": "CRICKET IETA",
     "Type": "Non-IoT"
   },
   {
@@ -24,7 +24,7 @@
     "Device OS Version": "1.5",
     "Device Hardware Version": "2.1",
     "Device Payment Type": "Pre-Paid",
-    "Device Channel": "Retail",
+    "Device Channel": "CRICKET VITA",
     "Type": "IoT"
   },
   {
@@ -38,7 +38,7 @@
     "Device OS Version": "19",
     "Device Hardware Version": "1.2",
     "Device Payment Type": "Post-Paid",
-    "Device Channel": "Online",
+    "Device Channel": "CRICKET FREELANCE",
     "Type": "Non-IoT"
   },
   {
@@ -52,7 +52,7 @@
     "Device OS Version": "4.4",
     "Device Hardware Version": "3.0",
     "Device Payment Type": "Subscription",
-    "Device Channel": "Direct",
+    "Device Channel": "BYOD",
     "Type": "IoT"
   },
   {
@@ -66,7 +66,7 @@
     "Device OS Version": "13",
     "Device Hardware Version": "1.1",
     "Device Payment Type": "Post-Paid",
-    "Device Channel": "Carrier",
+    "Device Channel": "STOCK",
     "Type": "Non-IoT"
   },
   {
@@ -80,7 +80,7 @@
     "Device OS Version": "7.0",
     "Device Hardware Version": "4.0",
     "Device Payment Type": "Pre-Paid",
-    "Device Channel": "Retail",
+    "Device Channel": "MYNO BASELINE",
     "Type": "IoT"
   },
   {
@@ -94,7 +94,7 @@
     "Device OS Version": "16",
     "Device Hardware Version": "1.0",
     "Device Payment Type": "Post-Paid",
-    "Device Channel": "Online",
+    "Device Channel": "CRICKET IETA",
     "Type": "Non-IoT"
   },
   {
@@ -108,7 +108,7 @@
     "Device OS Version": "2.3",
     "Device Hardware Version": "1.5",
     "Device Payment Type": "Pre-Paid",
-    "Device Channel": "Retail",
+    "Device Channel": "CRICKET VITA",
     "Type": "IoT"
   },
   {
@@ -122,7 +122,7 @@
     "Device OS Version": "12",
     "Device Hardware Version": "1.0",
     "Device Payment Type": "Post-Paid",
-    "Device Channel": "Online",
+    "Device Channel": "CRICKET FREELANCE",
     "Type": "Non-IoT"
   },
   {
@@ -136,7 +136,7 @@
     "Device OS Version": "3.2",
     "Device Hardware Version": "2.0",
     "Device Payment Type": "Subscription",
-    "Device Channel": "Direct",
+    "Device Channel": "BYOD",
     "Type": "IoT"
   },
   {
@@ -150,7 +150,7 @@
     "Device OS Version": "11",
     "Device Hardware Version": "1.3",
     "Device Payment Type": "Pre-Paid",
-    "Device Channel": "Retail",
+    "Device Channel": "STOCK",
     "Type": "Non-IoT"
   },
   {
@@ -164,7 +164,7 @@
     "Device OS Version": "5.1",
     "Device Hardware Version": "1.8",
     "Device Payment Type": "Subscription",
-    "Device Channel": "Online",
+    "Device Channel": "MYNO BASELINE",
     "Type": "IoT"
   },
   {
@@ -178,7 +178,7 @@
     "Device OS Version": "13",
     "Device Hardware Version": "1.0",
     "Device Payment Type": "Post-Paid",
-    "Device Channel": "Carrier",
+    "Device Channel": "CRICKET IETA",
     "Type": "Non-IoT"
   },
   {
@@ -192,7 +192,7 @@
     "Device OS Version": "6.2",
     "Device Hardware Version": "2.0",
     "Device Payment Type": "Pre-Paid",
-    "Device Channel": "Retail",
+    "Device Channel": "CRICKET VITA",
     "Type": "IoT"
   },
   {
@@ -206,7 +206,7 @@
     "Device OS Version": "11",
     "Device Hardware Version": "1.1",
     "Device Payment Type": "Post-Paid",
-    "Device Channel": "Online",
+    "Device Channel": "CRICKET FREELANCE",
     "Type": "Non-IoT"
   },
   {
@@ -220,7 +220,7 @@
     "Device OS Version": "3.0",
     "Device Hardware Version": "1.7",
     "Device Payment Type": "Pre-Paid",
-    "Device Channel": "Retail",
+    "Device Channel": "BYOD",
     "Type": "IoT"
   },
   {
@@ -234,7 +234,7 @@
     "Device OS Version": "12",
     "Device Hardware Version": "1.0",
     "Device Payment Type": "Post-Paid",
-    "Device Channel": "CRICKET IETA",
+    "Device Channel": "STOCK",
     "Type": "Non-IoT"
   },
   {
@@ -248,7 +248,7 @@
     "Device OS Version": "2.1",
     "Device Hardware Version": "1.4",
     "Device Payment Type": "Pre-Paid",
-    "Device Channel": "Retail",
+    "Device Channel": "MYNO BASELINE",
     "Type": "IoT"
   },
   {
@@ -262,7 +262,7 @@
     "Device OS Version": "11",
     "Device Hardware Version": "1.2",
     "Device Payment Type": "Post-Paid",
-    "Device Channel": "Online",
+    "Device Channel": "CRICKET IETA",
     "Type": "Non-IoT"
   },
   {
@@ -276,7 +276,7 @@
     "Device OS Version": "4.0",
     "Device Hardware Version": "1.9",
     "Device Payment Type": "Subscription",
-    "Device Channel": "Direct",
+    "Device Channel": "CRICKET VITA",
     "Type": "IoT"
   },
   {
@@ -290,7 +290,7 @@
     "Device OS Version": "12",
     "Device Hardware Version": "1.0",
     "Device Payment Type": "Post-Paid",
-    "Device Channel": "Carrier",
+    "Device Channel": "CRICKET FREELANCE",
     "Type": "Non-IoT"
   },
   {
@@ -304,7 +304,7 @@
     "Device OS Version": "3.5",
     "Device Hardware Version": "1.6",
     "Device Payment Type": "Pre-Paid",
-    "Device Channel": "Retail",
+    "Device Channel": "BYOD",
     "Type": "IoT"
   },
   {
@@ -318,7 +318,7 @@
     "Device OS Version": "11",
     "Device Hardware Version": "1.3",
     "Device Payment Type": "Post-Paid",
-    "Device Channel": "Online",
+    "Device Channel": "STOCK",
     "Type": "Non-IoT"
   },
   {
@@ -332,7 +332,7 @@
     "Device OS Version": "3.8",
     "Device Hardware Version": "1.5",
     "Device Payment Type": "Subscription",
-    "Device Channel": "Direct",
+    "Device Channel": "MYNO BASELINE",
     "Type": "IoT"
   },
   {
@@ -346,7 +346,7 @@
     "Device OS Version": "2.0",
     "Device Hardware Version": "1.0",
     "Device Payment Type": "Post-Paid",
-    "Device Channel": "Carrier",
+    "Device Channel": "CRICKET IETA",
     "Type": "Non-IoT"
   },
   {
@@ -360,7 +360,7 @@
     "Device OS Version": "4.1",
     "Device Hardware Version": "1.8",
     "Device Payment Type": "Pre-Paid",
-    "Device Channel": "Retail",
+    "Device Channel": "CRICKET VITA",
     "Type": "IoT"
   },
   {
@@ -374,7 +374,7 @@
     "Device OS Version": "11",
     "Device Hardware Version": "1.2",
     "Device Payment Type": "Post-Paid",
-    "Device Channel": "Online",
+    "Device Channel": "CRICKET FREELANCE",
     "Type": "Non-IoT"
   },
   {
@@ -388,7 +388,7 @@
     "Device OS Version": "4.5",
     "Device Hardware Version": "2.0",
     "Device Payment Type": "Pre-Paid",
-    "Device Channel": "Retail",
+    "Device Channel": "BYOD",
     "Type": "IoT"
   },
   {
@@ -402,7 +402,7 @@
     "Device OS Version": "12",
     "Device Hardware Version": "1.0",
     "Device Payment Type": "Post-Paid",
-    "Device Channel": "Carrier",
+    "Device Channel": "STOCK",
     "Type": "Non-IoT"
   },
   {
@@ -416,7 +416,7 @@
     "Device OS Version": "5.0",
     "Device Hardware Version": "1.9",
     "Device Payment Type": "Pre-Paid",
-    "Device Channel": "Retail",
+    "Device Channel": "MYNO BASELINE",
     "Type": "IoT"
   },
   {
@@ -430,7 +430,7 @@
     "Device OS Version": "11",
     "Device Hardware Version": "1.3",
     "Device Payment Type": "Post-Paid",
-    "Device Channel": "Online",
+    "Device Channel": "CRICKET IETA",
     "Type": "Non-IoT"
   },
   {
@@ -444,7 +444,7 @@
     "Device OS Version": "3.2",
     "Device Hardware Version": "1.6",
     "Device Payment Type": "Pre-Paid",
-    "Device Channel": "Retail",
+    "Device Channel": "CRICKET VITA",
     "Type": "IoT"
   },
   {
@@ -458,7 +458,7 @@
     "Device OS Version": "12",
     "Device Hardware Version": "1.0",
     "Device Payment Type": "Post-Paid",
-    "Device Channel": "Carrier",
+    "Device Channel": "CRICKET FREELANCE",
     "Type": "Non-IoT"
   },
   {
@@ -472,7 +472,7 @@
     "Device OS Version": "2.4",
     "Device Hardware Version": "1.5",
     "Device Payment Type": "Pre-Paid",
-    "Device Channel": "Retail",
+    "Device Channel": "BYOD",
     "Type": "IoT"
   },
   {
@@ -486,7 +486,7 @@
     "Device OS Version": "11",
     "Device Hardware Version": "1.4",
     "Device Payment Type": "Post-Paid",
-    "Device Channel": "Online",
+    "Device Channel": "STOCK",
     "Type": "Non-IoT"
   },
   {
@@ -500,7 +500,7 @@
     "Device OS Version": "3.1",
     "Device Hardware Version": "1.7",
     "Device Payment Type": "Pre-Paid",
-    "Device Channel": "Retail",
+    "Device Channel": "MYNO BASELINE",
     "Type": "IoT"
   },
   {
@@ -514,7 +514,7 @@
     "Device OS Version": "12",
     "Device Hardware Version": "1.0",
     "Device Payment Type": "Post-Paid",
-    "Device Channel": "Carrier",
+    "Device Channel": "CRICKET IETA",
     "Type": "Non-IoT"
   },
   {
@@ -528,7 +528,7 @@
     "Device OS Version": "4.3",
     "Device Hardware Version": "1.8",
     "Device Payment Type": "Pre-Paid",
-    "Device Channel": "Retail",
+    "Device Channel": "CRICKET VITA",
     "Type": "IoT"
   },
   {
@@ -542,7 +542,7 @@
     "Device OS Version": "11",
     "Device Hardware Version": "1.0",
     "Device Payment Type": "Post-Paid",
-    "Device Channel": "Carrier",
+    "Device Channel": "CRICKET FREELANCE",
     "Type": "Non-IoT"
   },
   {
@@ -556,7 +556,7 @@
     "Device OS Version": "2.9",
     "Device Hardware Version": "1.6",
     "Device Payment Type": "Pre-Paid",
-    "Device Channel": "Retail",
+    "Device Channel": "BYOD",
     "Type": "IoT"
   },
   {
@@ -570,7 +570,7 @@
     "Device OS Version": "11",
     "Device Hardware Version": "1.3",
     "Device Payment Type": "Post-Paid",
-    "Device Channel": "Online",
+    "Device Channel": "STOCK",
     "Type": "Non-IoT"
   },
   {
@@ -584,7 +584,7 @@
     "Device OS Version": "3.7",
     "Device Hardware Version": "1.5",
     "Device Payment Type": "Subscription",
-    "Device Channel": "Direct",
+    "Device Channel": "MYNO BASELINE",
     "Type": "IoT"
   },
   {
@@ -598,7 +598,7 @@
     "Device OS Version": "11",
     "Device Hardware Version": "1.0",
     "Device Payment Type": "Post-Paid",
-    "Device Channel": "Carrier",
+    "Device Channel": "CRICKET IETA",
     "Type": "Non-IoT"
   },
   {
@@ -612,7 +612,7 @@
     "Device OS Version": "2.2",
     "Device Hardware Version": "1.4",
     "Device Payment Type": "Pre-Paid",
-    "Device Channel": "Retail",
+    "Device Channel": "CRICKET VITA",
     "Type": "IoT"
   },
   {
@@ -626,7 +626,7 @@
     "Device OS Version": "11",
     "Device Hardware Version": "1.3",
     "Device Payment Type": "Post-Paid",
-    "Device Channel": "Online",
+    "Device Channel": "CRICKET FREELANCE",
     "Type": "Non-IoT"
   },
   {
@@ -640,7 +640,7 @@
     "Device OS Version": "3.3",
     "Device Hardware Version": "1.7",
     "Device Payment Type": "Pre-Paid",
-    "Device Channel": "Retail",
+    "Device Channel": "BYOD",
     "Type": "IoT"
   },
   {
@@ -654,7 +654,7 @@
     "Device OS Version": "12",
     "Device Hardware Version": "1.0",
     "Device Payment Type": "Post-Paid",
-    "Device Channel": "Carrier",
+    "Device Channel": "STOCK",
     "Type": "Non-IoT"
   },
   {
@@ -668,7 +668,7 @@
     "Device OS Version": "4.2",
     "Device Hardware Version": "1.8",
     "Device Payment Type": "Pre-Paid",
-    "Device Channel": "Retail",
+    "Device Channel": "MYNO BASELINE",
     "Type": "IoT"
   },
   {
@@ -682,7 +682,7 @@
     "Device OS Version": "11",
     "Device Hardware Version": "1.0",
     "Device Payment Type": "Post-Paid",
-    "Device Channel": "Carrier",
+    "Device Channel": "CRICKET IETA",
     "Type": "Non-IoT"
   },
   {
@@ -696,7 +696,7 @@
     "Device OS Version": "2.3",
     "Device Hardware Version": "1.4",
     "Device Payment Type": "Pre-Paid",
-    "Device Channel": "Retail",
+    "Device Channel": "CRICKET VITA",
     "Type": "IoT"
   }
 ]

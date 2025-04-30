@@ -502,5 +502,158 @@
     "device_channels": ["CRICKET IETA"],
     "device": "ST0919D",
     "stage": "DEVICE TESTING"
+  },
+  {
+    "chapter": "9000.0",
+    "deliverable": "SYSTEM USE",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": ["DA IR", "DA MR"],
+    "device_channels": ["CRICKET IETA"],
+    "device": "ST9999A",
+    "stage": "FORECAST"
+  },
+  {
+    "chapter": "9000.1",
+    "deliverable": "SYSTEM USE",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": ["DA IR", "DA MR"],
+    "device_channels": ["CRICKET VITA"],
+    "device": "ST9999A",
+    "stage": "FORECAST"
+  },
+  {
+    "chapter": "9000.2",
+    "deliverable": "SYSTEM USE",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": ["DA IR", "DA MR"],
+    "device_channels": ["CRICKET FREELANCE"],
+    "device": "ST9999A",
+    "stage": "FORECAST"
+  },
+  {
+    "chapter": "9000.3",
+    "deliverable": "SYSTEM USE",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": ["DA IR", "DA MR"],
+    "device_channels": ["BYOD"],
+    "device": "ST9999A",
+    "stage": "FORECAST"
+  },
+  {
+    "chapter": "9000.4",
+    "deliverable": "SYSTEM USE",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": ["DA IR", "DA MR"],
+    "device_channels": ["STOCK"],
+    "device": "ST9999A",
+    "stage": "FORECAST"
+  },
+  {
+    "chapter": "9000.5",
+    "deliverable": "SYSTEM USE",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": ["DA IR", "DA MR"],
+    "device_channels": ["MYNO BASELINE"],
+    "device": "ST9999A",
+    "stage": "FORECAST"
+  },
+  {
+    "chapter": "9001.0",
+    "deliverable": "SYSTEM TEST",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": ["DA IR", "DA MR"],
+    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
+    "device": "ST9999B",
+    "stage": "DEVICE TESTING"
+  },
+  {
+    "chapter": "9001.1",
+    "deliverable": "SYSTEM TEST",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": ["DA IR", "DA MR"],
+    "device_channels": ["CRICKET FREELANCE", "BYOD"],
+    "device": "ST9999B",
+    "stage": "DEVICE TESTING"
+  },
+  {
+    "chapter": "9001.2",
+    "deliverable": "SYSTEM TEST",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": ["DA IR", "DA MR"],
+    "device_channels": ["STOCK", "MYNO BASELINE"],
+    "device": "ST9999B",
+    "stage": "DEVICE TESTING"
+  },
+  {
+    "chapter": "9002.0",
+    "deliverable": "SYSTEM COMPLETE",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": ["DA IR", "DA MR"],
+    "device_channels": ["CRICKET IETA"],
+    "device": "ST9999C",
+    "stage": "TA COMPLETE"
+  },
+  {
+    "chapter": "9002.1",
+    "deliverable": "SYSTEM COMPLETE",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": ["DA IR", "DA MR"],
+    "device_channels": ["CRICKET VITA"],
+    "device": "ST9999C",
+    "stage": "TA COMPLETE"
+  },
+  {
+    "chapter": "9002.2",
+    "deliverable": "SYSTEM COMPLETE",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": ["DA IR", "DA MR"],
+    "device_channels": ["CRICKET FREELANCE"],
+    "device": "ST9999C",
+    "stage": "TA COMPLETE"
+  },
+  {
+    "chapter": "9002.3",
+    "deliverable": "SYSTEM COMPLETE",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": ["DA IR", "DA MR"],
+    "device_channels": ["BYOD"],
+    "device": "ST9999C",
+    "stage": "TA COMPLETE"
+  },
+  {
+    "chapter": "9002.4",
+    "deliverable": "SYSTEM COMPLETE",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": ["DA IR", "DA MR"],
+    "device_channels": ["STOCK"],
+    "device": "ST9999C",
+    "stage": "TA COMPLETE"
+  },
+  {
+    "chapter": "9002.5",
+    "deliverable": "SYSTEM COMPLETE",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": ["DA IR", "DA MR"],
+    "device_channels": ["MYNO BASELINE"],
+    "device": "ST9999C",
+    "stage": "TA COMPLETE"
+  },
+  {
+    "chapter": "9003.0",
+    "deliverable": "SYSTEM SUBMIT",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": ["DA IR", "DA MR"],
+    "device_channels": ["CRICKET IETA", "CRICKET VITA", "CRICKET FREELANCE"],
+    "device": "ST9999D",
+    "stage": "SUBMITTED"
+  },
+  {
+    "chapter": "9003.1",
+    "deliverable": "SYSTEM SUBMIT",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": ["DA IR", "DA MR"],
+    "device_channels": ["BYOD", "STOCK", "MYNO BASELINE"],
+    "device": "ST9999D",
+    "stage": "SUBMITTED"
   }
 ]
