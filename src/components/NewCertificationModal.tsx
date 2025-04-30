@@ -156,18 +156,11 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
             setSelectedWorkflow(transformedWorkflow);
           }
 
-          if (JSON.stringify(memoizedDefaultWorkflow) !== JSON.stringify(transformedWorkflow)) {
-            setStoreSelectedWorkflow(transformedWorkflow);
-          }
-
           setErrorMessage('');
         } else {
           console.warn(`No workflow found for project type "${formData.projectType}". Using default workflow.`);
           if (JSON.stringify(selectedWorkflow) !== JSON.stringify(memoizedDefaultWorkflow)) {
             setSelectedWorkflow(memoizedDefaultWorkflow);
-          }
-          if (JSON.stringify(memoizedDefaultWorkflow) !== JSON.stringify(memoizedDefaultWorkflow)) {
-            setStoreSelectedWorkflow(memoizedDefaultWorkflow);
           }
           setErrorMessage(`No workflow found for project type "${formData.projectType}". Using default workflow.`);
         }
@@ -176,21 +169,23 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
         if (JSON.stringify(selectedWorkflow) !== JSON.stringify(memoizedDefaultWorkflow)) {
           setSelectedWorkflow(memoizedDefaultWorkflow);
         }
-        if (JSON.stringify(memoizedDefaultWorkflow) !== JSON.stringify(memoizedDefaultWorkflow)) {
-          setStoreSelectedWorkflow(memoizedDefaultWorkflow);
-        }
         setErrorMessage("Error processing workflow. Using default workflow.");
       }
     } else {
       if (JSON.stringify(selectedWorkflow) !== JSON.stringify(memoizedDefaultWorkflow)) {
         setSelectedWorkflow(memoizedDefaultWorkflow);
       }
-      if (JSON.stringify(memoizedDefaultWorkflow) !== JSON.stringify(memoizedDefaultWorkflow)) {
-        setStoreSelectedWorkflow(memoizedDefaultWorkflow);
-      }
       setErrorMessage('');
     }
-  }, [formData.projectType, savedWorkflows, memoizedDefaultWorkflow, setStoreSelectedWorkflow]);
+  }, [formData.projectType, savedWorkflows, memoizedDefaultWorkflow]);
+
+  // Synchronize selectedWorkflow with the store
+  useEffect(() => {
+    if (selectedWorkflow && JSON.stringify(selectedWorkflow) !== JSON.stringify(memoizedDefaultWorkflow)) {
+      console.log('Synchronizing selectedWorkflow with store:', selectedWorkflow);
+      setStoreSelectedWorkflow(selectedWorkflow);
+    }
+  }, [selectedWorkflow, memoizedDefaultWorkflow, setStoreSelectedWorkflow]);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -678,7 +673,7 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
                           </div>
                         </div>
                       ))}
-                      {formData.oemDocuments.length == 0 && (
+                      {formData.oemDocuments.length === 0 && (
                         <div className="p-3 text-sm text-gray-500">
                           No documents uploaded
                         </div>
