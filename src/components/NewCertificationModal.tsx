@@ -590,12 +590,18 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
           )}
 
           {currentStep === 'review' && (
-            <div className="flex flex-col h-full">
-              <div className="p-6 border-b">
-                <Dialog.Title className="text-xl font-bold mb-4">
-                  Review Certification Request
-                </Dialog.Title>
+            <div className="flex flex-col h-[70vh]">
+              {/* Sticky dialog title/header */}
+              <div className="sticky top-0 z-20 bg-white border-b shadow-sm">
+                <div className="p-6">
+                  <Dialog.Title className="text-xl font-bold mb-4">
+                    Review Certification Request
+                  </Dialog.Title>
+                </div>
+              </div>
 
+              {/* Scrollable middle section */}
+              <div className="flex-1 min-h-0 overflow-y-auto p-6">
                 <div className="space-y-6">
                   <div>
                     <h3 className="text-lg font-semibold mb-2">Project Information</h3>
@@ -722,7 +728,8 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
                 </div>
               </div>
 
-              <div className="p-6 bg-gray-50 mt-auto">
+              {/* Sticky footer for review step */}
+              <div className="sticky bottom-0 z-20 bg-gray-50 border-t p-6">
                 <div className="flex justify-between items-center">
                   <div className="flex items-center text-sm text-gray-600">
                     <ClockIcon className="w-4 h-4 mr-1" />
