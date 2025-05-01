@@ -20,7 +20,8 @@
       "Detailed certification plan approved",
       "Deliverables & dates locked in"
     ],
-    "task_name": "Deliverable Reqs: PreAuth"
+    "task_name": "Deliverable Reqs: PreAuth",
+    "time_frame_days": 5
   },
   {
     "chapter": "1000.0",
@@ -43,7 +44,8 @@
       "Detailed certification plan approved",
       "Deliverables & dates locked in"
     ],
-    "task_name": "Deliverable Reqs: Samples \u2013 Marketing & Certification"
+    "task_name": "Deliverable Reqs: Samples \u2013 Marketing & Certification",
+    "time_frame_days": 7
   },
   {
     "chapter": "1000.0",
@@ -66,7 +68,8 @@
       "Detailed certification plan approved",
       "Deliverables & dates locked in"
     ],
-    "task_name": "Deliverable Reqs: PTCRB"
+    "task_name": "Deliverable Reqs: PTCRB",
+    "time_frame_days": 10
   },
   {
     "chapter": "1000.0",
@@ -89,7 +92,8 @@
       "Detailed certification plan approved",
       "Deliverables & dates locked in"
     ],
-    "task_name": "Deliverable Reqs: Certs \u2013 Release Notes"
+    "task_name": "Deliverable Reqs: Certs \u2013 Release Notes",
+    "time_frame_days": 6
   },
   {
     "chapter": "1000.0",
@@ -112,7 +116,8 @@
       "Detailed certification plan approved",
       "Deliverables & dates locked in"
     ],
-    "task_name": "Deliverable Reqs: FOTA-16038"
+    "task_name": "Deliverable Reqs: FOTA-16038",
+    "time_frame_days": 8
   },
   {
     "chapter": "1000.1",
