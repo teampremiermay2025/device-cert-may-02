@@ -7,6 +7,13 @@
 
 // You can import as many as you want and add to the DATA_TO_LOAD array.
 import userData from './data/users.json';
+import devicesData from './data/devices.json';
+
+// Add id to each device in devicesData
+const devicesWithIds = devicesData.slice(0, 2).map(device => ({
+  ...device,
+  id: crypto.randomUUID(),
+}));
 const DATA_TO_LOAD = [
   {
     key: 'jiraWorkflows',
@@ -20,6 +27,10 @@ const DATA_TO_LOAD = [
     key: 'dashboards',
     data: [{"id":"main-dashboard","title":"Main Dashboard","description":"Device Certification Dashboard","type":"default","sharedWith":[],"layout":[],"createdAt":"2025-04-25T17:08:53.690Z","updatedAt":"2025-04-25T17:08:53.690Z","createdBy":"system"},{"id":"waiver-dashboard","title":"Waiver Request","description":"Manage waiver requests and approvals","type":"default","sharedWith":[],"layout":[],"createdAt":"2025-04-25T17:08:53.690Z","updatedAt":"2025-04-25T17:08:53.690Z","createdBy":"system"},{"id":"device-list","title":"Device List Dashboard","description":"View and manage device inventory","type":"default","sharedWith":[],"layout":[],"createdAt":"2025-04-25T17:08:53.690Z","updatedAt":"2025-04-25T17:08:53.690Z","createdBy":"system"},{"id":"device-schedule","title":"Device Schedule Dashboard","description":"Track device certification schedules","type":"default","sharedWith":[],"layout":[],"createdAt":"2025-04-25T17:08:53.690Z","updatedAt":"2025-04-25T17:08:53.690Z","createdBy":"system"},{"id":"03ca8ff6-ef76-445b-89b3-5700ac2f7bf6","title":"test","description":"","type":"empty","sharedWith":[],"layout":[{"title":"test","type":"tasks","width":3,"height":3,"config":{},"id":"311488db-5931-40da-9448-f989cc581893","x":0,"y":0},{"title":"stream","type":"activity","width":3,"height":3,"config":{},"id":"b439f8af-077b-43c8-b537-ec6b6ea14f7e","x":3,"y":0},{"title":"s","type":"chart","width":6,"height":4,"config":{"chartType":"line"},"id":"9f62df19-d3ce-4e24-8d5f-1f9009edc773","x":0,"y":3}],"createdAt":"2025-04-25T21:46:28.686Z","updatedAt":"2025-04-28T17:30:44.712Z","createdBy":"Alex Carter"}]
     , // Replace with imported dashboardsData
+  },
+  {
+    key: 'devices',
+    data: devicesWithIds,
   },
  /*  {
     key: 'users',
