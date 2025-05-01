@@ -158,6 +158,7 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
 
   // New handler for TaskBoard (does NOT close the panel)
   const handleTaskUpdateNoClose = (updatedTask: CertificationTask) => {
+    console.log('Updating task:', updatedTask);
     const updatedTasks = certification.tasks.map(task =>
       task.id === updatedTask.id ? updatedTask : task
     );

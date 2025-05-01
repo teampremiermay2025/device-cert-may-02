@@ -8,6 +8,7 @@ import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import usersData from '../data/users.json';
+import { GridApi, ColumnApi } from 'ag-grid-community';
 
 interface DashboardProps {
   onNewCertification: () => void;
@@ -26,6 +27,18 @@ const statusOrder: CertificationStage[] = [
 ];
 
 const projectTypes = ['DA IR', 'DA MR', 'DA EMR', 'DA SMR'];
+
+const statusOptions = [
+  'FORECAST',
+  'PLANNING',
+  'SUBMITTED',
+  'SUBMISSION_REVIEW',
+  'DEVICE_ENTRY',
+  'DEVICE_TESTING',
+  'TAQ_REVIEW',
+  'TA_COMPLETE',
+  'CLOSED',
+];
 
 const getStatusColor = (status: CertificationStage): string => {
   const colors: Record<CertificationStage, string> = {
@@ -121,9 +134,10 @@ const AssigneeEditor = (props: any) => {
 export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
   const [certifications, setCertifications] = useState<CertificationRequest[]>([]);
   const [selectedCertification, setSelectedCertification] = useState<CertificationRequest | null>(null);
-  const [gridApi, setGridApi] = useState(null);
-  const [columnApi, setColumnApi] = useState(null);
+  const [gridApi, setGridApi] = useState<GridApi | null>(null);
+  const [columnApi, setColumnApi] = useState<ColumnApi | null>(null);
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  const [selectedStatus, setSelectedStatus] = useState<string>('');
   const [isStatusOverviewExpanded, setIsStatusOverviewExpanded] = useState(true);
   const [viewMode, setViewMode] = useState<'card' | 'grid'>('card');
 
@@ -186,8 +200,9 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
     '--ag-checkbox-checked-color': 'rgb(59 130 246)',
     '--ag-checkbox-unchecked-color': '#9ca3af',
     '--ag-row-height': '48px',
-    '--ag-header-height': '48px',
+    '--ag-header-height': '52px',
     '--ag-list-item-height': '40px',
+    '--ag-floating-filters-height': '40px',
   }), []);
 
   const columnDefs = useMemo(() => [
@@ -231,13 +246,14 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
       filter: 'agTextColumnFilter',
       cellClass: 'text-gray-700',
       minWidth: 150,
+      hide: true,
     },
     {
       field: 'deviceType',
       headerName: 'Device Type',
       filter: 'agSetColumnFilter',
       cellClass: 'text-gray-700',
-      minWidth: 130,
+      minWidth: 130,  hide: true,
     },
     {
       field: 'assignee',
@@ -263,6 +279,7 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
       cellRenderer: DateCellRenderer,
       editable: true,
       minWidth: 130,
+      cellClass: 'cell-center',
     },
     {
       field: 'lastUpdated',
@@ -270,7 +287,7 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
       filter: 'agDateColumnFilter',
       cellRenderer: DateCellRenderer,
       sort: 'desc',
-      minWidth: 130,
+      minWidth: 130, cellClass: 'cell-center',
     },
   ], []);
 
@@ -278,7 +295,21 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
     setGridApi(params.api);
     setColumnApi(params.columnApi);
     params.api.sizeColumnsToFit();
+    // Auto-size all columns to fit content
+    setTimeout(() => {
+      if (params.columnApi && typeof params.columnApi.getAllColumns === 'function') {
+        const allColumnIds = params.columnApi.getAllColumns().map((col: any) => col.getColId());
+        params.columnApi.autoSizeColumns(allColumnIds, false);
+      }
+    }, 100);
   }, []);
+
+  useEffect(() => {
+    if (columnApi && typeof columnApi.getAllColumns === 'function') {
+      const allColumnIds = columnApi.getAllColumns().map((col: any) => col.getColId());
+      columnApi.autoSizeColumns(allColumnIds, false);
+    }
+  }, [certifications, columnApi]);
 
   const onCellValueChanged = useCallback((event: any) => {
     const updatedCertification = { ...event.data };
@@ -306,18 +337,6 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
     );
   };
 
-  const statusCounts = statusOrder.map(stage => ({
-    stage,
-    total: certifications.filter(cert => cert.status === stage).length,
-  }));
-
-  const projectTypeCounts = projectTypes.map(type => ({
-    type,
-    count: certifications.filter(cert => cert.type === type).length
-  }));
-
-  const totalActive = certifications.filter(cert => cert.status !== 'CLOSED').length;
-
   useEffect(() => {
     if (gridApi) {
       const filterInstance = gridApi.getFilterInstance('type');
@@ -332,6 +351,57 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
       gridApi.onFilterChanged();
     }
   }, [selectedTypes, gridApi]);
+
+  useEffect(() => {
+    if (gridApi) {
+      const filterInstance = gridApi.getFilterInstance('status');
+      if (selectedStatus) {
+        filterInstance.setModel({
+          type: 'set',
+          values: [selectedStatus],
+        });
+      } else {
+        filterInstance.setModel(null);
+      }
+      gridApi.onFilterChanged();
+    }
+  }, [selectedStatus, gridApi]);
+
+  useEffect(() => {
+    if (viewMode === 'grid' && gridApi) {
+      // Sync type filter
+      const typeFilter = gridApi.getFilterInstance('type');
+      if (typeFilter && typeof typeFilter.setModel === 'function') {
+        if (selectedTypes.length > 0) {
+          typeFilter.setModel({ type: 'set', values: selectedTypes });
+        } else {
+          typeFilter.setModel(null);
+        }
+      }
+      // Sync status filter
+      const statusFilter = gridApi.getFilterInstance('status');
+      if (statusFilter && typeof statusFilter.setModel === 'function') {
+        if (selectedStatus) {
+          statusFilter.setModel({ type: 'set', values: [selectedStatus] });
+        } else {
+          statusFilter.setModel(null);
+        }
+      }
+      gridApi.onFilterChanged();
+    }
+  }, [viewMode, gridApi, selectedTypes, selectedStatus]);
+
+  const statusCounts = statusOrder.map(stage => ({
+    stage,
+    total: certifications.filter(cert => cert.status === stage).length,
+  }));
+
+  const projectTypeCounts = projectTypes.map(type => ({
+    type,
+    count: certifications.filter(cert => cert.type === type).length
+  }));
+
+  const totalActive = certifications.filter(cert => cert.status !== 'CLOSED').length;
 
   return (
     <div className="p-8 mx-auto">
@@ -418,36 +488,54 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
             </div>
           </div>
 
-          <div className="mb-6 flex flex-wrap gap-2 items-center">
-            <button
-              onClick={selectAllTypes}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                selectedTypes.length === projectTypes.length
-                  ? 'bg-gray-800 text-white shadow-sm'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              All Types
-            </button>
-            {projectTypeCounts.map(({ type, count }) => (
+          <div className="mb-6 flex flex-wrap gap-4 items-center bg-gray-50 border border-gray-200 rounded-lg p-4">
+            <div className="flex gap-2 items-center">
+              <span className="font-medium text-gray-700">Type:</span>
               <button
-                key={type}
-                onClick={() => toggleTypeFilter(type)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors shadow-sm ${
-                  selectedTypes.includes(type)
-                    ? getTypeColor(type)
+                onClick={selectAllTypes}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  selectedTypes.length === projectTypes.length
+                    ? 'bg-gray-800 text-white shadow-sm'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
-                {type} ({count})
+                All Types
               </button>
-            ))}
+              {projectTypeCounts.map(({ type, count }) => (
+                <button
+                  key={type}
+                  onClick={() => toggleTypeFilter(type)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors shadow-sm ${
+                    selectedTypes.includes(type)
+                      ? getTypeColor(type)
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  {type} ({count})
+                </button>
+              ))}
+            </div>
+            <div className="flex gap-2 items-center ml-6">
+              <span className="font-medium text-gray-700">Status:</span>
+              <select
+                value={selectedStatus}
+                onChange={e => setSelectedStatus(e.target.value)}
+                className="px-3 py-2 rounded-lg border border-gray-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-200"
+                style={{ minWidth: 120 }}
+              >
+                <option value="">All Statuses</option>
+                {statusOptions.map(status => (
+                  <option key={status} value={status}>{status.split('_').map(w => w.charAt(0) + w.slice(1).toLowerCase()).join(' ')}</option>
+                ))}
+              </select>
+            </div>
           </div>
 
           {viewMode === 'card' ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {certifications
                 .filter(cert => selectedTypes.length === 0 || selectedTypes.includes(cert.type))
+                .filter(cert => selectedStatus === '' || cert.status === selectedStatus)
                 .map((cert) => (
                   <CertificationCard 
                     key={cert.id} 
@@ -461,7 +549,8 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
               <div 
                 className="ag-theme-alpine w-full" 
                 style={{ 
-                  height: 'calc(100vh - 480px)',
+                  height: 'auto', 
+                  minHeight: 200,
                   ...gridTheme
                 }}
               >
@@ -481,6 +570,7 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
                   suppressRowClickSelection={true}
                   suppressCellFocus={true}
                   context={{ setSelectedCertification }}
+                  domLayout="autoHeight"
                   sideBar={{
                     toolPanels: [
                       {
@@ -522,6 +612,7 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
             );
             storage.saveCertifications(updatedCertifications);
             setCertifications(updatedCertifications);
+            setSelectedCertification(updated);
           }}
           onCancel={() => setSelectedCertification(null)}
         />
