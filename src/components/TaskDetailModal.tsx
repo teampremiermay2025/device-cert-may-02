@@ -8,7 +8,9 @@ import {
   UserCircleIcon,
   ExclamationCircleIcon,
   CheckCircleIcon,
-  SparklesIcon
+  SparklesIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
 } from '@heroicons/react/24/outline';
 import { CertificationTask, TaskPriority, TaskStatus } from '../types';
 import testCasesData from '../data/testcases.json';
@@ -18,6 +20,12 @@ interface TaskDetailModalProps {
   onClose: () => void;
   task: CertificationTask;
   onUpdate: (task: CertificationTask) => void;
+}
+
+interface TestCase {
+  test_case_id: string;
+  test_case_description: string;
+  acceptance_criteria: string[];
 }
 
 export const TaskDetailModal: FC<TaskDetailModalProps> = ({
@@ -30,11 +38,12 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
   const [newComment, setNewComment] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  // Add state for AI test case generation UI
+  // State for AI test case generation UI
   const [showAITestCaseSection, setShowAITestCaseSection] = useState(false);
   const [aiStep, setAIStep] = useState<'idle' | 'processing' | 'understanding' | 'typing' | 'done'>('idle');
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const [aiTestCases, setAITestCases] = useState<string[]>([]);
+  const [aiTestCases, setAITestCases] = useState<TestCase[]>([]); // Store full test case objects
+  const [expandedTestCases, setExpandedTestCases] = useState<{ [key: string]: boolean }>({}); // Track expanded state
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleStatusChange = (status: TaskStatus) => {
@@ -99,6 +108,7 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
     setAIStep('idle');
     setUploadedFile(null);
     setAITestCases([]);
+    setExpandedTestCases({}); // Reset expanded state
   };
 
   // Handler for file drop
@@ -121,6 +131,14 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
     }
   };
 
+  // Toggle expand/collapse for a test case
+  const toggleTestCase = (testCaseId: string) => {
+    setExpandedTestCases((prev) => ({
+      ...prev,
+      [testCaseId]: !prev[testCaseId],
+    }));
+  };
+
   // Simulate AI processing steps
   const startAIProcessing = () => {
     setAIStep('processing');
@@ -131,37 +149,30 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
         setTimeout(() => {
           setAIStep('done');
           // Extract requirement_tag from editedTask.description
-          // Expected format: "Deliverable: <requirement_tag>"
+          // Expected format: "<requirement_tag>"
           const description = editedTask?.description || '';
-         // const prefix = 'Deliverable: ';
-          let requirementTag = '';
-
-         // if (description.startsWith(prefix)) {
-            requirementTag = description;
-         // }
+          let requirementTag = description;
 
           console.log('Extracted requirement tag:', requirementTag);
 
           if (!requirementTag) {
-            setAITestCases(['No matching test cases found for this requirement tag.']);
+            setAITestCases(['No matching test cases found for this requirement tag.'] as any);
             return;
           }
 
           // Filter test cases from testcases.json based on requirement_tag
           console.log('Matching requirement tag:', requirementTag);
-          const matchingChapter = testCasesData.find(
+          const matchingChapters = testCasesData.filter(
             (chapter) => chapter.requirement_tag === requirementTag
           );
-          console.log('Matching chapter:', matchingChapter);
+          console.log('Matching chapters:', matchingChapters);
 
-          if (matchingChapter && matchingChapter.test_cases.length > 0) {
-            // Extract test_case_id from matching test cases
-            const filteredTestCases = matchingChapter.test_cases.map(
-              (testCase) => testCase.test_case_id
-            );
-            setAITestCases(filteredTestCases);
+          if (matchingChapters.length > 0) {
+            // Collect all test cases from all matching chapters
+            const allTestCases = matchingChapters.flatMap(chapter => chapter.test_cases);
+            setAITestCases(allTestCases);
           } else {
-            setAITestCases(['No test cases found for requirement tag: ' + requirementTag]);
+            setAITestCases(['No test cases found for requirement tag: ' + requirementTag] as any);
           }
         }, 2500);
       }, 2000);
@@ -359,16 +370,51 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
                     {aiStep === 'done' && (
                       <div className="mt-4">
                         <div className="text-green-700 font-semibold mb-2">Test Cases Generated:</div>
-                        <div className="bg-white rounded-lg border">
+                        <div className="bg-white rounded-lg border max-h-64 overflow-y-auto">
                           {aiTestCases.map((tc, idx) => (
-                            <div
-                              key={idx}
-                              className="p-4 border-b last:border-b-0 hover:bg-gray-50 animate-fade-in-up"
-                            >
-                              <div className="flex items-center justify-between">
-                                <span className="text-gray-700">{tc}</span>
+                            typeof tc === 'string' ? (
+                              <div
+                                key={idx}
+                                className="p-4 border-b last:border-b-0 hover:bg-gray-50 animate-fade-in-up"
+                              >
+                                <div className="flex items-center justify-between">
+                                  <span className="text-gray-700">{tc}</span>
+                                </div>
                               </div>
-                            </div>
+                            ) : (
+                              <div
+                                key={tc.test_case_id}
+                                className="border-b last:border-b-0 hover:bg-gray-50 animate-fade-in-up"
+                              >
+                                <div
+                                  className="p-4 flex items-center justify-between cursor-pointer"
+                                  onClick={() => toggleTestCase(tc.test_case_id)}
+                                >
+                                  <span className="text-gray-700 font-medium">{tc.test_case_id}</span>
+                                  {expandedTestCases[tc.test_case_id] ? (
+                                    <ChevronUpIcon className="w-5 h-5 text-gray-500" />
+                                  ) : (
+                                    <ChevronDownIcon className="w-5 h-5 text-gray-500" />
+                                  )}
+                                </div>
+                                {expandedTestCases[tc.test_case_id] && (
+                                  <div className="px-4 pb-4 text-gray-600">
+                                    <div className="mb-2">
+                                      <span className="font-semibold">Description: </span>
+                                      <span>{tc.test_case_description}</span>
+                                    </div>
+                                    <div>
+                                      <span className="font-semibold">Acceptance Criteria:</span>
+                                      <ul className="list-disc pl-5 mt-1">
+                                        {tc.acceptance_criteria.map((criterion, critIdx) => (
+                                          <li key={critIdx} className="text-sm">{criterion}</li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            )
                           ))}
                         </div>
                       </div>
