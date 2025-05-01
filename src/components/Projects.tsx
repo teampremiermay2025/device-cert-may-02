@@ -442,6 +442,7 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
            
           }}
           onCancel={() => setSelectedCertification(null)}
+         
         />
       )}
     </div>

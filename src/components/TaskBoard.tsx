@@ -37,7 +37,7 @@ const TaskCard: FC<{ task: CertificationTask; onDetailsClick?: () => void }> = (
         {/* Details button/link for opening task details */}
         {onDetailsClick && (
           <button
-            className="mt-2 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold shadow hover:bg-blue-200 transition focus:outline-none border border-blue-200"
+            className="mt-2 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold shadow hover:bg-blue-200 transition focus:outline-none border border-blue-200 no-drag"
             style={{ display: 'inline-block' }}
             onClick={e => {
               e.stopPropagation();
@@ -120,11 +120,12 @@ export const TaskBoard: FC<TaskBoardProps> = ({ tasks, onTaskUpdate, onTaskClick
         layouts={{ lg: generateLayout() }}
         breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
         cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
-        rowHeight={100}
+        rowHeight={25}
         onLayoutChange={handleLayoutChange}
         isDraggable
         isResizable={false}
         margin={[16, 16]}
+        draggableCancel=".no-drag"
       >
     
         {tasks.map(task => (

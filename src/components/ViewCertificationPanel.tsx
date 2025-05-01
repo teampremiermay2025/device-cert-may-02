@@ -152,7 +152,7 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
     }
 
     storage.updateCertification(updatedCertification);
-    onUpdate(updatedCertification);
+    onUpdateNoClose(updatedCertification);
     setSelectedTask(null);
   };
 
