@@ -21,7 +21,7 @@ const columns: { id: TaskStatus; title: string }[] = [
 ];
 
 const TaskCard: FC<{ task: CertificationTask; onDetailsClick?: () => void }> = ({ task, onDetailsClick }) => (
-  <div className="bg-white rounded-lg p-3 shadow-sm hover:shadow cursor-grab active:cursor-grabbing ">
+  <div className="bg-gray-50 rounded-lg p-3 shadow-sm hover:shadow cursor-grab active:cursor-grabbing ">
     <div className="flex items-start gap-2">
       <span className={`font-mono ${getTaskPriorityColor(task.priority)}`}>{getTaskPriorityIcon(task.priority)}</span>
       <div className="flex-1 min-w-0">
