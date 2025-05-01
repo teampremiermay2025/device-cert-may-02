@@ -1,45 +1,17 @@
-import { FC, useState, useEffect } from 'react';
-import { PlusIcon, FunnelIcon, Bars4Icon, TableCellsIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
-import { CertificationCard } from './CertificationCard';
+import { FC, useState, useEffect, useMemo, useCallback } from 'react';
+import { PlusIcon, FunnelIcon, Bars4Icon, TableCellsIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 import { CertificationRequest, CertificationStage } from '../types';
 import { ViewCertificationPanel } from './ViewCertificationPanel';
+import { CertificationCard } from './CertificationCard';
 import { storage } from '../lib/storage';
-import { AssigneeBubble } from './NewCertificationModal';
+import { AgGridReact } from 'ag-grid-react';
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-alpine.css';
+import usersData from '../data/users.json';
 
 interface DashboardProps {
   onNewCertification: () => void;
 }
-
-interface StatusCount {
-  stage: CertificationStage;
-  total: number;
-}
-
-interface FilterState {
-  status: CertificationStage | '';
-  types: string[];
-  primaryPC: string;
-  deviceModel: string;
-  deviceType: string;
-  releaseType: string;
-  showActive: boolean;
-  currentWeek: boolean;
-  nextWeek: boolean;
-  hideTest: boolean;
-}
-
-const initialFilterState: FilterState = {
-  status: '',
-  types: [],
-  primaryPC: '',
-  deviceModel: '',
-  deviceType: '',
-  releaseType: '',
-  showActive: true,
-  currentWeek: false,
-  nextWeek: false,
-  hideTest: false,
-};
 
 const statusOrder: CertificationStage[] = [
   'FORECAST',
@@ -54,19 +26,18 @@ const statusOrder: CertificationStage[] = [
 ];
 
 const projectTypes = ['DA IR', 'DA MR', 'DA EMR', 'DA SMR'];
-const deviceTypes = ['Handset', 'Tablet', 'Watch', 'Other'];
 
 const getStatusColor = (status: CertificationStage): string => {
   const colors: Record<CertificationStage, string> = {
-    'FORECAST': 'bg-purple-50 border-purple-200 hover:bg-purple-100',
-    'PLANNING': 'bg-blue-50 border-blue-200 hover:bg-blue-100',
-    'SUBMITTED': 'bg-yellow-50 border-yellow-200 hover:bg-yellow-100',
-    'SUBMISSION_REVIEW': 'bg-orange-50 border-orange-200 hover:bg-orange-100',
-    'DEVICE_ENTRY': 'bg-cyan-50 border-cyan-200 hover:bg-cyan-100',
-    'DEVICE_TESTING': 'bg-indigo-50 border-indigo-200 hover:bg-indigo-100',
-    'TAQ_REVIEW': 'bg-pink-50 border-pink-200 hover:bg-pink-100',
-    'TA_COMPLETE': 'bg-green-50 border-green-200 hover:bg-green-100',
-    'CLOSED': 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+    'FORECAST': 'bg-purple-100 text-purple-800',
+    'PLANNING': 'bg-blue-100 text-blue-800',
+    'SUBMITTED': 'bg-yellow-100 text-yellow-800',
+    'SUBMISSION_REVIEW': 'bg-orange-100 text-orange-800',
+    'DEVICE_ENTRY': 'bg-cyan-100 text-cyan-800',
+    'DEVICE_TESTING': 'bg-indigo-100 text-indigo-800',
+    'TAQ_REVIEW': 'bg-pink-100 text-pink-800',
+    'TA_COMPLETE': 'bg-green-100 text-green-800',
+    'CLOSED': 'bg-gray-100 text-gray-800'
   };
   return colors[status];
 };
@@ -81,17 +52,80 @@ const getTypeColor = (type: string): string => {
   return colors[type] || 'bg-gray-100 text-gray-800';
 };
 
+const DarpKeyCellRenderer = (props: any) => {
+  return (
+    <div 
+      className="text-blue-600 hover:text-blue-800 cursor-pointer font-medium"
+      onClick={(e) => {
+        e.stopPropagation();
+        props.context.setSelectedCertification(props.data);
+      }}
+    >
+      {props.value}
+    </div>
+  );
+};
+
+const AssigneeCellRenderer = (props: any) => {
+  const user = usersData.users.find(u => u.id === props.value);
+  if (!user) return '-';
+
+  const nameParts = user.name.split(' ');
+  const initials = nameParts.length > 1 ? nameParts[0][0] + nameParts[nameParts.length - 1][0] : user.name.slice(0, 2);
+
+  return (
+    <div className="flex items-center gap-2">
+      {user.avatar ? (
+        <img src={user.avatar} alt={user.name} className="w-6 h-6 rounded-full" />
+      ) : (
+        <span className="w-6 h-6 flex items-center justify-center rounded-full bg-blue-300 text-white text-xs">
+          {initials}
+        </span>
+      )}
+      <span>{user.name}</span>
+    </div>
+  );
+};
+
+const AssigneeEditor = (props: any) => {
+  const [selectedUser, setSelectedUser] = useState(props.value);
+
+  const onUserSelect = (userId: string) => {
+    setSelectedUser(userId);
+    props.stopEditing();
+    props.setValue(userId);
+  };
+
+  return (
+    <div className="bg-white shadow-lg rounded-lg p-2 z-50">
+      {usersData.users.map(user => (
+        <div
+          key={user.id}
+          className="flex items-center gap-2 p-2 hover:bg-blue-50 cursor-pointer rounded"
+          onClick={() => onUserSelect(user.id)}
+        >
+          {user.avatar ? (
+            <img src={user.avatar} alt={user.name} className="w-6 h-6 rounded-full" />
+          ) : (
+            <span className="w-6 h-6 flex items-center justify-center rounded-full bg-blue-300 text-white text-xs">
+              {user.name.split(' ').map(n => n[0]).join('')}
+            </span>
+          )}
+          <span>{user.name}</span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
   const [certifications, setCertifications] = useState<CertificationRequest[]>([]);
   const [selectedCertification, setSelectedCertification] = useState<CertificationRequest | null>(null);
-  const [filters, setFilters] = useState<FilterState>(initialFilterState);
-  const [showFilters, setShowFilters] = useState(false);
-  const [viewMode, setViewMode] = useState<'card' | 'grid'>('card');
+  const [gridApi, setGridApi] = useState(null);
+  const [columnApi, setColumnApi] = useState(null);
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [isStatusOverviewExpanded, setIsStatusOverviewExpanded] = useState(true);
-
-  const [search, setSearch] = useState('');
-  const [sortBy, setSortBy] = useState<'forecastedLaunchDate'|'lastUpdated'|'projectName'|'assignee'>('forecastedLaunchDate');
-  const [sortDir, setSortDir] = useState<'asc'|'desc'>('desc');
+  const [viewMode, setViewMode] = useState<'card' | 'grid'>('card');
 
   useEffect(() => {
     const handleStorageChange = () => {
@@ -106,13 +140,176 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
     };
   }, []);
 
-  // Calculate status counts based on filtered certifications
-  const getFilteredStatusCounts = (certs: CertificationRequest[]): StatusCount[] => {
-    return statusOrder.map(stage => ({
-      stage,
-      total: certs.filter(cert => cert.status === stage).length,
-    }));
+  const StatusCellRenderer = (props: any) => {
+    const statusClass = getStatusColor(props.value as CertificationStage);
+    return (
+      <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${statusClass}`}>
+        {props.value}
+      </span>
+    );
   };
+
+  const DateCellRenderer = (props: any) => {
+    return props.value ? (
+      <span className="text-gray-700">
+        {new Date(props.value).toLocaleDateString()}
+      </span>
+    ) : '-';
+  };
+
+  const defaultColDef = useMemo(() => ({
+    sortable: true,
+    filter: true,
+    resizable: true,
+    floatingFilter: true,
+    enableRowGroup: true,
+    enablePivot: true,
+    enableValue: true,
+    cellClass: 'py-2',
+  }), []);
+
+  const gridTheme = useMemo(() => ({
+    '--ag-font-family': 'Inter, system-ui, sans-serif',
+    '--ag-font-size': '14px',
+    '--ag-cell-horizontal-padding': '1rem',
+    '--ag-header-column-separator-display': 'none',
+    '--ag-header-foreground-color': '#1f2937',
+    '--ag-header-background-color': '#f9fafb',
+    '--ag-row-hover-color': 'rgb(243 244 246)',
+    '--ag-selected-row-background-color': 'rgb(239 246 255)',
+    '--ag-odd-row-background-color': '#ffffff',
+    '--ag-row-border-color': 'rgb(243 244 246)',
+    '--ag-border-color': 'rgb(229 231 235)',
+    '--ag-secondary-border-color': 'rgb(229 231 235)',
+    '--ag-header-column-resize-handle-color': 'rgb(229 231 235)',
+    '--ag-range-selection-border-color': 'rgb(59 130 246)',
+    '--ag-checkbox-checked-color': 'rgb(59 130 246)',
+    '--ag-checkbox-unchecked-color': '#9ca3af',
+    '--ag-row-height': '48px',
+    '--ag-header-height': '48px',
+    '--ag-list-item-height': '40px',
+  }), []);
+
+  const columnDefs = useMemo(() => [
+    {
+      field: 'darpKey',
+      headerName: 'DARP Key',
+      filter: 'agTextColumnFilter',
+      editable: true,
+      cellRenderer: DarpKeyCellRenderer,
+      checkboxSelection: true,
+      headerCheckboxSelection: true,
+      cellClass: 'font-medium text-gray-900',
+      minWidth: 150,
+    },
+    {
+      field: 'projectName',
+      headerName: 'Project Name',
+      filter: 'agTextColumnFilter',
+      editable: true,
+      cellClass: 'text-gray-700',
+      minWidth: 200,
+    },
+    {
+      field: 'type',
+      headerName: 'Type',
+      filter: 'agSetColumnFilter',
+      cellClass: 'text-gray-700',
+      minWidth: 120,
+    },
+    {
+      field: 'status',
+      headerName: 'Status',
+      cellRenderer: StatusCellRenderer,
+      filter: 'agSetColumnFilter',
+      minWidth: 140,
+      cellClass: 'flex items-center',
+    },
+    {
+      field: 'deviceModel',
+      headerName: 'Device Model',
+      filter: 'agTextColumnFilter',
+      cellClass: 'text-gray-700',
+      minWidth: 150,
+    },
+    {
+      field: 'deviceType',
+      headerName: 'Device Type',
+      filter: 'agSetColumnFilter',
+      cellClass: 'text-gray-700',
+      minWidth: 130,
+    },
+    {
+      field: 'assignee',
+      headerName: 'Assignee',
+      filter: 'agSetColumnFilter',
+      editable: true,
+      cellRenderer: AssigneeCellRenderer,
+      cellEditor: AssigneeEditor,
+      cellClass: 'text-gray-700',
+      minWidth: 200,
+      filterParams: {
+        values: usersData.users.map(u => u.id),
+        valueFormatter: (params: any) => {
+          const user = usersData.users.find(u => u.id === params.value);
+          return user ? user.name : params.value;
+        }
+      }
+    },
+    {
+      field: 'forecastedLaunchDate',
+      headerName: 'Launch Date',
+      filter: 'agDateColumnFilter',
+      cellRenderer: DateCellRenderer,
+      editable: true,
+      minWidth: 130,
+    },
+    {
+      field: 'lastUpdated',
+      headerName: 'Last Updated',
+      filter: 'agDateColumnFilter',
+      cellRenderer: DateCellRenderer,
+      sort: 'desc',
+      minWidth: 130,
+    },
+  ], []);
+
+  const onGridReady = useCallback((params: any) => {
+    setGridApi(params.api);
+    setColumnApi(params.columnApi);
+    params.api.sizeColumnsToFit();
+  }, []);
+
+  const onCellValueChanged = useCallback((event: any) => {
+    const updatedCertification = { ...event.data };
+    const updatedCertifications = certifications.map(cert =>
+      cert.id === updatedCertification.id ? updatedCertification : cert
+    );
+    storage.saveCertifications(updatedCertifications);
+  }, [certifications]);
+
+  const onRowDoubleClicked = useCallback((event: any) => {
+    setSelectedCertification(event.data);
+  }, []);
+
+  const toggleTypeFilter = (type: string) => {
+    setSelectedTypes(prev => 
+      prev.includes(type) 
+        ? prev.filter(t => t !== type)
+        : [...prev, type]
+    );
+  };
+
+  const selectAllTypes = () => {
+    setSelectedTypes(prev => 
+      prev.length === projectTypes.length ? [] : [...projectTypes]
+    );
+  };
+
+  const statusCounts = statusOrder.map(stage => ({
+    stage,
+    total: certifications.filter(cert => cert.status === stage).length,
+  }));
 
   const projectTypeCounts = projectTypes.map(type => ({
     type,
@@ -121,71 +318,24 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
 
   const totalActive = certifications.filter(cert => cert.status !== 'CLOSED').length;
 
-  const toggleTypeFilter = (type: string) => {
-    setFilters(prev => ({
-      ...prev,
-      types: prev.types.includes(type)
-        ? prev.types.filter(t => t !== type)
-        : [...prev.types, type]
-    }));
-  };
-
-  const selectAllTypes = () => {
-    setFilters(prev => ({
-      ...prev,
-      types: prev.types.length === projectTypes.length ? [] : [...projectTypes]
-    }));
-  };
-
-  const filteredCertifications = certifications.filter(cert => {
-    if (filters.status && cert.status !== filters.status) return false;
-    if (filters.types.length > 0 && !filters.types.includes(cert.type)) return false;
-    if (filters.hideTest && cert.projectName.toLowerCase().includes('test')) return false;
-    if (filters.showActive && cert.status === 'CLOSED') return false;
-    if (filters.deviceType && cert.deviceType !== filters.deviceType) return false;
-    if (search && !(
-      cert.darpKey.toLowerCase().includes(search.toLowerCase()) ||
-      cert.projectName.toLowerCase().includes(search.toLowerCase()) ||
-      cert.type.toLowerCase().includes(search.toLowerCase()) ||
-      cert.status.toLowerCase().includes(search.toLowerCase())
-    )) return false;
-    return true;
-  });
-
-  const sortedCertifications = [...filteredCertifications].sort((a, b) => {
-    let valA, valB;
-    switch (sortBy) {
-      case 'forecastedLaunchDate':
-        valA = a.forecastedLaunchDate || '';
-        valB = b.forecastedLaunchDate || '';
-        break;
-      case 'lastUpdated':
-        valA = a.lastUpdated || '';
-        valB = b.lastUpdated || '';
-        break;
-      case 'assignee':
-        valA = a.assignee || '';
-        valB = b.assignee || '';
-        break;
-      case 'projectName':
-        valA = a.projectName || '';
-        valB = b.projectName || '';
-        break;
-      default:
-        valA = '';
-        valB = '';
+  useEffect(() => {
+    if (gridApi) {
+      const filterInstance = gridApi.getFilterInstance('type');
+      if (selectedTypes.length > 0) {
+        filterInstance.setModel({
+          type: 'set',
+          values: selectedTypes,
+        });
+      } else {
+        filterInstance.setModel(null);
+      }
+      gridApi.onFilterChanged();
     }
-    if (valA < valB) return sortDir === 'asc' ? -1 : 1;
-    if (valA > valB) return sortDir === 'asc' ? 1 : -1;
-    return 0;
-  });
-
-  const statusCounts = getFilteredStatusCounts(filteredCertifications);
+  }, [selectedTypes, gridApi]);
 
   return (
-    <div className="p-8  mx-auto">
-      {/* Only show the heading and dashboard top right icons if not viewing a certification */}
-      {!selectedCertification && (
+    <div className="p-8 mx-auto">
+      {!selectedCertification ? (
         <>
           <div className="flex justify-between items-center mb-8">
             <div>
@@ -208,13 +358,6 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
                 </button>
               </div>
               <button
-                className="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
-                onClick={() => setShowFilters(!showFilters)}
-              >
-                <FunnelIcon className="w-5 h-5 mr-2 text-gray-500" />
-                Filters
-              </button>
-              <button 
                 className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition duration-150 ease-in-out shadow-sm"
                 onClick={onNewCertification}
               >
@@ -224,120 +367,7 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
             </div>
           </div>
 
-          {/* Project Type Filters */}
-          <div className="mb-6 flex flex-wrap gap-2 items-center">
-            <button
-              onClick={selectAllTypes}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                filters.types.length === projectTypes.length
-                  ? 'bg-gray-800 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              All Types
-            </button>
-            {projectTypeCounts.map(({ type, count }) => (
-              <button
-                key={type}
-                onClick={() => toggleTypeFilter(type)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                  filters.types.includes(type)
-                    ? getTypeColor(type)
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-              >
-                {type} ({count})
-              </button>
-            ))}
-          </div>
-
-          {showFilters && (
-            <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-              <h3 className="text-sm font-medium text-gray-700 mb-4">Filter Certifications</h3>
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm text-gray-700 mb-1">Status</label>
-                  <select
-                    value={filters.status}
-                    onChange={(e) => setFilters(f => ({ ...f, status: e.target.value as CertificationStage | '' }))}
-                    className="w-full border rounded-lg px-3 py-2"
-                  >
-                    <option value="">All Statuses</option>
-                    {statusOrder.map((stage) => (
-                      <option key={stage} value={stage}>
-                        {stage.split('_').map(word => word.charAt(0) + word.slice(1).toLowerCase()).join(' ')}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-700 mb-1">Device Type</label>
-                  <select
-                    value={filters.deviceType}
-                    onChange={(e) => setFilters(f => ({ ...f, deviceType: e.target.value }))}
-                    className="w-full border rounded-lg px-3 py-2"
-                  >
-                    <option value="">All Device Types</option>
-                    {deviceTypes.map(type => (
-                      <option key={type} value={type}>{type}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <div className="mt-4 grid grid-cols-4 gap-4">
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={filters.showActive}
-                    onChange={(e) => setFilters(f => ({ ...f, showActive: e.target.checked }))}
-                    className="mr-2"
-                  />
-                  Show Active Only
-                </label>
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={filters.currentWeek}
-                    onChange={(e) => setFilters(f => ({ ...f, currentWeek: e.target.checked }))}
-                    className="mr-2"
-                  />
-                  Current Week
-                </label>
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={filters.nextWeek}
-                    onChange={(e) => setFilters(f => ({ ...f, nextWeek: e.target.checked }))}
-                    className="mr-2"
-                  />
-                  Next Week
-                </label>
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={filters.hideTest}
-                    onChange={(e) => setFilters(f => ({ ...f, hideTest: e.target.checked }))}
-                    className="mr-2"
-                  />
-                  Hide Test Devices
-                </label>
-              </div>
-              <div className="mt-4 flex justify-end">
-                <button
-                  onClick={() => setFilters(initialFilterState)}
-                  className="text-sm text-gray-600 hover:text-gray-900"
-                >
-                  Clear All Filters
-                </button>
-              </div>
-            </div>
-          )}
-        </>
-      )}
-      {/* Only show the cards/grid if no certification is selected */}
-      {!selectedCertification && (
-        <div>
-          <div className="bg-white rounded-lg shadow-sm mb-8">
+          <div className="bg-white rounded-xl shadow-sm mb-8">
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
@@ -350,11 +380,11 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
                   onClick={() => setIsStatusOverviewExpanded(!isStatusOverviewExpanded)}
                   className="p-2 hover:bg-gray-100 rounded-full transition-colors"
                 >
-                  <ChevronDownIcon
-                    className={`w-5 h-5 transform transition-transform ${
-                      isStatusOverviewExpanded ? 'rotate-180' : ''
-                    }`}
-                  />
+                  {isStatusOverviewExpanded ? (
+                    <ChevronUpIcon className="w-5 h-5" />
+                  ) : (
+                    <ChevronDownIcon className="w-5 h-5" />
+                  )}
                 </button>
               </div>
               
@@ -363,12 +393,17 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
                   {statusCounts.map(({ stage, total }) => (
                     <button
                       key={stage}
-                      onClick={() => setFilters(f => ({ ...f, status: f.status === stage ? '' : stage }))}
-                      className={`p-4 rounded-lg border transition-all ${
-                        getStatusColor(stage)
-                      } ${
-                        filters.status === stage ? 'ring-2 ring-blue-500' : ''
-                      }`}
+                      onClick={() => {
+                        if (gridApi) {
+                          const filterInstance = gridApi.getFilterInstance('status');
+                          filterInstance.setModel({
+                            type: 'set',
+                            values: [stage],
+                          });
+                          gridApi.onFilterChanged();
+                        }
+                      }}
+                      className={`p-4 rounded-xl border transition-all ${getStatusColor(stage)} hover:shadow-sm`}
                     >
                       <div className="flex justify-between items-center">
                         <span className="font-medium">
@@ -383,83 +418,94 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold text-gray-900">Certification Requests</h2>
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                {filteredCertifications.length} Shown
-              </span>
-            </div>
+          <div className="mb-6 flex flex-wrap gap-2 items-center">
+            <button
+              onClick={selectAllTypes}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                selectedTypes.length === projectTypes.length
+                  ? 'bg-gray-800 text-white shadow-sm'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              All Types
+            </button>
+            {projectTypeCounts.map(({ type, count }) => (
+              <button
+                key={type}
+                onClick={() => toggleTypeFilter(type)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors shadow-sm ${
+                  selectedTypes.includes(type)
+                    ? getTypeColor(type)
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                {type} ({count})
+              </button>
+            ))}
+          </div>
 
-            {viewMode === 'card' ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredCertifications.map((cert) => (
+          {viewMode === 'card' ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {certifications
+                .filter(cert => selectedTypes.length === 0 || selectedTypes.includes(cert.type))
+                .map((cert) => (
                   <CertificationCard 
                     key={cert.id} 
                     certification={cert}
                     onClick={() => setSelectedCertification(cert)}
                   />
                 ))}
+            </div>
+          ) : (
+            <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200">
+              <div 
+                className="ag-theme-alpine w-full" 
+                style={{ 
+                  height: 'calc(100vh - 480px)',
+                  ...gridTheme
+                }}
+              >
+                <AgGridReact
+                  rowData={certifications}
+                  columnDefs={columnDefs}
+                  defaultColDef={defaultColDef}
+                  onGridReady={onGridReady}
+                  onCellValueChanged={onCellValueChanged}
+                  onRowDoubleClicked={onRowDoubleClicked}
+                  rowSelection="multiple"
+                  enableRangeSelection={true}
+                  copyHeadersToClipboard={true}
+                  rowGroupPanelShow="always"
+                  groupDisplayType="multipleColumns"
+                  animateRows={true}
+                  suppressRowClickSelection={true}
+                  suppressCellFocus={true}
+                  context={{ setSelectedCertification }}
+                  sideBar={{
+                    toolPanels: [
+                      {
+                        id: 'columns',
+                        labelDefault: 'Columns',
+                        labelKey: 'columns',
+                        iconKey: 'columns',
+                        toolPanel: 'agColumnsToolPanel',
+                      },
+                      {
+                        id: 'filters',
+                        labelDefault: 'Filters',
+                        labelKey: 'filters',
+                        iconKey: 'filter',
+                        toolPanel: 'agFiltersToolPanel',
+                      },
+                    ],
+                    defaultToolPanel: 'columns',
+                  }}
+                />
               </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <div className="flex flex-wrap gap-4 mb-4 items-center">
-                  <input
-                    type="text"
-                    placeholder="Quick search by key, summary, type, status..."
-                    value={search}
-                    onChange={e => setSearch(e.target.value)}
-                    className="border rounded px-3 py-2 text-sm w-64"
-                  />
-                  <label className="text-sm font-medium">Sort By:</label>
-                  <select value={sortBy} onChange={e => setSortBy(e.target.value as any)} className="border rounded px-2 py-1 text-sm">
-                    <option value="forecastedLaunchDate">Forecasted Launch Date</option>
-                    <option value="lastUpdated">Last Updated</option>
-                    <option value="projectName">Project Name</option>
-                    <option value="assignee">Assignee</option>
-                  </select>
-                  <button onClick={() => setSortDir(dir => dir === 'asc' ? 'desc' : 'asc')} className="border rounded px-2 py-1 text-sm">
-                    {sortDir === 'asc' ? '▲' : '▼'}
-                  </button>
-                </div>
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Key</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Summary</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Project Type</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Forecasted Launch</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assignee</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Updated</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {sortedCertifications.map((cert) => (
-                      <tr
-                        key={cert.id}
-                        className="hover:bg-gray-50 cursor-pointer"
-                        onClick={() => setSelectedCertification(cert)}
-                      >
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{cert.darpKey}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{cert.projectName}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{cert.type}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{cert.status}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{cert.forecastedLaunchDate || '-'}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><AssigneeBubble assigneeId={cert.assignee} /></td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{cert.lastUpdated ? new Date(cert.lastUpdated).toLocaleDateString() : '-'}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Show the inline panel and hide other sections when selectedCertification is set */}
-      {selectedCertification && (
+            </div>
+          )}
+        </>
+      ) : (
         <ViewCertificationPanel
           certification={selectedCertification}
           onUpdate={(updated) => {
@@ -468,7 +514,7 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
             );
             storage.saveCertifications(updatedCertifications);
             setCertifications(updatedCertifications);
-            setSelectedCertification(null); // Hide panel and show dashboard again after save
+            setSelectedCertification(null);
           }}
           onUpdateNoClose={(updated) => {
             const updatedCertifications = certifications.map(cert =>
@@ -476,10 +522,8 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
             );
             storage.saveCertifications(updatedCertifications);
             setCertifications(updatedCertifications);
-           
           }}
           onCancel={() => setSelectedCertification(null)}
-         
         />
       )}
     </div>
