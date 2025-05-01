@@ -433,6 +433,14 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
             setCertifications(updatedCertifications);
             setSelectedCertification(null); // Hide panel and show dashboard again after save
           }}
+          onUpdateNoClose={(updated) => {
+            const updatedCertifications = certifications.map(cert =>
+              cert.id === updated.id ? updated : cert
+            );
+            storage.saveCertifications(updatedCertifications);
+            setCertifications(updatedCertifications);
+           
+          }}
           onCancel={() => setSelectedCertification(null)}
         />
       )}

@@ -23,12 +23,13 @@ import { TaskDetailModal } from './TaskDetailModal';
 interface ViewCertificationPanelProps {
   certification: CertificationRequest;
   onUpdate: (certification: CertificationRequest) => void;
+  onUpdateNoClose: (certification: CertificationRequest) => void;
   onCancel: () => void;
 }
 
 export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
   certification,
-  onUpdate,
+  onUpdate,onUpdateNoClose,
   onCancel,
 }) => {
   const [selectedTask, setSelectedTask] = useState<CertificationTask | null>(null);
@@ -113,6 +114,7 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
     }));
   };
 
+  // Existing handler (keep as-is for TaskDetail modal)
   const handleTaskUpdate = (updatedTask: CertificationTask) => {
     const updatedTasks = certification.tasks.map(task =>
       task.id === updatedTask.id ? updatedTask : task
@@ -152,6 +154,47 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
     storage.updateCertification(updatedCertification);
     onUpdate(updatedCertification);
     setSelectedTask(null);
+  };
+
+  // New handler for TaskBoard (does NOT close the panel)
+  const handleTaskUpdateNoClose = (updatedTask: CertificationTask) => {
+    const updatedTasks = certification.tasks.map(task =>
+      task.id === updatedTask.id ? updatedTask : task
+    );
+
+    let updatedCertification = {
+      ...certification,
+      tasks: updatedTasks,
+      lastUpdated: new Date().toISOString(),
+    };
+
+    const currentStageTasks = updatedCertification.tasks.filter(
+      task => task.stage === certification.status
+    );
+    const allTasksDone = currentStageTasks.every(task => task.status === 'DONE');
+
+    if (allTasksDone && workflow) {
+      const stageOrder = workflow.stages.map((stage: any) => stage.name);
+      const currentStageIndex = stageOrder.indexOf(certification.status);
+      const nextStageIndex = currentStageIndex + 1;
+
+      if (nextStageIndex < stageOrder.length) {
+        const nextStage = stageOrder[nextStageIndex] as CertificationStage;
+        const newTasks = filterTasksFromRuleset(nextStage, certification.type, certification.deviceChannel);
+
+        updatedCertification = {
+          ...updatedCertification,
+          status: nextStage,
+          tasks: [
+            ...updatedCertification.tasks,
+            ...newTasks,
+          ],
+        };
+      }
+    }
+
+    storage.updateCertification(updatedCertification);
+    onUpdateNoClose(updatedCertification);
   };
 
   const currentStageTasks = certification.tasks.filter(
@@ -362,7 +405,7 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
           {view === 'board' ? (
             <TaskBoard
               tasks={currentStageTasks}
-              onTaskUpdate={handleTaskUpdate}
+              onTaskUpdate={handleTaskUpdateNoClose}
               onTaskClick={handleTaskSelect}
             />
           ) : (
