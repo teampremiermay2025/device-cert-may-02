@@ -7,6 +7,8 @@ import { useWorkflowStore } from '../store/workflowStore';
 import { createTasksForStage } from '../lib/workflow';
 import deviceData from '../data/devices.json';
 import taskStepsData from '../data/ruleset.json';
+import usersData from '../data/users.json';
+import Select from 'react-select';
 
 interface NewCertificationModalProps {
   isOpen: boolean;
@@ -14,6 +16,73 @@ interface NewCertificationModalProps {
 }
 
 type Step = 'form' | 'processing' | 'review';
+
+// Utility to get user by id
+const getUserById = (id: string) => usersData.users.find(u => u.id === id);
+
+// Assignee bubble component
+const AssigneeBubble = ({ assigneeId }: { assigneeId?: string }) => {
+  if (!assigneeId) return null;
+  const user = getUserById(assigneeId);
+  if (!user) return null;
+  const nameParts = user.name.split(' ');
+  const initials = nameParts.length > 1 ? nameParts[0][0] + nameParts[nameParts.length - 1][0] : user.name.slice(0, 2);
+  return (
+    <span className="flex items-center gap-1 bg-blue-100 border border-blue-200 rounded-full px-2 py-0.5 text-xs font-semibold text-blue-800 shadow-sm">
+      {user.avatar ? (
+        <img src={user.avatar} alt={user.name} className="w-5 h-5 rounded-full mr-1" />
+      ) : (
+        <span className="w-5 h-5 flex items-center justify-center rounded-full bg-blue-300 text-white mr-1" style={{fontSize: '0.85rem'}}>{initials}</span>
+      )}
+      <span className="font-bold text-blue-900">{initials}</span>
+      <span className="ml-1 text-blue-800">{user.name}</span>
+    </span>
+  );
+};
+
+// Options for react-select
+const userOptions = usersData.users.map(user => ({
+  value: user.id,
+  label: user.name,
+  avatar: user.avatar,
+  name: user.name,
+}));
+
+// Custom Option for react-select
+const UserOption = (props: any) => {
+  const { data, innerProps, isFocused } = props;
+  const nameParts = data.name.split(' ');
+  const initials = nameParts.length > 1 ? nameParts[0][0] + nameParts[nameParts.length - 1][0] : data.name.slice(0, 2);
+  return (
+    <div {...innerProps} className={`flex items-center gap-2 px-2 py-1 cursor-pointer ${isFocused ? 'bg-blue-50' : ''}`}>
+      {data.avatar ? (
+        <img src={data.avatar} alt={data.name} className="w-5 h-5 rounded-full" />
+      ) : (
+        <span className="w-5 h-5 flex items-center justify-center rounded-full bg-blue-300 text-white" style={{fontSize: '0.85rem'}}>{initials}</span>
+      )}
+      <span className="font-bold text-blue-900">{initials}</span>
+      <span className="text-blue-800">{data.name}</span>
+    </div>
+  );
+};
+
+// Custom SingleValue for react-select
+const UserSingleValue = (props: any) => {
+  const { data } = props;
+  const nameParts = data.name.split(' ');
+  const initials = nameParts.length > 1 ? nameParts[0][0] + nameParts[nameParts.length - 1][0] : data.name.slice(0, 2);
+  return (
+    <div className="flex items-center gap-2">
+      {data.avatar ? (
+        <img src={data.avatar} alt={data.name} className="w-5 h-5 rounded-full" />
+      ) : (
+        <span className="w-5 h-5 flex items-center justify-center rounded-full bg-blue-300 text-white" style={{fontSize: '0.85rem'}}>{initials}</span>
+      )}
+      <span className="font-bold text-blue-900">{initials}</span>
+      <span className="text-blue-800">{data.name}</span>
+    </div>
+  );
+};
 
 export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, onClose }) => {
   const [currentStep, setCurrentStep] = useState<Step>('form');
@@ -32,6 +101,7 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
     forecastedTADate: '',
     forecastedLaunchDate: '',
     deviceModel: '',
+    startDate: new Date().toISOString().slice(0, 10), // Default to today
   });
 
   // Group devices by type
@@ -221,6 +291,30 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
     }
   };
 
+  // Helper: Get available OEM_MEMBERs, filter out-of-office
+  function getAvailableOemMembers(taskDueDate?: string) {
+    const oemMembers = usersData.users.filter(u => u.role === 'OEM_MEMBER');
+    if (!taskDueDate) return oemMembers;
+    const dueDateStr = new Date(taskDueDate).toISOString().slice(0, 10);
+    return oemMembers.filter(u => {
+      if (!u.outOfOfficeDays) return true;
+      return !u.outOfOfficeDays.includes(dueDateStr);
+    });
+  }
+
+  // Helper: Distribute tasks across OEM_MEMBERs
+  function assignTasksToOemMembers(tasks: any[], dueDate?: string) {
+    const availableMembers = getAvailableOemMembers(dueDate);
+    if (availableMembers.length === 0) return tasks;
+    let idx = 0;
+    return tasks.map(task => {
+      // For each task, assign to next available OEM_MEMBER, round-robin
+      const assignee = availableMembers[idx % availableMembers.length];
+      idx++;
+      return { ...task, assignee: assignee.id };
+    });
+  }
+
   // Function to filter tasks from ruleset.json based on projectType, deviceChannel, and stage
   const filterTasksFromRuleset = (stage: string, projectType: string, deviceChannel: string): CertificationTask[] => {
     const filteredTasks = taskStepsData.filter((task) => {
@@ -234,13 +328,14 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
       return matchesIssueType && matchesDeviceChannel && matchesStage;
     });
 
-    return filteredTasks.map((task) => ({
+    // Create tasks without assignee first
+    let tasks = filteredTasks.map((task) => ({
       id: crypto.randomUUID(),
       name: `${task.deliverable}`,
       description: `${task.requirement_tag}`,
       status: 'TODO' as TaskStatus,
       isChecked: false,
-      assignee: formData.assignee || undefined,
+      // assignee will be distributed below
       priority: 'MEDIUM' as TaskPriority,
       dueDate: formData.targetDate || undefined,
       attachments: [],
@@ -249,6 +344,10 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
       labels: [],
       stage: stage.toUpperCase() as CertificationStage,
     }));
+
+    // Distribute assignees
+    tasks = assignTasksToOemMembers(tasks, formData.targetDate);
+    return tasks;
   };
 
   const handleConfirm = () => {
@@ -299,6 +398,7 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
       components: '',
       affectsVersion: formData.softwareVersion,
       resolution: '',
+      startDate: formData.startDate,
     };
 
     const certifications = storage.getCertifications();
@@ -486,15 +586,31 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
                     </div>
                     <div>
                       <label className="block text-sm font-medium mb-1">
-                        Assignee
+                        Start Date
                       </label>
                       <input
-                        type="text"
+                        type="date"
                         className="w-full border rounded p-2"
-                        placeholder="Enter assignee name"
-                        value={formData.assignee}
-                        onChange={(e) => setFormData({ ...formData, assignee: e.target.value })}
+                        value={formData.startDate}
+                        onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
                       />
+                    </div>
+                    <div className="flex items-center gap-2 mt-2">
+                      <label className="block text-sm font-medium text-gray-700">Assignee:</label>
+                      <div className="w-64">
+                        <Select
+                          options={userOptions}
+                          value={userOptions.find(opt => opt.value === formData.assignee) || null}
+                          onChange={option => setFormData(prev => ({ ...prev, assignee: option ? option.value : '' }))}
+                          isClearable
+                          placeholder="Search or select user..."
+                          components={{ Option: UserOption, SingleValue: UserSingleValue }}
+                          styles={{
+                            control: (base) => ({ ...base, minHeight: '2.5rem', borderRadius: '0.5rem', borderColor: '#bfdbfe' }),
+                            option: (base, state) => ({ ...base, backgroundColor: state.isFocused ? '#e0e7ff' : undefined }),
+                          }}
+                        />
+                      </div>
                     </div>
                   </div>
 
@@ -643,6 +759,10 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
                       <div>
                         <p className="text-sm text-gray-600">Assignee</p>
                         <p className="font-medium">{formData.assignee || 'Not specified'}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Start Date</p>
+                        <p className="font-medium">{formData.startDate}</p>
                       </div>
                     </div>
                   </div>
