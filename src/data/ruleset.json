@@ -12,7 +12,7 @@
     "device_channels": [
       "CRICKET IETA",
       "CRICKET VITA",
-      "PLANNING"
+      "PLANNING","STOCK"
     ],
     "device": "ALL DEV",
     "stage": "PLANNING",
@@ -36,7 +36,8 @@
     "device_channels": [
       "CRICKET IETA",
       "CRICKET VITA",
-      "PLANNING"
+      "PLANNING",
+      "STOCK"
     ],
     "device": "ALL DEV",
     "stage": "PLANNING",
@@ -130,7 +131,7 @@
     ],
     "device_channels": [
       "CRICKET IETA",
-      "CRICKET VITA"
+      "CRICKET VITA","STOCK"
     ],
     "device": "ALL DEV",
     "stage": "SUBMISSION REVIEW",
@@ -151,7 +152,7 @@
     ],
     "device_channels": [
       "CRICKET IETA",
-      "CRICKET VITA"
+      "CRICKET VITA","STOCK"
     ],
     "device": "ALL DEV",
     "stage": "SUBMISSION REVIEW",
@@ -550,8 +551,7 @@
       "NDAP IR"
     ],
     "device_channels": [
-      "CRICKET IETA",
-      "CRICKET VITA"
+      "CRICKET IETA"
     ],
     "device": "ALL DEV",
     "stage": "FORECAST",
@@ -572,8 +572,7 @@
       "NDAP IR"
     ],
     "device_channels": [
-      "CRICKET IETA",
-      "CRICKET VITA"
+      "CRICKET IETA"
     ],
     "device": "ALL DEV",
     "stage": "FORECAST",
@@ -593,7 +592,8 @@
       "E DA MR"
     ],
     "device_channels": [
-      "CRICKET IETA"
+      "CRICKET IETA",
+      "STOCK"
     ],
     "device": "ALL DEV",
     "stage": "DEVICE ENTRY",
@@ -632,7 +632,7 @@
       "DA MR"
     ],
     "device_channels": [
-      "CRICKET VITA"
+      "CRICKET VITA","STOCK"
     ],
     "device": "ALL DEV",
     "stage": "TAQ REVIEW",
