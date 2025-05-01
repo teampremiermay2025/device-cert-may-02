@@ -20,39 +20,38 @@ const columns: { id: TaskStatus; title: string }[] = [
   { id: 'DONE', title: 'Done' }
 ];
 
-const TaskCard: FC<{ task: CertificationTask }> = ({ task }) => (
-  <div className="bg-white rounded-lg p-3 shadow-sm hover:shadow cursor-grab active:cursor-grabbing">
+const TaskCard: FC<{ task: CertificationTask; onDetailsClick?: () => void }> = ({ task, onDetailsClick }) => (
+  <div className="bg-white rounded-lg p-3 shadow-sm hover:shadow cursor-grab active:cursor-grabbing ">
     <div className="flex items-start gap-2">
-      <span className={`font-mono ${getTaskPriorityColor(task.priority)}`}>
-        {getTaskPriorityIcon(task.priority)}
-      </span>
+      <span className={`font-mono ${getTaskPriorityColor(task.priority)}`}>{getTaskPriorityIcon(task.priority)}</span>
       <div className="flex-1 min-w-0">
-        <h4 className="font-medium text-sm truncate">
-          {task.name}
-        </h4>
+        <h4 className="font-medium text-sm truncate">{task.name}</h4>
         {task.description && (
-          <p className="text-sm text-gray-500 truncate mt-1">
-            {task.description}
-          </p>
+          <p className="text-sm text-gray-500 truncate mt-1">{task.description}</p>
         )}
         <div className="flex flex-wrap gap-2 mt-2">
           {task.labels.map(label => (
-            <span
-              key={label}
-              className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs"
-            >
-              {label}
-            </span>
+            <span key={label} className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">{label}</span>
           ))}
         </div>
+        {/* Details button/link for opening task details */}
+        {onDetailsClick && (
+          <button
+            className="mt-2 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold shadow hover:bg-blue-200 transition focus:outline-none border border-blue-200"
+            style={{ display: 'inline-block' }}
+            onClick={e => {
+              e.stopPropagation();
+              onDetailsClick();
+            }}
+          >
+            View Details
+          </button>
+        )}
       </div>
     </div>
-    
     <div className="flex items-center justify-between mt-3 text-xs text-gray-500">
       <div className="flex items-center gap-2">
-        {task.assignee && (
-          <span>{task.assignee}</span>
-        )}
+        {task.assignee && <span>{task.assignee}</span>}
         {task.dueDate && (
           <span>Due {new Date(task.dueDate).toLocaleDateString()}</span>
         )}
@@ -117,7 +116,7 @@ export const TaskBoard: FC<TaskBoardProps> = ({ tasks, onTaskUpdate, onTaskClick
       </div>
 
       <ResponsiveGridLayout
-        className="layout"
+        className="layout "
         layouts={{ lg: generateLayout() }}
         breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
         cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
@@ -127,11 +126,14 @@ export const TaskBoard: FC<TaskBoardProps> = ({ tasks, onTaskUpdate, onTaskClick
         isResizable={false}
         margin={[16, 16]}
       >
+    
         {tasks.map(task => (
-          <div key={task.id} onClick={() => onTaskClick(task)}>
-            <TaskCard task={task} />
+          <div key={task.id}>
+            <TaskCard task={task} onDetailsClick={() => onTaskClick(task)} />
           </div>
         ))}
+
+       
       </ResponsiveGridLayout>
     </div>
   );
