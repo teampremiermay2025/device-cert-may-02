@@ -98,8 +98,8 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
 
     return filteredTasks.map((task) => ({
       id: crypto.randomUUID(),
-      name: `${task.chapter} (${task.requirement_tag})`,
-      description: `Deliverable: ${task.deliverable}`,
+      name: `(${task.deliverable})`,
+      description: `${task.requirement_tag}`,
       status: 'TODO' as TaskStatus,
       isChecked: false,
       assignee: certification.assignee || undefined,

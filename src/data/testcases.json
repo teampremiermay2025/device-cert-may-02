@@ -1,0 +1,992 @@
+
+[
+
+  {
+
+    "chapter_no": "3",
+
+    "chapter_name": "Bands & Modes",
+
+    "section_no": "3.0",
+
+    "section_name": "Chapter Requirement",
+
+    "requirement_tag": "ALL CHAPTERS",
+
+    "description": "RAT Applicability-LTE PS",
+
+    "test_cases": [
+
+      {
+
+        "test_case_id": "LTE_PS_001",
+
+        "test_case_description": "Verify LTE PS data transfer during mobility",
+
+        "acceptance_criteria": [
+
+          "The device must maintain LTE PS data transfer while moving at 80 km/h.",
+
+          "Downlink throughput must exceed 60 Mbps during a 5-minute test.",
+
+          "No disconnections or packet loss during the test."
+
+        ]
+
+      }
+
+    ]
+
+  },
+
+  {
+
+    "chapter_no": "3",
+
+    "chapter_name": "Bands & Modes",
+
+    "section_no": "3.5.3",
+
+    "section_name": "5G Roaming Requirements",
+
+    "requirement_tag": "CDR-FVG-561",
+
+    "description": "n79 Roaming",
+
+    "test_cases": [
+
+      {
+
+        "test_case_id": "NR_n79_Roaming_001",
+
+        "test_case_description": "Verify 5G NR Band n79 connectivity during international roaming",
+
+        "acceptance_criteria": [
+
+          "The device must connect to 5G NR Band n79 while roaming internationally.",
+
+          "Downlink throughput must exceed 200 Mbps during a 5-minute test.",
+
+          "No disconnections or performance degradation during the test."
+
+        ]
+
+      }
+
+    ]
+
+  },
+
+  {
+
+    "chapter_no": "3",
+
+    "chapter_name": "Bands & Modes",
+
+    "section_no": "3.2.3",
+
+    "section_name": "LTE Frequency Bands",
+
+    "requirement_tag": "CDR-PRO-220",
+
+    "description": "LTE 3GPP Band 2",
+
+    "test_cases": [
+
+      {
+
+        "test_case_id": "LTE_Band_2_001",
+
+        "test_case_description": "Verify LTE Band 2 performance for video streaming",
+
+        "acceptance_criteria": [
+
+          "The device must connect to LTE Band 2.",
+
+          "The device must stream a 1080p video with no buffering for 5 minutes.",
+
+          "Downlink throughput must exceed 40 Mbps during the test."
+
+        ]
+
+      }
+
+    ]
+
+  },
+
+  {
+
+    "chapter_no": "3",
+
+    "chapter_name": "Bands & Modes",
+
+    "section_no": "3.5.2",
+
+    "section_name": "5G FR1 Band Requirements",
+
+    "requirement_tag": "CDR-FVG-410",
+
+    "description": "Sub 6GHz NR Band n14",
+
+    "test_cases": [
+
+      {
+
+        "test_case_id": "NR_Band_n14_001",
+
+        "test_case_description": "Verify device performance on 5G NR Band n14 for public safety",
+
+        "acceptance_criteria": [
+
+          "The device must connect to 5G NR Band n14.",
+
+          "Downlink throughput must exceed 80 Mbps during a 5-minute test.",
+
+          "No disconnections during the test."
+
+        ]
+
+      }
+
+    ]
+
+  },
+
+  {
+
+    "chapter_no": "3",
+
+    "chapter_name": "Bands & Modes",
+
+    "section_no": "3.0",
+
+    "section_name": "Chapter Requirement",
+
+    "requirement_tag": "CDR-BAS-007",
+
+    "description": "RAT Applicability-UMTS CS",
+
+    "test_cases": [
+
+      {
+
+        "test_case_id": "UMTS_CS_001",
+
+        "test_case_description": "Verify UMTS CS voice call initiation",
+
+        "acceptance_criteria": [
+
+          "The device must initiate a UMTS CS voice call within 5 seconds.",
+
+          "Voice quality must meet a MOS of at least 3.0.",
+
+          "No call drops during a 2-minute test call."
+
+        ]
+
+      }
+
+    ]
+
+  },
+
+  {
+
+    "chapter_no": "3",
+
+    "chapter_name": "Bands & Modes",
+
+    "section_no": "3.2.1",
+
+    "section_name": "GSM Frequency Bands",
+
+    "requirement_tag": "CDR-PRO-062",
+
+    "description": "GSM 900 Frequency Band Support",
+
+    "test_cases": [
+
+      {
+
+        "test_case_id": "GSM_900_001",
+
+        "test_case_description": "Verify GSM 900 band support for voice calls",
+
+        "acceptance_criteria": [
+
+          "The device must connect to GSM 900 band.",
+
+          "The device must initiate a voice call with no errors.",
+
+          "Voice quality must meet a MOS of at least 3.0 during a 2-minute call."
+
+        ]
+
+      }
+
+    ]
+
+  },
+
+  {
+
+    "chapter_no": "3",
+
+    "chapter_name": "Bands & Modes",
+
+    "section_no": "3.3",
+
+    "section_name": "LTE Roaming",
+
+    "requirement_tag": "CDR-PRO-294",
+
+    "description": "LTE Band 40",
+
+    "test_cases": [
+
+      {
+
+        "test_case_id": "LTE_Band_40_Roaming_001",
+
+        "test_case_description": "Verify LTE Band 40 connectivity during roaming",
+
+        "acceptance_criteria": [
+
+          "The device must connect to LTE Band 40 while roaming.",
+
+          "No disconnections during a 15-minute test.",
+
+          "Downlink throughput must exceed 35 Mbps during the test."
+
+        ]
+
+      }
+
+    ]
+
+  },
+
+  {
+
+    "chapter_no": "3",
+
+    "chapter_name": "Bands & Modes",
+
+    "section_no": "3.5.1",
+
+    "section_name": "5G NR FR2 Operating Bands and Bandwidth Requirements",
+
+    "requirement_tag": "CDR-FVG-120",
+
+    "description": "5G NR FR2 Bandwidth Support - 200MHz",
+
+    "test_cases": [
+
+      {
+
+        "test_case_id": "NR_FR2_200MHz_001",
+
+        "test_case_description": "Verify 5G NR FR2 bandwidth support for 200MHz",
+
+        "acceptance_criteria": [
+
+          "The device must support a 200MHz bandwidth on 5G NR FR2.",
+
+          "Downlink throughput must exceed 800 Mbps during a 5-minute test.",
+
+          "No performance degradation during the test."
+
+        ]
+
+      }
+
+    ]
+
+  },
+
+  {
+
+    "chapter_no": "3",
+
+    "chapter_name": "Bands & Modes",
+
+    "section_no": "3.0",
+
+    "section_name": "Chapter Requirement",
+
+    "requirement_tag": "CDR-BAS-987",
+
+    "description": "Made-Up Requirement: Dual SIM Support in LTE",
+
+    "test_cases": [
+
+      {
+
+        "test_case_id": "LTE_Dual_SIM_001",
+
+        "test_case_description": "Verify dual SIM functionality for LTE data and voice",
+
+        "acceptance_criteria": [
+
+          "The device must support LTE data on SIM 1 while making a voice call on SIM 2.",
+
+          "Data throughput on SIM 1 must exceed 50 Mbps during the call.",
+
+          "Voice quality on SIM 2 must meet a MOS of at least 3.5."
+
+        ]
+
+      }
+
+    ]
+
+  },
+
+  {
+
+    "chapter_no": "3",
+
+    "chapter_name": "Bands & Modes",
+
+    "section_no": "3.5.3",
+
+    "section_name": "5G Roaming Requirements",
+
+    "requirement_tag": "CDR-FVG-588",
+
+    "description": "n3 Roaming",
+
+    "test_cases": [
+
+      {
+
+        "test_case_id": "NR_n3_Roaming_001",
+
+        "test_case_description": "Verify 5G NR Band n3 connectivity during roaming",
+
+        "acceptance_criteria": [
+
+          "The device must connect to 5G NR Band n3 while roaming.",
+
+          "Downlink throughput must exceed 150 Mbps during a 5-minute test.",
+
+          "No disconnections or performance degradation during the test."
+
+        ]
+
+      }
+
+    ]
+
+  },
+
+  {
+
+    "chapter_no": "3",
+
+    "chapter_name": "Bands & Modes",
+
+    "section_no": "3.2.3",
+
+    "section_name": "LTE Frequency Bands",
+
+    "requirement_tag": "CDR-PRO-250",
+
+    "description": "LTE Band 29",
+
+    "test_cases": [
+
+      {
+
+        "test_case_id": "LTE_Band_29_001",
+
+        "test_case_description": "Verify LTE Band 29 connectivity for supplemental downlink",
+
+        "acceptance_criteria": [
+
+          "The device must connect to LTE Band 29 as a supplemental downlink.",
+
+          "Downlink throughput must exceed 30 Mbps during a 5-minute test.",
+
+          "No disconnections during the test."
+
+        ]
+
+      }
+
+    ]
+
+  },
+
+  {
+
+    "chapter_no": "3",
+
+    "chapter_name": "Bands & Modes",
+
+    "section_no": "3.5.2",
+
+    "section_name": "5G FR1 Band Requirements",
+
+    "requirement_tag": "CDR-FVG-417",
+
+    "description": "Sub 6GHz NR band n30",
+
+    "test_cases": [
+
+      {
+
+        "test_case_id": "NR_Band_n30_001",
+
+        "test_case_description": "Verify device performance on 5G NR Band n30",
+
+        "acceptance_criteria": [
+
+          "The device must connect to 5G NR Band n30.",
+
+          "Downlink throughput must exceed 100 Mbps during a 5-minute test.",
+
+          "Uplink throughput must exceed 35 Mbps during a 5-minute test."
+
+        ]
+
+      }
+
+    ]
+
+  },
+
+  {
+
+    "chapter_no": "3",
+
+    "chapter_name": "Bands & Modes",
+
+    "section_no": "3.0",
+
+    "section_name": "Chapter Requirement",
+
+    "requirement_tag": "CDR-BAS-008",
+
+    "description": "RAT Applicability-UMTS PS",
+
+    "test_cases": [
+
+      {
+
+        "test_case_id": "UMTS_PS_001",
+
+        "test_case_description": "Verify UMTS PS data transfer during mobility",
+
+        "acceptance_criteria": [
+
+          "The device must maintain UMTS PS data transfer while moving at 50 km/h.",
+
+          "Downlink throughput must exceed 5 Mbps during a 5-minute test.",
+
+          "No disconnections or packet loss during the test."
+
+        ]
+
+      }
+
+    ]
+
+  },
+
+  {
+
+    "chapter_no": "3",
+
+    "chapter_name": "Bands & Modes",
+
+    "section_no": "3.2.1",
+
+    "section_name": "GSM Frequency Bands",
+
+    "requirement_tag": "CDR-PRO-063",
+
+    "description": "GSM 1800 Frequency Band Support",
+
+    "test_cases": [
+
+      {
+
+        "test_case_id": "GSM_1800_001",
+
+        "test_case_description": "Verify GSM 1800 band support for SMS",
+
+        "acceptance_criteria": [
+
+          "The device must connect to GSM 1800 band.",
+
+          "The device must send and receive SMS with no errors.",
+
+          "SMS delivery time must be less than 5 seconds."
+
+        ]
+
+      }
+
+    ]
+
+  },
+
+  {
+
+    "chapter_no": "3",
+
+    "chapter_name": "Bands & Modes",
+
+    "section_no": "3.3",
+
+    "section_name": "LTE Roaming",
+
+    "requirement_tag": "CDR-PRO-295",
+
+    "description": "LTE Band 38",
+
+    "test_cases": [
+
+      {
+
+        "test_case_id": "LTE_Band_38_Roaming_001",
+
+        "test_case_description": "Verify LTE Band 38 connectivity during roaming",
+
+        "acceptance_criteria": [
+
+          "The device must connect to LTE Band 38 while roaming.",
+
+          "No disconnections during a 15-minute test.",
+
+          "Downlink throughput must exceed 40 Mbps during the test."
+
+        ]
+
+      }
+
+    ]
+
+  },
+
+  {
+
+    "chapter_no": "3",
+
+    "chapter_name": "Bands & Modes",
+
+    "section_no": "3.5.1",
+
+    "section_name": "5G NR FR2 Operating Bands and Bandwidth Requirements",
+
+    "requirement_tag": "CDR-FVG-125",
+
+    "description": "5G NR FR2 Bandwidth Support - 400MHz",
+
+    "test_cases": [
+
+      {
+
+        "test_case_id": "NR_FR2_400MHz_001",
+
+        "test_case_description": "Verify 5G NR FR2 bandwidth support for 400MHz",
+
+        "acceptance_criteria": [
+
+          "The device must support a 400MHz bandwidth on 5G NR FR2.",
+
+          "Downlink throughput must exceed 1 Gbps during a 5-minute test.",
+
+          "No performance degradation during the test."
+
+        ]
+
+      }
+
+    ]
+
+  },
+
+  {
+
+    "chapter_no": "3",
+
+    "chapter_name": "Bands & Modes",
+
+    "section_no": "3.0",
+
+    "section_name": "Chapter Requirement",
+
+    "requirement_tag": "CDR-BAS-985",
+
+    "description": "Made-Up Requirement: eSIM Support in 5G SA",
+
+    "test_cases": [
+
+      {
+
+        "test_case_id": "NR_eSIM_001",
+
+        "test_case_description": "Verify eSIM functionality for 5G SA connectivity",
+
+        "acceptance_criteria": [
+
+          "The device must activate an eSIM profile for 5G SA connectivity.",
+
+          "The device must connect to 5G SA within 10 seconds of eSIM activation.",
+
+          "Downlink throughput must exceed 150 Mbps during a 5-minute test."
+
+        ]
+
+      }
+
+    ]
+
+  },
+
+  {
+
+    "chapter_no": "3",
+
+    "chapter_name": "Bands & Modes",
+
+    "section_no": "3.5.3",
+
+    "section_name": "5G Roaming Requirements",
+
+    "requirement_tag": "CDR-FVG-596",
+
+    "description": "n257 Roaming",
+
+    "test_cases": [
+
+      {
+
+        "test_case_id": "NR_n257_Roaming_001",
+
+        "test_case_description": "Verify 5G NR Band n257 connectivity during roaming",
+
+        "acceptance_criteria": [
+
+          "The device must connect to 5G NR Band n257 while roaming.",
+
+          "Downlink throughput must exceed 500 Mbps during a 5-minute test.",
+
+          "No disconnections or performance degradation during the test."
+
+        ]
+
+      }
+
+    ]
+
+  },
+
+  {
+
+    "chapter_no": "3",
+
+    "chapter_name": "Bands & Modes",
+
+    "section_no": "3.2.3",
+
+    "section_name": "LTE Frequency Bands",
+
+    "requirement_tag": "CDR-PRO-260",
+
+    "description": "LTE Band 30",
+
+    "test_cases": [
+
+      {
+
+        "test_case_id": "LTE_Band_30_001",
+
+        "test_case_description": "Verify LTE Band 30 performance for data transfer",
+
+        "acceptance_criteria": [
+
+          "The device must connect to LTE Band 30.",
+
+          "Downlink throughput must exceed 50 Mbps during a 5-minute test.",
+
+          "No disconnections during the test."
+
+        ]
+
+      }
+
+    ]
+
+  },
+
+  {
+
+    "chapter_no": "3",
+
+    "chapter_name": "Bands & Modes",
+
+    "section_no": "3.5.2",
+
+    "section_name": "5G FR1 Band Requirements",
+
+    "requirement_tag": "CDR-FVG-555",
+
+    "description": "n48",
+
+    "test_cases": [
+
+      {
+
+        "test_case_id": "NR_Band_n48_001",
+
+        "test_case_description": "Verify device performance on 5G NR Band n48",
+
+        "acceptance_criteria": [
+
+          "The device must connect to 5G NR Band n48.",
+
+          "Downlink throughput must exceed 180 Mbps during a 5-minute test.",
+
+          "Uplink throughput must exceed 50 Mbps during a 5-minute test."
+
+        ]
+
+      }
+
+    ]
+
+  },
+
+  {
+
+    "chapter_no": "3",
+
+    "chapter_name": "Bands & Modes",
+
+    "section_no": "3.0",
+
+    "section_name": "Chapter Requirement",
+
+    "requirement_tag": "CDR-BAS-983",
+
+    "description": "Made-Up Requirement: Battery Performance in 5G SA",
+
+    "test_cases": [
+
+      {
+
+        "test_case_id": "NR_Battery_001",
+
+        "test_case_description": "Verify battery performance during 5G SA data transfer",
+
+        "acceptance_criteria": [
+
+          "The device must perform a 5G SA data transfer for 1 hour.",
+
+          "Battery consumption must be less than 20% during the test.",
+
+          "Downlink throughput must remain above 100 Mbps throughout the test."
+
+        ]
+
+      }
+
+    ]
+
+  },
+
+  {
+
+    "chapter_no": "3",
+
+    "chapter_name": "Bands & Modes",
+
+    "section_no": "3.2.2",
+
+    "section_name": "UMTS Frequency Bands",
+
+    "requirement_tag": "CDR-PRO-100",
+
+    "description": "UMTS Band I Global",
+
+    "test_cases": [
+
+      {
+
+        "test_case_id": "UMTS_Band_I_001",
+
+        "test_case_description": "Verify UMTS Band I support for data transfer",
+
+        "acceptance_criteria": [
+
+          "The device must connect to UMTS Band I.",
+
+          "Downlink throughput must exceed 5 Mbps during a 5-minute test.",
+
+          "No disconnections during the test."
+
+        ]
+
+      }
+
+    ]
+
+  },
+
+  {
+
+    "chapter_no": "3",
+
+    "chapter_name": "Bands & Modes",
+
+    "section_no": "3.3",
+
+    "section_name": "LTE Roaming",
+
+    "requirement_tag": "CDR-PRO-297",
+
+    "description": "LTE Band 41",
+
+    "test_cases": [
+
+      {
+
+        "test_case_id": "LTE_Band_41_Roaming_001",
+
+        "test_case_description": "Verify LTE Band 41 connectivity during roaming",
+
+        "acceptance_criteria": [
+
+          "The device must connect to LTE Band 41 while roaming.",
+
+          "No disconnections during a 15-minute test.",
+
+          "Downlink throughput must exceed 50 Mbps during the test."
+
+        ]
+
+      }
+
+    ]
+
+  },
+
+  {
+
+    "chapter_no": "3",
+
+    "chapter_name": "Bands & Modes",
+
+    "section_no": "3.5.1",
+
+    "section_name": "5G NR FR2 Operating Bands and Bandwidth Requirements",
+
+    "requirement_tag": "CDR-FVG-130",
+
+    "description": "5G NR FR2 IBW",
+
+    "test_cases": [
+
+      {
+
+        "test_case_id": "NR_FR2_IBW_001",
+
+        "test_case_description": "Verify 5G NR FR2 Instantaneous Bandwidth (IBW) support",
+
+        "acceptance_criteria": [
+
+          "The device must support the specified IBW on 5G NR FR2.",
+
+          "Downlink throughput must exceed 700 Mbps during a 5-minute test.",
+
+          "No performance degradation during the test."
+
+        ]
+
+      }
+
+    ]
+
+  },
+
+  {
+
+    "chapter_no": "3",
+
+    "chapter_name": "Bands & Modes",
+
+    "section_no": "3.0",
+
+    "section_name": "Chapter Requirement",
+
+    "requirement_tag": "CDR-BAS-981",
+
+    "description": "Made-Up Requirement: LTE Group Messaging Support",
+
+    "test_cases": [
+
+      {
+
+        "test_case_id": "LTE_Group_Messaging_001",
+
+        "test_case_description": "Verify group messaging functionality over LTE",
+
+        "acceptance_criteria": [
+
+          "The device must send and receive group messages over LTE.",
+
+          "Messages must be delivered within 5 seconds to all group members.",
+
+          "No errors or message loss during a 10-minute test."
+
+        ]
+
+      }
+
+    ]
+
+  },
+
+  {
+
+    "chapter_no": "3",
+
+    "chapter_name": "Bands & Modes",
+
+    "section_no": "3.5.3",
+
+    "section_name": "5G Roaming Requirements",
+
+    "requirement_tag": "CDR-FVG-5970",
+
+    "description": "n261 Roaming",
+
+    "test_cases": [
+
+      {
+
+        "test_case_id": "NR_n261_Roaming_001",
+
+        "test_case_description": "Verify 5G NR Band n261 connectivity during roaming",
+
+        "acceptance_criteria": [
+
+          "The device must connect to 5G NR Band n261 while roaming.",
+
+          "Downlink throughput must exceed 600 Mbps during a 5-minute test.",
+
+          "No disconnections or performance degradation during the test."
+
+        ]
+
+      }
+
+    ]
+
+  }
+
+]

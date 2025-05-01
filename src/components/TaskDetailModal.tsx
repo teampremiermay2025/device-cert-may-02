@@ -11,6 +11,7 @@ import {
   SparklesIcon
 } from '@heroicons/react/24/outline';
 import { CertificationTask, TaskPriority, TaskStatus } from '../types';
+import testCasesData from '../data/testcases.json';
 
 interface TaskDetailModalProps {
   isOpen: boolean;
@@ -129,12 +130,39 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
         setAIStep('typing');
         setTimeout(() => {
           setAIStep('done');
-          setAITestCases([
-            'Test Case 1: Verify MO VoLTE call initiation during active data session in LTE RAN',
-            'Test Case 2: Verify MT VoLTE call reception during active data session in LTE RAN',
-            'Test Case 3: Verify that MO 5G device can send SMS over NAS in 5G SA mode',
-            'Test Case 4: Verify that a User can receive group chat messages with data toggle off',
-          ]);
+          // Extract requirement_tag from editedTask.description
+          // Expected format: "Deliverable: <requirement_tag>"
+          const description = editedTask?.description || '';
+         // const prefix = 'Deliverable: ';
+          let requirementTag = '';
+
+         // if (description.startsWith(prefix)) {
+            requirementTag = description;
+         // }
+
+          console.log('Extracted requirement tag:', requirementTag);
+
+          if (!requirementTag) {
+            setAITestCases(['No matching test cases found for this requirement tag.']);
+            return;
+          }
+
+          // Filter test cases from testcases.json based on requirement_tag
+          console.log('Matching requirement tag:', requirementTag);
+          const matchingChapter = testCasesData.find(
+            (chapter) => chapter.requirement_tag === requirementTag
+          );
+          console.log('Matching chapter:', matchingChapter);
+
+          if (matchingChapter && matchingChapter.test_cases.length > 0) {
+            // Extract test_case_id from matching test cases
+            const filteredTestCases = matchingChapter.test_cases.map(
+              (testCase) => testCase.test_case_id
+            );
+            setAITestCases(filteredTestCases);
+          } else {
+            setAITestCases(['No test cases found for requirement tag: ' + requirementTag]);
+          }
         }, 2500);
       }, 2000);
     }, 2000);

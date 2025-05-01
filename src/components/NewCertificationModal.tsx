@@ -237,7 +237,7 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
     return filteredTasks.map((task) => ({
       id: crypto.randomUUID(),
       name: `${task.deliverable}`,
-      description: ` ${task.requirement_tag}`,
+      description: `${task.requirement_tag}`,
       status: 'TODO' as TaskStatus,
       isChecked: false,
       assignee: formData.assignee || undefined,
