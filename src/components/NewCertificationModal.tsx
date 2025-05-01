@@ -21,7 +21,7 @@ type Step = 'form' | 'processing' | 'review';
 const getUserById = (id: string) => usersData.users.find(u => u.id === id);
 
 // Assignee bubble component
-const AssigneeBubble = ({ assigneeId }: { assigneeId?: string }) => {
+export const AssigneeBubble = ({ assigneeId }: { assigneeId?: string }) => {
   if (!assigneeId) return null;
   const user = getUserById(assigneeId);
   if (!user) return null;

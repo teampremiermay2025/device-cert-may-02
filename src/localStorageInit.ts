@@ -14,7 +14,7 @@ const DATA_TO_LOAD = [
   },
   {
     key: 'certifications',
-    data: []
+    data:[{"id":"428185cf-96e4-409f-b430-3b7eb1d7c78e","darpKey":"DARP 1","projectName":"Smoke Test: ST0919A","type":"DA IR","status":"FORECAST","targetDate":"","softwareVersion":"1.0.0","lastUpdated":"2025-05-01T17:53:44.932Z","tasks":[{"id":"a331546f-f083-498e-bb98-daad6212ee0e","name":"Compliance Reqs Chapter Reviews","description":"ALL CHAPTERS","status":"TODO","isChecked":false,"priority":"MEDIUM","attachments":[],"comments":[],"labels":[],"stage":"FORECAST","assignee":"3"},{"id":"02aedf21-8d3f-4863-ac80-b7b77bb71d16","name":"Deliverable Reqs: Chapter Reviews","description":"ALL CHAPTERS","status":"TODO","isChecked":false,"priority":"MEDIUM","attachments":[],"comments":[],"labels":[],"stage":"FORECAST","assignee":"5"}],"issues":[],"workflow":"4f053462-0aa1-45ff-961d-0b6671725228","assignee":"1","vendor":"Samsung","deviceType":"Smartphone","deviceModel":"SM-G998U","deviceMarketingName":"Galaxy S21 Ultra","deviceCodeName":"Onyx","deviceOS":"Android","deviceOSVersion":"13","deviceHardwareVersion":"1.1","devicePaymentType":"Post-Paid","deviceChannel":"STOCK","securityLevel":"","reporter":"","primaryPC":"","vendorProjectLead":"","createdAt":"2025-05-01T17:53:44.932Z","updatedAt":"2025-05-01T17:53:44.932Z","forecastedDEDate":"2025-05-08","forecastedFFWDate":"2025-05-08","forecastedTADate":"2025-05-08","forecastedLaunchDate":"2025-05-08","components":"","affectsVersion":"1.0.0","resolution":"","startDate":"2025-05-01"}]
   },
   {
     key: 'dashboards',

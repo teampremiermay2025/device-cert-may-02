@@ -4,6 +4,7 @@ import { CertificationCard } from './CertificationCard';
 import { CertificationRequest, CertificationStage } from '../types';
 import { ViewCertificationPanel } from './ViewCertificationPanel';
 import { storage } from '../lib/storage';
+import { AssigneeBubble } from './NewCertificationModal';
 
 interface DashboardProps {
   onNewCertification: () => void;
@@ -88,6 +89,10 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
   const [viewMode, setViewMode] = useState<'card' | 'grid'>('card');
   const [isStatusOverviewExpanded, setIsStatusOverviewExpanded] = useState(true);
 
+  const [search, setSearch] = useState('');
+  const [sortBy, setSortBy] = useState<'forecastedLaunchDate'|'lastUpdated'|'projectName'|'assignee'>('forecastedLaunchDate');
+  const [sortDir, setSortDir] = useState<'asc'|'desc'>('desc');
+
   useEffect(() => {
     const handleStorageChange = () => {
       setCertifications(storage.getCertifications());
@@ -137,7 +142,42 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
     if (filters.types.length > 0 && !filters.types.includes(cert.type)) return false;
     if (filters.hideTest && cert.projectName.toLowerCase().includes('test')) return false;
     if (filters.showActive && cert.status === 'CLOSED') return false;
+    if (filters.deviceType && cert.deviceType !== filters.deviceType) return false;
+    if (search && !(
+      cert.darpKey.toLowerCase().includes(search.toLowerCase()) ||
+      cert.projectName.toLowerCase().includes(search.toLowerCase()) ||
+      cert.type.toLowerCase().includes(search.toLowerCase()) ||
+      cert.status.toLowerCase().includes(search.toLowerCase())
+    )) return false;
     return true;
+  });
+
+  const sortedCertifications = [...filteredCertifications].sort((a, b) => {
+    let valA, valB;
+    switch (sortBy) {
+      case 'forecastedLaunchDate':
+        valA = a.forecastedLaunchDate || '';
+        valB = b.forecastedLaunchDate || '';
+        break;
+      case 'lastUpdated':
+        valA = a.lastUpdated || '';
+        valB = b.lastUpdated || '';
+        break;
+      case 'assignee':
+        valA = a.assignee || '';
+        valB = b.assignee || '';
+        break;
+      case 'projectName':
+        valA = a.projectName || '';
+        valB = b.projectName || '';
+        break;
+      default:
+        valA = '';
+        valB = '';
+    }
+    if (valA < valB) return sortDir === 'asc' ? -1 : 1;
+    if (valA > valB) return sortDir === 'asc' ? 1 : -1;
+    return 0;
   });
 
   const statusCounts = getFilteredStatusCounts(filteredCertifications);
@@ -363,54 +403,51 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
               </div>
             ) : (
               <div className="overflow-x-auto">
+                <div className="flex flex-wrap gap-4 mb-4 items-center">
+                  <input
+                    type="text"
+                    placeholder="Quick search by key, summary, type, status..."
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                    className="border rounded px-3 py-2 text-sm w-64"
+                  />
+                  <label className="text-sm font-medium">Sort By:</label>
+                  <select value={sortBy} onChange={e => setSortBy(e.target.value as any)} className="border rounded px-2 py-1 text-sm">
+                    <option value="forecastedLaunchDate">Forecasted Launch Date</option>
+                    <option value="lastUpdated">Last Updated</option>
+                    <option value="projectName">Project Name</option>
+                    <option value="assignee">Assignee</option>
+                  </select>
+                  <button onClick={() => setSortDir(dir => dir === 'asc' ? 'desc' : 'asc')} className="border rounded px-2 py-1 text-sm">
+                    {sortDir === 'asc' ? '▲' : '▼'}
+                  </button>
+                </div>
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Key
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Summary
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Project Type
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Status
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Software Version
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Target Date
-                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Key</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Summary</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Project Type</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Forecasted Launch</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assignee</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Updated</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {filteredCertifications.map((cert) => (
+                    {sortedCertifications.map((cert) => (
                       <tr
                         key={cert.id}
                         className="hover:bg-gray-50 cursor-pointer"
                         onClick={() => setSelectedCertification(cert)}
                       >
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {cert.darpKey}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {cert.projectName}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {cert.type}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {cert.status}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {cert.softwareVersion}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {cert.targetDate}
-                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{cert.darpKey}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{cert.projectName}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{cert.type}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{cert.status}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{cert.forecastedLaunchDate || '-'}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><AssigneeBubble assigneeId={cert.assignee} /></td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{cert.lastUpdated ? new Date(cert.lastUpdated).toLocaleDateString() : '-'}</td>
                       </tr>
                     ))}
                   </tbody>
