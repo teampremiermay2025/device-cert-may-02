@@ -1,6 +1,12 @@
 [
   {
     "Device Issue Key": "DARP-117313",
+    "Summary": "MKTG ST0919A",
+    "Status": "PLANNING",
+    "Comments": "Device is in planning stage.",
+    "Assignee": "John Doe",
+    "priority": "High",
+    "Created Date": "2025-05-01",
     "Device Vendor": "Smoke Test",
     "Device Type": "Handset",
     "Device Model": "ST0919A",
@@ -15,6 +21,12 @@
   },
   {
     "Device Issue Key": "DARP-117314",
+    "Summary": "EcoSensor 2023",
+    "Status": "PLANNING",
+    "Comments": "Device is in planning stage.",
+    "Assignee": "John Doe",
+    "priority": "Medium",
+    "Created Date": "2025-04-29",
     "Device Vendor": "EcoSense",
     "Device Type": "IoT Sensor",
     "Device Model": "ES2023B",

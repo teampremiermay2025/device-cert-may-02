@@ -4,7 +4,32 @@ const STORAGE_KEYS = {
   CERTIFICATIONS: 'certifications',
   WORKFLOWS: 'workflows',
   DASHBOARDS: 'dashboards',
+  DEVICES: 'devices',
 } as const;
+
+// Define the Device interface based on devices.json
+interface Device {
+  id: string;
+  deviceIssueKey: string;
+  summary: string;
+  status: string;
+  comments: string;
+  assignee?: string;
+  priority: string;
+  createdDate: string;
+  deviceVendor: string;
+  deviceType: string;
+  deviceModel: string;
+  deviceMarketingName: string;
+  deviceCodeName: string;
+  deviceOS: string;
+  deviceOSVersion: string;
+  deviceHardwareVersion: string;
+  devicePaymentType: string;
+  deviceChannel: string;
+  type: string;
+  [key: string]: any;
+}
 
 const initialCertifications: CertificationRequest[] = [
   {
@@ -69,10 +94,22 @@ const initialCertifications: CertificationRequest[] = [
     ],
     issues: []
   },
-  // Add more sample data here...
 ];
 
-export const storage = {
+interface Storage {
+  getCertifications: () => CertificationRequest[];
+  saveCertifications: (certifications: CertificationRequest[]) => void;
+  updateCertification: (certification: CertificationRequest) => void;
+  getWorkflows: () => Workflow[];
+  saveWorkflows: (workflows: Workflow[]) => void;
+  getDashboards: () => Dashboard[];
+  saveDashboards: (dashboards: Dashboard[]) => void;
+  getDevices: () => Device[];
+  saveDevices: (devices: Device[]) => void;
+  updateDevice: (device: Device) => void;
+}
+
+export const storage: Storage = {
   getCertifications(): CertificationRequest[] {
     const data = localStorage.getItem(STORAGE_KEYS.CERTIFICATIONS);
     if (!data) {
@@ -89,7 +126,7 @@ export const storage = {
 
   updateCertification(updatedCertification: CertificationRequest) {
     const certifications = this.getCertifications();
-    const updatedCertifications = certifications.map(cert => 
+    const updatedCertifications = certifications.map(cert =>
       cert.id === updatedCertification.id ? updatedCertification : cert
     );
     this.saveCertifications(updatedCertifications);
@@ -112,5 +149,23 @@ export const storage = {
   saveDashboards(dashboards: Dashboard[]) {
     localStorage.setItem(STORAGE_KEYS.DASHBOARDS, JSON.stringify(dashboards));
     window.dispatchEvent(new Event('dashboards-updated'));
-  }
+  },
+
+  getDevices(): Device[] {
+    const data = localStorage.getItem(STORAGE_KEYS.DEVICES);
+    return data ? JSON.parse(data) : [];
+  },
+
+  saveDevices(devices: Device[]) {
+    localStorage.setItem(STORAGE_KEYS.DEVICES, JSON.stringify(devices));
+    window.dispatchEvent(new Event('devices-updated'));
+  },
+
+  updateDevice(updatedDevice: Device) {
+    const devices = this.getDevices();
+    const updatedDevices = devices.map(device =>
+      device.id === updatedDevice.id ? updatedDevice : device
+    );
+    this.saveDevices(updatedDevices);
+  },
 };
