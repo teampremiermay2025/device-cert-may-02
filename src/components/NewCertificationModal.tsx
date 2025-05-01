@@ -317,6 +317,14 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
 
   // Function to filter tasks from ruleset.json based on projectType, deviceChannel, and stage
   const filterTasksFromRuleset = (stage: string, projectType: string, deviceChannel: string): CertificationTask[] => {
+    console.log('filterTasksFromRuleset filters:', {
+      stage,
+      projectType,
+      deviceChannel,
+      lowerStage: stage.toUpperCase(),
+      lowerProjectType: projectType.toLowerCase(),
+      lowerDeviceChannel: deviceChannel.toLowerCase()
+    });
     const filteredTasks = taskStepsData.filter((task) => {
       const matchesIssueType = task.issue_types.some(
         (type: string) => type.toLowerCase() === projectType.toLowerCase()
@@ -327,7 +335,7 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
       const matchesStage = task.stage.toUpperCase() === stage.toUpperCase();
       return matchesIssueType && matchesDeviceChannel && matchesStage;
     });
-
+    console.log('Before Tasks after filteredTasks:', filteredTasks); 
     // Create tasks without assignee first
     let tasks = filteredTasks.map((task) => ({
       id: crypto.randomUUID(),
@@ -344,9 +352,10 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
       labels: [],
       stage: stage.toUpperCase() as CertificationStage,
     }));
-
+  
     // Distribute assignees
     tasks = assignTasksToOemMembers(tasks, formData.targetDate);
+   
     return tasks;
   };
 
@@ -360,6 +369,7 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
     // Get initial tasks for the "FORECAST" stage from ruleset.json
     const initialStage = 'FORECAST';
     const tasks = filterTasksFromRuleset(initialStage, projectType, deviceChannel);
+    console.log('Tasks created in handleConfirm:', tasks); // Debug: Log tasks at creation
 
     const now = new Date().toISOString();
     const newCertification: CertificationRequest = {
