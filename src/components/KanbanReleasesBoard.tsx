@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { storage } from '../lib/storage';
 import { CertificationRequest, CertificationStage } from '../types';
+import usersData from '../data/users.json';
 
 const STAGE_LABELS: { [key in CertificationStage]: string } = {
   FORECAST: 'Forecast',
@@ -29,6 +30,8 @@ const STAGE_ORDER: CertificationStage[] = [
 export const KanbanReleasesBoard: React.FC = () => {
   // Retrieve releases from localStorage using storage lib
   const releases = useMemo<CertificationRequest[]>(() => storage.getCertifications(), []);
+  // Direct access to users from JSON
+  const users = usersData.users;
 
   // Quick filter state
   const [quickFilter, setQuickFilter] = useState<'ALL' | 'MINE' | 'UPCOMING' | 'COMPLETED'>('ALL');
@@ -38,6 +41,7 @@ export const KanbanReleasesBoard: React.FC = () => {
   const filteredReleases = useMemo(() => {
     let filtered = [...releases];
     if (quickFilter === 'MINE') {
+      // Use user from localStorage for current session, but users from JSON for lookup
       const user = JSON.parse(localStorage.getItem('user') || '{}');
       filtered = filtered.filter(r => r.assignee && user?.name && r.assignee.includes(user.name));
     } else if (quickFilter === 'UPCOMING') {

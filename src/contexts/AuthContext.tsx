@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import usersData from '../data/users.json';
 
 interface User {
   id: string;
@@ -48,7 +49,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const getAllUsers = () => JSON.parse(localStorage.getItem('users') || '[]');
+  const getAllUsers = () => usersData.users;
 
   const login = async (email: string, password: string) => {
     // For demo purposes, accept any user from users.json with a simple password check

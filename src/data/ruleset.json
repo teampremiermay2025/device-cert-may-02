@@ -1,614 +1,2445 @@
 [
   {
     "chapter": "1000.0",
-    "deliverable": "SYSTEM USE",
+    "deliverable": "Deliverable Reqs: PreAuth",
     "requirement_tag": "ALL CHAPTERS",
-    "issue_types": ["DA IR", "DA MR", "E DA MR", "DA ADAPT IR"],
-    "device_channels": ["CRICKET IETA", "CRICKET VITA","PLANNING"],
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR",
+      "DA ADAPT IR"
+    ],
+    "device_channels": [
+      "CRICKET IETA",
+      "CRICKET VITA",
+      "PLANNING"
+    ],
     "device": "ALL DEV",
-    "stage": "PLANNING"
+    "stage": "PLANNING",
+    "completion_criteria": [
+      "Detailed certification plan approved",
+      "Deliverables & dates locked in"
+    ],
+    "task_name": "Deliverable Reqs: PreAuth"
+  },
+  {
+    "chapter": "1000.0",
+    "deliverable": "Deliverable Reqs: Samples \u2013 Marketing & Certification",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR",
+      "DA ADAPT IR"
+    ],
+    "device_channels": [
+      "CRICKET IETA",
+      "CRICKET VITA",
+      "PLANNING"
+    ],
+    "device": "ALL DEV",
+    "stage": "PLANNING",
+    "completion_criteria": [
+      "Detailed certification plan approved",
+      "Deliverables & dates locked in"
+    ],
+    "task_name": "Deliverable Reqs: Samples \u2013 Marketing & Certification"
+  },
+  {
+    "chapter": "1000.0",
+    "deliverable": "Deliverable Reqs: PTCRB",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR",
+      "DA ADAPT IR"
+    ],
+    "device_channels": [
+      "CRICKET IETA",
+      "CRICKET VITA",
+      "PLANNING"
+    ],
+    "device": "ALL DEV",
+    "stage": "PLANNING",
+    "completion_criteria": [
+      "Detailed certification plan approved",
+      "Deliverables & dates locked in"
+    ],
+    "task_name": "Deliverable Reqs: PTCRB"
+  },
+  {
+    "chapter": "1000.0",
+    "deliverable": "Deliverable Reqs: Certs \u2013 Release Notes",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR",
+      "DA ADAPT IR"
+    ],
+    "device_channels": [
+      "CRICKET IETA",
+      "CRICKET VITA",
+      "PLANNING"
+    ],
+    "device": "ALL DEV",
+    "stage": "PLANNING",
+    "completion_criteria": [
+      "Detailed certification plan approved",
+      "Deliverables & dates locked in"
+    ],
+    "task_name": "Deliverable Reqs: Certs \u2013 Release Notes"
+  },
+  {
+    "chapter": "1000.0",
+    "deliverable": "Deliverable Reqs: FOTA-16038",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR",
+      "DA ADAPT IR"
+    ],
+    "device_channels": [
+      "CRICKET IETA",
+      "CRICKET VITA",
+      "PLANNING"
+    ],
+    "device": "ALL DEV",
+    "stage": "PLANNING",
+    "completion_criteria": [
+      "Detailed certification plan approved",
+      "Deliverables & dates locked in"
+    ],
+    "task_name": "Deliverable Reqs: FOTA-16038"
   },
   {
     "chapter": "1000.1",
-    "deliverable": "PreAuth",
+    "deliverable": "TA Approvals Reqs: FFI",
     "requirement_tag": "Subtask Chapter Master",
-    "issue_types": ["DA IR", "DA MR", "E DA MR"],
-    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA",
+      "CRICKET VITA"
+    ],
     "device": "ALL DEV",
-    "stage": "SUBMISSION REVIEW"
+    "stage": "SUBMISSION REVIEW",
+    "completion_criteria": [
+      "All RFIs closed",
+      "Submission package formally accepted"
+    ],
+    "task_name": "TA Approvals Reqs: FFI"
   },
   {
     "chapter": "1000.1",
-    "deliverable": "PreAuth",
+    "deliverable": "Deliverable Reqs: Attestation",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA",
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "SUBMISSION REVIEW",
+    "completion_criteria": [
+      "All RFIs closed",
+      "Submission package formally accepted"
+    ],
+    "task_name": "Deliverable Reqs: Attestation"
+  },
+  {
+    "chapter": "1000.1",
+    "deliverable": "Deliverable Reqs: Upload Lab UE Capability Test Results",
     "requirement_tag": "PTN Test Authorization Letter (18062)",
-    "issue_types": ["DA IR", "DA MR", "E DA MR"],
-    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA",
+      "CRICKET VITA"
+    ],
     "device": "ALL DEV",
-    "stage": "DEVICE TESTING"
+    "stage": "DEVICE TESTING",
+    "completion_criteria": [
+      "All test cases executed and passed (or retested)",
+      "Full results uploaded to authority"
+    ],
+    "task_name": "Deliverable Reqs: Upload Lab UE Capability Test Results"
+  },
+  {
+    "chapter": "1000.1",
+    "deliverable": "Deliverable Reqs: Certs",
+    "requirement_tag": "PTN Test Authorization Letter (18062)",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA",
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "DEVICE TESTING",
+    "completion_criteria": [
+      "All test cases executed and passed (or retested)",
+      "Full results uploaded to authority"
+    ],
+    "task_name": "Deliverable Reqs: Certs"
+  },
+  {
+    "chapter": "1000.1",
+    "deliverable": "Deliverable Reqs: Certs-VoLTE & WiFi Audio",
+    "requirement_tag": "PTN Test Authorization Letter (18062)",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA",
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "DEVICE TESTING",
+    "completion_criteria": [
+      "All test cases executed and passed (or retested)",
+      "Full results uploaded to authority"
+    ],
+    "task_name": "Deliverable Reqs: Certs-VoLTE & WiFi Audio"
+  },
+  {
+    "chapter": "1000.1",
+    "deliverable": "Deliverable Reqs: Certs-FirstNet",
+    "requirement_tag": "PTN Test Authorization Letter (18062)",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA",
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "DEVICE TESTING",
+    "completion_criteria": [
+      "All test cases executed and passed (or retested)",
+      "Full results uploaded to authority"
+    ],
+    "task_name": "Deliverable Reqs: Certs-FirstNet"
+  },
+  {
+    "chapter": "1000.1",
+    "deliverable": "Deliverable Reqs: Certs-Noise & Speech",
+    "requirement_tag": "PTN Test Authorization Letter (18062)",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA",
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "DEVICE TESTING",
+    "completion_criteria": [
+      "All test cases executed and passed (or retested)",
+      "Full results uploaded to authority"
+    ],
+    "task_name": "Deliverable Reqs: Certs-Noise & Speech"
+  },
+  {
+    "chapter": "1000.1",
+    "deliverable": "Deliverable Reqs: FOTA-19612",
+    "requirement_tag": "PTN Test Authorization Letter (18062)",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA",
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "DEVICE TESTING",
+    "completion_criteria": [
+      "All test cases executed and passed (or retested)",
+      "Full results uploaded to authority"
+    ],
+    "task_name": "Deliverable Reqs: FOTA-19612"
+  },
+  {
+    "chapter": "1000.1",
+    "deliverable": "Deliverable Reqs: Certs-Battery",
+    "requirement_tag": "PTN Test Authorization Letter (18062)",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA",
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "DEVICE TESTING",
+    "completion_criteria": [
+      "All test cases executed and passed (or retested)",
+      "Full results uploaded to authority"
+    ],
+    "task_name": "Deliverable Reqs: Certs-Battery"
+  },
+  {
+    "chapter": "1000.1",
+    "deliverable": "Deliverable Rene Testion Confirmation-IODT & IOT",
+    "requirement_tag": "PTN Test Authorization Letter (18062)",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA",
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "DEVICE TESTING",
+    "completion_criteria": [
+      "All test cases executed and passed (or retested)",
+      "Full results uploaded to authority"
+    ],
+    "task_name": "Deliverable Rene Testion Confirmation-IODT & IOT"
   },
   {
     "chapter": "1000.2",
-    "deliverable": "PreAuth-Testing",
+    "deliverable": "Bundle approved reports, release notes & attestations",
     "requirement_tag": "Subtask Chapter Master",
-    "issue_types": ["DA IR", "DA MR", "E DA MR", "NDAP IR"],
-    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR",
+      "NDAP IR"
+    ],
+    "device_channels": [
+      "CRICKET IETA",
+      "CRICKET VITA"
+    ],
     "device": "ALL DEV",
-    "stage": "TA COMPLETE"
+    "stage": "TA COMPLETE",
+    "completion_criteria": [
+      "Certification package uploaded as \u201cready for issuance\u201d"
+    ],
+    "task_name": "Bundle approved reports, release notes & attestations"
   },
   {
     "chapter": "1000.2",
-    "deliverable": "PreAuth-Testing",
+    "deliverable": "Prepare \u201cCertification Package\u201d for final upload",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR",
+      "NDAP IR"
+    ],
+    "device_channels": [
+      "CRICKET IETA",
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "TA COMPLETE",
+    "completion_criteria": [
+      "Certification package uploaded as \u201cready for issuance\u201d"
+    ],
+    "task_name": "Prepare \u201cCertification Package\u201d for final upload"
+  },
+  {
+    "chapter": "1000.2",
+    "deliverable": "Collect internal approval signatures",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR",
+      "NDAP IR"
+    ],
+    "device_channels": [
+      "CRICKET IETA",
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "TA COMPLETE",
+    "completion_criteria": [
+      "Certification package uploaded as \u201cready for issuance\u201d"
+    ],
+    "task_name": "Collect internal approval signatures"
+  },
+  {
+    "chapter": "1000.2",
+    "deliverable": "Deliverable Reqs: Testing Confirmation \u2013 AQT",
     "requirement_tag": "PTN-10776 Testing Results for Radio PTN (pre-LE) [include 16706 logs]",
-    "issue_types": ["DA IR", "DA MR", "E DA MR"],
-    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA",
+      "CRICKET VITA"
+    ],
     "device": "ALL DEV",
-    "stage": "SUBMITTED"
+    "stage": "SUBMITTED",
+    "completion_criteria": [
+      "All docs, firmware & provisioning datasets submitted",
+      "\u201cReceived\u201d acknowledgments logged"
+    ],
+    "task_name": "Deliverable Reqs: Testing Confirmation \u2013 AQT"
   },
   {
     "chapter": "1000.2",
-    "deliverable": "PreAuth-Testing",
-    "requirement_tag": "APTN-10776 Test Results for Application PTN (pre-LE) [include 16706 logs]",
-    "issue_types": ["DA IR", "DA MR", "E DA MR", "NDAP IR"],
-    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
+    "deliverable": "Deliverable Reqs: Provisioning \u2013 ACS",
+    "requirement_tag": "PTN-10776 Testing Results for Radio PTN (pre-LE) [include 16706 logs]",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA",
+      "CRICKET VITA"
+    ],
     "device": "ALL DEV",
-    "stage": "FORECAST"
+    "stage": "SUBMITTED",
+    "completion_criteria": [
+      "All docs, firmware & provisioning datasets submitted",
+      "\u201cReceived\u201d acknowledgments logged"
+    ],
+    "task_name": "Deliverable Reqs: Provisioning \u2013 ACS"
+  },
+  {
+    "chapter": "1000.2",
+    "deliverable": "Deliverable Reqs: Provisioning \u2013 IMEI",
+    "requirement_tag": "PTN-10776 Testing Results for Radio PTN (pre-LE) [include 16706 logs]",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA",
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "SUBMITTED",
+    "completion_criteria": [
+      "All docs, firmware & provisioning datasets submitted",
+      "\u201cReceived\u201d acknowledgments logged"
+    ],
+    "task_name": "Deliverable Reqs: Provisioning \u2013 IMEI"
+  },
+  {
+    "chapter": "1000.2",
+    "deliverable": "Deliverable Reqs: DE \u2013 Device Firmware",
+    "requirement_tag": "PTN-10776 Testing Results for Radio PTN (pre-LE) [include 16706 logs]",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA",
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "SUBMITTED",
+    "completion_criteria": [
+      "All docs, firmware & provisioning datasets submitted",
+      "\u201cReceived\u201d acknowledgments logged"
+    ],
+    "task_name": "Deliverable Reqs: DE \u2013 Device Firmware"
+  },
+  {
+    "chapter": "1000.2",
+    "deliverable": "Deliverable Reqs: Provisioning-IMEI Central (Cricket)",
+    "requirement_tag": "PTN-10776 Testing Results for Radio PTN (pre-LE) [include 16706 logs]",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA",
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "SUBMITTED",
+    "completion_criteria": [
+      "All docs, firmware & provisioning datasets submitted",
+      "\u201cReceived\u201d acknowledgments logged"
+    ],
+    "task_name": "Deliverable Reqs: Provisioning-IMEI Central (Cricket)"
+  },
+  {
+    "chapter": "1000.2",
+    "deliverable": "Deliverable Reqs: Provisioning-IMEI Master (AT&T)",
+    "requirement_tag": "PTN-10776 Testing Results for Radio PTN (pre-LE) [include 16706 logs]",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA",
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "SUBMITTED",
+    "completion_criteria": [
+      "All docs, firmware & provisioning datasets submitted",
+      "\u201cReceived\u201d acknowledgments logged"
+    ],
+    "task_name": "Deliverable Reqs: Provisioning-IMEI Master (AT&T)"
+  },
+  {
+    "chapter": "1000.2",
+    "deliverable": "Deliverable Reqs: Provisioning-IMEI ESIM (COU)",
+    "requirement_tag": "PTN-10776 Testing Results for Radio PTN (pre-LE) [include 16706 logs]",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA",
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "SUBMITTED",
+    "completion_criteria": [
+      "All docs, firmware & provisioning datasets submitted",
+      "\u201cReceived\u201d acknowledgments logged"
+    ],
+    "task_name": "Deliverable Reqs: Provisioning-IMEI ESIM (COU)"
+  },
+  {
+    "chapter": "1000.2",
+    "deliverable": "Compliance Reqs Chapter Reviews",
+    "requirement_tag": "APTN-10776 Test Results for Application PTN (pre-LE) [include 16706 logs]",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR",
+      "NDAP IR"
+    ],
+    "device_channels": [
+      "CRICKET IETA",
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "FORECAST",
+    "completion_criteria": [
+      "High-level requirements catalogued",
+      "Chapter owners assigned"
+    ],
+    "task_name": "Compliance Reqs Chapter Reviews"
+  },
+  {
+    "chapter": "1000.2",
+    "deliverable": "Deliverable Reqs: Chapter Reviews",
+    "requirement_tag": "APTN-10776 Test Results for Application PTN (pre-LE) [include 16706 logs]",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR",
+      "NDAP IR"
+    ],
+    "device_channels": [
+      "CRICKET IETA",
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "FORECAST",
+    "completion_criteria": [
+      "High-level requirements catalogued",
+      "Chapter owners assigned"
+    ],
+    "task_name": "Deliverable Reqs: Chapter Reviews"
   },
   {
     "chapter": "1001.1",
-    "deliverable": "SAMPLES",
+    "deliverable": "Deliverable Reqs: Samples \u2013 Marketing & Certification (delivery)",
     "requirement_tag": "Subtask Chapter Master",
-    "issue_types": ["DA IR", "DA MR", "E DA MR"],
-    "device_channels": ["CRICKET IETA"],
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA"
+    ],
     "device": "ALL DEV",
-    "stage": "DEVICE ENTRY"
+    "stage": "DEVICE ENTRY",
+    "completion_criteria": [
+      "Devices in lab & registered in LIMS",
+      "Devices labeled and ready for testing"
+    ],
+    "task_name": "Deliverable Reqs: Samples \u2013 Marketing & Certification (delivery)"
+  },
+  {
+    "chapter": "1001.1",
+    "deliverable": "Deliverable Reqs: Testing Confirmation \u2013 AQT (setup)",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA"
+    ],
+    "device": "ALL DEV",
+    "stage": "DEVICE ENTRY",
+    "completion_criteria": [
+      "Devices in lab & registered in LIMS",
+      "Devices labeled and ready for testing"
+    ],
+    "task_name": "Deliverable Reqs: Testing Confirmation \u2013 AQT (setup)"
   },
   {
     "chapter": "1001.2",
-    "deliverable": "Testing",
+    "deliverable": "Deliverable Reqs: Attestation-RTT",
     "requirement_tag": "Sample Validation",
-    "issue_types": ["DA IR", "DA MR"],
-    "device_channels": ["CRICKET VITA"],
+    "issue_types": [
+      "DA IR",
+      "DA MR"
+    ],
+    "device_channels": [
+      "CRICKET VITA"
+    ],
     "device": "ALL DEV",
-    "stage": "TAQ REVIEW"
+    "stage": "TAQ REVIEW",
+    "completion_criteria": [
+      "All attestations signed & submitted",
+      "No open technical comments"
+    ],
+    "task_name": "Deliverable Reqs: Attestation-RTT"
+  },
+  {
+    "chapter": "1001.2",
+    "deliverable": "Deliverable Reqs: Attestation-Logs",
+    "requirement_tag": "Sample Validation",
+    "issue_types": [
+      "DA IR",
+      "DA MR"
+    ],
+    "device_channels": [
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "TAQ REVIEW",
+    "completion_criteria": [
+      "All attestations signed & submitted",
+      "No open technical comments"
+    ],
+    "task_name": "Deliverable Reqs: Attestation-Logs"
+  },
+  {
+    "chapter": "1001.2",
+    "deliverable": "Deliverable Reqs: Attestation-Test Results",
+    "requirement_tag": "Sample Validation",
+    "issue_types": [
+      "DA IR",
+      "DA MR"
+    ],
+    "device_channels": [
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "TAQ REVIEW",
+    "completion_criteria": [
+      "All attestations signed & submitted",
+      "No open technical comments"
+    ],
+    "task_name": "Deliverable Reqs: Attestation-Test Results"
   },
   {
     "chapter": "1001.3",
-    "deliverable": "PreAuth",
+    "deliverable": "Deliverable Reqs: PreAuth",
     "requirement_tag": "Subtask Chapter Master",
-    "issue_types": ["DA IR", "E DA MR"],
-    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
+    "issue_types": [
+      "DA IR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA",
+      "CRICKET VITA"
+    ],
     "device": "ALL DEV",
-    "stage": "PLANNING"
+    "stage": "PLANNING",
+    "completion_criteria": [
+      "Detailed certification plan approved",
+      "Deliverables & dates locked in"
+    ],
+    "task_name": "Deliverable Reqs: PreAuth"
+  },
+  {
+    "chapter": "1001.3",
+    "deliverable": "Deliverable Reqs: Samples \u2013 Marketing & Certification",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": [
+      "DA IR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA",
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "PLANNING",
+    "completion_criteria": [
+      "Detailed certification plan approved",
+      "Deliverables & dates locked in"
+    ],
+    "task_name": "Deliverable Reqs: Samples \u2013 Marketing & Certification"
+  },
+  {
+    "chapter": "1001.3",
+    "deliverable": "Deliverable Reqs: PTCRB",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": [
+      "DA IR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA",
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "PLANNING",
+    "completion_criteria": [
+      "Detailed certification plan approved",
+      "Deliverables & dates locked in"
+    ],
+    "task_name": "Deliverable Reqs: PTCRB"
+  },
+  {
+    "chapter": "1001.3",
+    "deliverable": "Deliverable Reqs: Certs \u2013 Release Notes",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": [
+      "DA IR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA",
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "PLANNING",
+    "completion_criteria": [
+      "Detailed certification plan approved",
+      "Deliverables & dates locked in"
+    ],
+    "task_name": "Deliverable Reqs: Certs \u2013 Release Notes"
+  },
+  {
+    "chapter": "1001.3",
+    "deliverable": "Deliverable Reqs: FOTA-16038",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": [
+      "DA IR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA",
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "PLANNING",
+    "completion_criteria": [
+      "Detailed certification plan approved",
+      "Deliverables & dates locked in"
+    ],
+    "task_name": "Deliverable Reqs: FOTA-16038"
   },
   {
     "chapter": "1001.4",
-    "deliverable": "PreAuth-Testing",
+    "deliverable": "TA Approvals Reqs: FFI",
     "requirement_tag": "PTN-10800 Test Results",
-    "issue_types": ["DA IR", "DA MR", "NDAP IR"],
-    "device_channels": ["CRICKET IETA"],
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "NDAP IR"
+    ],
+    "device_channels": [
+      "CRICKET IETA"
+    ],
     "device": "ALL DEV",
-    "stage": "SUBMISSION REVIEW"
+    "stage": "SUBMISSION REVIEW",
+    "completion_criteria": [
+      "All RFIs closed",
+      "Submission package formally accepted"
+    ],
+    "task_name": "TA Approvals Reqs: FFI"
   },
   {
-    "chapter": "1002.0",
-    "deliverable": "SYSTEM DEPLOY",
-    "requirement_tag": "ALL CHAPTERS",
-    "issue_types": ["DA IR", "DA MR", "E DA MR"],
-    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
+    "chapter": "1001.4",
+    "deliverable": "Deliverable Reqs: Attestation",
+    "requirement_tag": "PTN-10800 Test Results",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "NDAP IR"
+    ],
+    "device_channels": [
+      "CRICKET IETA"
+    ],
     "device": "ALL DEV",
-    "stage": "DEVICE TESTING"
+    "stage": "SUBMISSION REVIEW",
+    "completion_criteria": [
+      "All RFIs closed",
+      "Submission package formally accepted"
+    ],
+    "task_name": "Deliverable Reqs: Attestation"
   },
   {
     "chapter": "1002.1",
-    "deliverable": "PreAuth",
+    "deliverable": "Bundle approved reports, release notes & attestations",
     "requirement_tag": "Subtask Chapter Master",
-    "issue_types": ["DA IR", "DA MR"],
-    "device_channels": ["CRICKET VITA"],
+    "issue_types": [
+      "DA IR",
+      "DA MR"
+    ],
+    "device_channels": [
+      "CRICKET VITA"
+    ],
     "device": "ALL DEV",
-    "stage": "TA COMPLETE"
+    "stage": "TA COMPLETE",
+    "completion_criteria": [
+      "Certification package uploaded as \u201cready for issuance\u201d"
+    ],
+    "task_name": "Bundle approved reports, release notes & attestations"
   },
   {
-    "chapter": "1002.2",
-    "deliverable": "PreAuth-Testing",
-    "requirement_tag": "PTN-10801 Test Results",
-    "issue_types": ["DA IR", "E DA MR", "NDAP IR"],
-    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
+    "chapter": "1002.1",
+    "deliverable": "Prepare \u201cCertification Package\u201d for final upload",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": [
+      "DA IR",
+      "DA MR"
+    ],
+    "device_channels": [
+      "CRICKET VITA"
+    ],
     "device": "ALL DEV",
-    "stage": "SUBMITTED"
+    "stage": "TA COMPLETE",
+    "completion_criteria": [
+      "Certification package uploaded as \u201cready for issuance\u201d"
+    ],
+    "task_name": "Prepare \u201cCertification Package\u201d for final upload"
+  },
+  {
+    "chapter": "1002.1",
+    "deliverable": "Collect internal approval signatures",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": [
+      "DA IR",
+      "DA MR"
+    ],
+    "device_channels": [
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "TA COMPLETE",
+    "completion_criteria": [
+      "Certification package uploaded as \u201cready for issuance\u201d"
+    ],
+    "task_name": "Collect internal approval signatures"
   },
   {
     "chapter": "1003.0",
-    "deliverable": "SYSTEM VALIDATION",
+    "deliverable": "Compliance Reqs Chapter Reviews",
     "requirement_tag": "ALL CHAPTERS",
-    "issue_types": ["DA IR", "DA MR", "E DA MR"],
-    "device_channels": ["CRICKET IETA"],
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA"
+    ],
     "device": "ALL DEV",
-    "stage": "FORECAST"
+    "stage": "FORECAST",
+    "completion_criteria": [
+      "High-level requirements catalogued",
+      "Chapter owners assigned"
+    ],
+    "task_name": "Compliance Reqs Chapter Reviews"
+  },
+  {
+    "chapter": "1003.0",
+    "deliverable": "Deliverable Reqs: Chapter Reviews",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA"
+    ],
+    "device": "ALL DEV",
+    "stage": "FORECAST",
+    "completion_criteria": [
+      "High-level requirements catalogued",
+      "Chapter owners assigned"
+    ],
+    "task_name": "Deliverable Reqs: Chapter Reviews"
   },
   {
     "chapter": "1003.1",
-    "deliverable": "Testing",
+    "deliverable": "Deliverable Reqs: Samples \u2013 Marketing & Certification (delivery)",
     "requirement_tag": "Subtask Chapter Master",
-    "issue_types": ["DA IR", "DA MR"],
-    "device_channels": ["CRICKET VITA"],
+    "issue_types": [
+      "DA IR",
+      "DA MR"
+    ],
+    "device_channels": [
+      "CRICKET VITA"
+    ],
     "device": "ALL DEV",
-    "stage": "DEVICE ENTRY"
+    "stage": "DEVICE ENTRY",
+    "completion_criteria": [
+      "Devices in lab & registered in LIMS",
+      "Devices labeled and ready for testing"
+    ],
+    "task_name": "Deliverable Reqs: Samples \u2013 Marketing & Certification (delivery)"
+  },
+  {
+    "chapter": "1003.1",
+    "deliverable": "Deliverable Reqs: Testing Confirmation \u2013 AQT (setup)",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": [
+      "DA IR",
+      "DA MR"
+    ],
+    "device_channels": [
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "DEVICE ENTRY",
+    "completion_criteria": [
+      "Devices in lab & registered in LIMS",
+      "Devices labeled and ready for testing"
+    ],
+    "task_name": "Deliverable Reqs: Testing Confirmation \u2013 AQT (setup)"
   },
   {
     "chapter": "1003.2",
-    "deliverable": "PreAuth-Testing",
+    "deliverable": "Deliverable Reqs: Attestation-RTT",
     "requirement_tag": "APTN-10802 Validation Results",
-    "issue_types": ["DA IR", "E DA MR", "NDAP IR"],
-    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
+    "issue_types": [
+      "DA IR",
+      "E DA MR",
+      "NDAP IR"
+    ],
+    "device_channels": [
+      "CRICKET IETA",
+      "CRICKET VITA"
+    ],
     "device": "ALL DEV",
-    "stage": "TAQ REVIEW"
+    "stage": "TAQ REVIEW",
+    "completion_criteria": [
+      "All attestations signed & submitted",
+      "No open technical comments"
+    ],
+    "task_name": "Deliverable Reqs: Attestation-RTT"
+  },
+  {
+    "chapter": "1003.2",
+    "deliverable": "Deliverable Reqs: Attestation-Logs",
+    "requirement_tag": "APTN-10802 Validation Results",
+    "issue_types": [
+      "DA IR",
+      "E DA MR",
+      "NDAP IR"
+    ],
+    "device_channels": [
+      "CRICKET IETA",
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "TAQ REVIEW",
+    "completion_criteria": [
+      "All attestations signed & submitted",
+      "No open technical comments"
+    ],
+    "task_name": "Deliverable Reqs: Attestation-Logs"
+  },
+  {
+    "chapter": "1003.2",
+    "deliverable": "Deliverable Reqs: Attestation-Test Results",
+    "requirement_tag": "APTN-10802 Validation Results",
+    "issue_types": [
+      "DA IR",
+      "E DA MR",
+      "NDAP IR"
+    ],
+    "device_channels": [
+      "CRICKET IETA",
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "TAQ REVIEW",
+    "completion_criteria": [
+      "All attestations signed & submitted",
+      "No open technical comments"
+    ],
+    "task_name": "Deliverable Reqs: Attestation-Test Results"
   },
   {
     "chapter": "1004.0",
-    "deliverable": "SYSTEM FINALIZE",
+    "deliverable": "Deliverable Reqs: PreAuth",
     "requirement_tag": "ALL CHAPTERS",
-    "issue_types": ["DA IR", "DA MR", "E DA MR"],
-    "device_channels": ["CRICKET IETA"],
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA"
+    ],
     "device": "ALL DEV",
-    "stage": "PLANNING"
+    "stage": "PLANNING",
+    "completion_criteria": [
+      "Detailed certification plan approved",
+      "Deliverables & dates locked in"
+    ],
+    "task_name": "Deliverable Reqs: PreAuth"
+  },
+  {
+    "chapter": "1004.0",
+    "deliverable": "Deliverable Reqs: Samples \u2013 Marketing & Certification",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA"
+    ],
+    "device": "ALL DEV",
+    "stage": "PLANNING",
+    "completion_criteria": [
+      "Detailed certification plan approved",
+      "Deliverables & dates locked in"
+    ],
+    "task_name": "Deliverable Reqs: Samples \u2013 Marketing & Certification"
+  },
+  {
+    "chapter": "1004.0",
+    "deliverable": "Deliverable Reqs: PTCRB",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA"
+    ],
+    "device": "ALL DEV",
+    "stage": "PLANNING",
+    "completion_criteria": [
+      "Detailed certification plan approved",
+      "Deliverables & dates locked in"
+    ],
+    "task_name": "Deliverable Reqs: PTCRB"
+  },
+  {
+    "chapter": "1004.0",
+    "deliverable": "Deliverable Reqs: Certs \u2013 Release Notes",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA"
+    ],
+    "device": "ALL DEV",
+    "stage": "PLANNING",
+    "completion_criteria": [
+      "Detailed certification plan approved",
+      "Deliverables & dates locked in"
+    ],
+    "task_name": "Deliverable Reqs: Certs \u2013 Release Notes"
+  },
+  {
+    "chapter": "1004.0",
+    "deliverable": "Deliverable Reqs: FOTA-16038",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA"
+    ],
+    "device": "ALL DEV",
+    "stage": "PLANNING",
+    "completion_criteria": [
+      "Detailed certification plan approved",
+      "Deliverables & dates locked in"
+    ],
+    "task_name": "Deliverable Reqs: FOTA-16038"
   },
   {
     "chapter": "1004.1",
-    "deliverable": "PreAuth",
+    "deliverable": "TA Approvals Reqs: FFI",
     "requirement_tag": "Subtask Chapter Master",
-    "issue_types": ["DA IR", "DA MR"],
-    "device_channels": ["CRICKET VITA"],
+    "issue_types": [
+      "DA IR",
+      "DA MR"
+    ],
+    "device_channels": [
+      "CRICKET VITA"
+    ],
     "device": "ALL DEV",
-    "stage": "SUBMISSION REVIEW"
+    "stage": "SUBMISSION REVIEW",
+    "completion_criteria": [
+      "All RFIs closed",
+      "Submission package formally accepted"
+    ],
+    "task_name": "TA Approvals Reqs: FFI"
   },
   {
-    "chapter": "1004.2",
-    "deliverable": "PreAuth-Testing",
-    "requirement_tag": "PTN-10803 Final Test Results",
-    "issue_types": ["DA IR", "E DA MR", "NDAP IR"],
-    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
+    "chapter": "1004.1",
+    "deliverable": "Deliverable Reqs: Attestation",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": [
+      "DA IR",
+      "DA MR"
+    ],
+    "device_channels": [
+      "CRICKET VITA"
+    ],
     "device": "ALL DEV",
-    "stage": "DEVICE TESTING"
+    "stage": "SUBMISSION REVIEW",
+    "completion_criteria": [
+      "All RFIs closed",
+      "Submission package formally accepted"
+    ],
+    "task_name": "Deliverable Reqs: Attestation"
   },
   {
     "chapter": "1005.0",
-    "deliverable": "SYSTEM RELEASE",
+    "deliverable": "Bundle approved reports, release notes & attestations",
     "requirement_tag": "ALL CHAPTERS",
-    "issue_types": ["DA IR", "DA MR", "E DA MR"],
-    "device_channels": ["CRICKET IETA"],
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA"
+    ],
     "device": "ALL DEV",
-    "stage": "TA COMPLETE"
+    "stage": "TA COMPLETE",
+    "completion_criteria": [
+      "Certification package uploaded as \u201cready for issuance\u201d"
+    ],
+    "task_name": "Bundle approved reports, release notes & attestations"
+  },
+  {
+    "chapter": "1005.0",
+    "deliverable": "Prepare \u201cCertification Package\u201d for final upload",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA"
+    ],
+    "device": "ALL DEV",
+    "stage": "TA COMPLETE",
+    "completion_criteria": [
+      "Certification package uploaded as \u201cready for issuance\u201d"
+    ],
+    "task_name": "Prepare \u201cCertification Package\u201d for final upload"
+  },
+  {
+    "chapter": "1005.0",
+    "deliverable": "Collect internal approval signatures",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA"
+    ],
+    "device": "ALL DEV",
+    "stage": "TA COMPLETE",
+    "completion_criteria": [
+      "Certification package uploaded as \u201cready for issuance\u201d"
+    ],
+    "task_name": "Collect internal approval signatures"
   },
   {
     "chapter": "1005.1",
-    "deliverable": "Testing",
+    "deliverable": "Deliverable Reqs: Testing Confirmation \u2013 AQT",
     "requirement_tag": "Subtask Chapter Master",
-    "issue_types": ["DA IR", "DA MR"],
-    "device_channels": ["CRICKET VITA"],
+    "issue_types": [
+      "DA IR",
+      "DA MR"
+    ],
+    "device_channels": [
+      "CRICKET VITA"
+    ],
     "device": "ALL DEV",
-    "stage": "SUBMITTED"
+    "stage": "SUBMITTED",
+    "completion_criteria": [
+      "All docs, firmware & provisioning datasets submitted",
+      "\u201cReceived\u201d acknowledgments logged"
+    ],
+    "task_name": "Deliverable Reqs: Testing Confirmation \u2013 AQT"
   },
   {
-    "chapter": "1005.2",
-    "deliverable": "PreAuth-Testing",
-    "requirement_tag": "PTN-10804 Release Validation",
-    "issue_types": ["DA IR", "E DA MR", "NDAP IR"],
-    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
-    "device": "ALL DEV",
-    "stage": "FORECAST"
-  },
-  {
-    "chapter": "1006.0",
-    "deliverable": "SYSTEM MONITOR",
-    "requirement_tag": "ALL CHAPTERS",
-    "issue_types": ["DA IR", "DA MR", "E DA MR"],
-    "device_channels": ["CRICKET IETA"],
-    "device": "ALL DEV",
-    "stage": "DEVICE ENTRY"
-  },
-  {
-    "chapter": "1006.1",
-    "deliverable": "PreAuth",
+    "chapter": "1005.1",
+    "deliverable": "Deliverable Reqs: Provisioning \u2013 ACS",
     "requirement_tag": "Subtask Chapter Master",
-    "issue_types": ["DA IR", "DA MR"],
-    "device_channels": ["CRICKET VITA"],
+    "issue_types": [
+      "DA IR",
+      "DA MR"
+    ],
+    "device_channels": [
+      "CRICKET VITA"
+    ],
     "device": "ALL DEV",
-    "stage": "TAQ REVIEW"
+    "stage": "SUBMITTED",
+    "completion_criteria": [
+      "All docs, firmware & provisioning datasets submitted",
+      "\u201cReceived\u201d acknowledgments logged"
+    ],
+    "task_name": "Deliverable Reqs: Provisioning \u2013 ACS"
   },
   {
-    "chapter": "1006.2",
-    "deliverable": "PreAuth-Testing",
-    "requirement_tag": "PTN-10805 Monitoring Results",
-    "issue_types": ["DA IR", "E DA MR", "NDAP IR"],
-    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
+    "chapter": "1005.1",
+    "deliverable": "Deliverable Reqs: Provisioning \u2013 IMEI",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": [
+      "DA IR",
+      "DA MR"
+    ],
+    "device_channels": [
+      "CRICKET VITA"
+    ],
     "device": "ALL DEV",
-    "stage": "PLANNING"
+    "stage": "SUBMITTED",
+    "completion_criteria": [
+      "All docs, firmware & provisioning datasets submitted",
+      "\u201cReceived\u201d acknowledgments logged"
+    ],
+    "task_name": "Deliverable Reqs: Provisioning \u2013 IMEI"
   },
   {
-    "chapter": "1007.0",
-    "deliverable": "SYSTEM UPDATE",
-    "requirement_tag": "ALL CHAPTERS",
-    "issue_types": ["DA IR", "DA MR", "E DA MR"],
-    "device_channels": ["CRICKET IETA"],
+    "chapter": "1005.1",
+    "deliverable": "Deliverable Reqs: DE \u2013 Device Firmware",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": [
+      "DA IR",
+      "DA MR"
+    ],
+    "device_channels": [
+      "CRICKET VITA"
+    ],
     "device": "ALL DEV",
-    "stage": "SUBMISSION REVIEW"
+    "stage": "SUBMITTED",
+    "completion_criteria": [
+      "All docs, firmware & provisioning datasets submitted",
+      "\u201cReceived\u201d acknowledgments logged"
+    ],
+    "task_name": "Deliverable Reqs: DE \u2013 Device Firmware"
+  },
+  {
+    "chapter": "1005.1",
+    "deliverable": "Deliverable Reqs: Provisioning-IMEI Central (Cricket)",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": [
+      "DA IR",
+      "DA MR"
+    ],
+    "device_channels": [
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "SUBMITTED",
+    "completion_criteria": [
+      "All docs, firmware & provisioning datasets submitted",
+      "\u201cReceived\u201d acknowledgments logged"
+    ],
+    "task_name": "Deliverable Reqs: Provisioning-IMEI Central (Cricket)"
+  },
+  {
+    "chapter": "1005.1",
+    "deliverable": "Deliverable Reqs: Provisioning-IMEI Master (AT&T)",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": [
+      "DA IR",
+      "DA MR"
+    ],
+    "device_channels": [
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "SUBMITTED",
+    "completion_criteria": [
+      "All docs, firmware & provisioning datasets submitted",
+      "\u201cReceived\u201d acknowledgments logged"
+    ],
+    "task_name": "Deliverable Reqs: Provisioning-IMEI Master (AT&T)"
+  },
+  {
+    "chapter": "1005.1",
+    "deliverable": "Deliverable Reqs: Provisioning-IMEI ESIM (COU)",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": [
+      "DA IR",
+      "DA MR"
+    ],
+    "device_channels": [
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "SUBMITTED",
+    "completion_criteria": [
+      "All docs, firmware & provisioning datasets submitted",
+      "\u201cReceived\u201d acknowledgments logged"
+    ],
+    "task_name": "Deliverable Reqs: Provisioning-IMEI ESIM (COU)"
   },
   {
     "chapter": "1007.1",
-    "deliverable": "Testing",
+    "deliverable": "Deliverable Reqs: Upload Lab UE Capability Test Results",
     "requirement_tag": "Subtask Chapter Master",
-    "issue_types": ["DA IR", "DA MR"],
-    "device_channels": ["CRICKET VITA"],
+    "issue_types": [
+      "DA IR",
+      "DA MR"
+    ],
+    "device_channels": [
+      "CRICKET VITA"
+    ],
     "device": "ALL DEV",
-    "stage": "DEVICE TESTING"
+    "stage": "DEVICE TESTING",
+    "completion_criteria": [
+      "All test cases executed and passed (or retested)",
+      "Full results uploaded to authority"
+    ],
+    "task_name": "Deliverable Reqs: Upload Lab UE Capability Test Results"
   },
   {
-    "chapter": "1007.2",
-    "deliverable": "PreAuth-Testing",
-    "requirement_tag": "PTN-10806 Update Validation",
-    "issue_types": ["DA IR", "E DA MR", "NDAP IR"],
-    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
+    "chapter": "1007.1",
+    "deliverable": "Deliverable Reqs: Certs",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": [
+      "DA IR",
+      "DA MR"
+    ],
+    "device_channels": [
+      "CRICKET VITA"
+    ],
     "device": "ALL DEV",
-    "stage": "TA COMPLETE"
+    "stage": "DEVICE TESTING",
+    "completion_criteria": [
+      "All test cases executed and passed (or retested)",
+      "Full results uploaded to authority"
+    ],
+    "task_name": "Deliverable Reqs: Certs"
+  },
+  {
+    "chapter": "1007.1",
+    "deliverable": "Deliverable Reqs: Certs-VoLTE & WiFi Audio",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": [
+      "DA IR",
+      "DA MR"
+    ],
+    "device_channels": [
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "DEVICE TESTING",
+    "completion_criteria": [
+      "All test cases executed and passed (or retested)",
+      "Full results uploaded to authority"
+    ],
+    "task_name": "Deliverable Reqs: Certs-VoLTE & WiFi Audio"
+  },
+  {
+    "chapter": "1007.1",
+    "deliverable": "Deliverable Reqs: Certs-FirstNet",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": [
+      "DA IR",
+      "DA MR"
+    ],
+    "device_channels": [
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "DEVICE TESTING",
+    "completion_criteria": [
+      "All test cases executed and passed (or retested)",
+      "Full results uploaded to authority"
+    ],
+    "task_name": "Deliverable Reqs: Certs-FirstNet"
+  },
+  {
+    "chapter": "1007.1",
+    "deliverable": "Deliverable Reqs: Certs-Noise & Speech",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": [
+      "DA IR",
+      "DA MR"
+    ],
+    "device_channels": [
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "DEVICE TESTING",
+    "completion_criteria": [
+      "All test cases executed and passed (or retested)",
+      "Full results uploaded to authority"
+    ],
+    "task_name": "Deliverable Reqs: Certs-Noise & Speech"
+  },
+  {
+    "chapter": "1007.1",
+    "deliverable": "Deliverable Reqs: FOTA-19612",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": [
+      "DA IR",
+      "DA MR"
+    ],
+    "device_channels": [
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "DEVICE TESTING",
+    "completion_criteria": [
+      "All test cases executed and passed (or retested)",
+      "Full results uploaded to authority"
+    ],
+    "task_name": "Deliverable Reqs: FOTA-19612"
+  },
+  {
+    "chapter": "1007.1",
+    "deliverable": "Deliverable Reqs: Certs-Battery",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": [
+      "DA IR",
+      "DA MR"
+    ],
+    "device_channels": [
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "DEVICE TESTING",
+    "completion_criteria": [
+      "All test cases executed and passed (or retested)",
+      "Full results uploaded to authority"
+    ],
+    "task_name": "Deliverable Reqs: Certs-Battery"
+  },
+  {
+    "chapter": "1007.1",
+    "deliverable": "Deliverable Rene Testion Confirmation-IODT & IOT",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": [
+      "DA IR",
+      "DA MR"
+    ],
+    "device_channels": [
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "DEVICE TESTING",
+    "completion_criteria": [
+      "All test cases executed and passed (or retested)",
+      "Full results uploaded to authority"
+    ],
+    "task_name": "Deliverable Rene Testion Confirmation-IODT & IOT"
   },
   {
     "chapter": "1008.0",
-    "deliverable": "SYSTEM MAINTAIN",
+    "deliverable": "Deliverable Reqs: Testing Confirmation \u2013 AQT",
     "requirement_tag": "ALL CHAPTERS",
-    "issue_types": ["DA IR", "DA MR", "E DA MR"],
-    "device_channels": ["CRICKET IETA"],
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA"
+    ],
     "device": "ALL DEV",
-    "stage": "SUBMITTED"
+    "stage": "SUBMITTED",
+    "completion_criteria": [
+      "All docs, firmware & provisioning datasets submitted",
+      "\u201cReceived\u201d acknowledgments logged"
+    ],
+    "task_name": "Deliverable Reqs: Testing Confirmation \u2013 AQT"
+  },
+  {
+    "chapter": "1008.0",
+    "deliverable": "Deliverable Reqs: Provisioning \u2013 ACS",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA"
+    ],
+    "device": "ALL DEV",
+    "stage": "SUBMITTED",
+    "completion_criteria": [
+      "All docs, firmware & provisioning datasets submitted",
+      "\u201cReceived\u201d acknowledgments logged"
+    ],
+    "task_name": "Deliverable Reqs: Provisioning \u2013 ACS"
+  },
+  {
+    "chapter": "1008.0",
+    "deliverable": "Deliverable Reqs: Provisioning \u2013 IMEI",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA"
+    ],
+    "device": "ALL DEV",
+    "stage": "SUBMITTED",
+    "completion_criteria": [
+      "All docs, firmware & provisioning datasets submitted",
+      "\u201cReceived\u201d acknowledgments logged"
+    ],
+    "task_name": "Deliverable Reqs: Provisioning \u2013 IMEI"
+  },
+  {
+    "chapter": "1008.0",
+    "deliverable": "Deliverable Reqs: DE \u2013 Device Firmware",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA"
+    ],
+    "device": "ALL DEV",
+    "stage": "SUBMITTED",
+    "completion_criteria": [
+      "All docs, firmware & provisioning datasets submitted",
+      "\u201cReceived\u201d acknowledgments logged"
+    ],
+    "task_name": "Deliverable Reqs: DE \u2013 Device Firmware"
+  },
+  {
+    "chapter": "1008.0",
+    "deliverable": "Deliverable Reqs: Provisioning-IMEI Central (Cricket)",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA"
+    ],
+    "device": "ALL DEV",
+    "stage": "SUBMITTED",
+    "completion_criteria": [
+      "All docs, firmware & provisioning datasets submitted",
+      "\u201cReceived\u201d acknowledgments logged"
+    ],
+    "task_name": "Deliverable Reqs: Provisioning-IMEI Central (Cricket)"
+  },
+  {
+    "chapter": "1008.0",
+    "deliverable": "Deliverable Reqs: Provisioning-IMEI Master (AT&T)",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA"
+    ],
+    "device": "ALL DEV",
+    "stage": "SUBMITTED",
+    "completion_criteria": [
+      "All docs, firmware & provisioning datasets submitted",
+      "\u201cReceived\u201d acknowledgments logged"
+    ],
+    "task_name": "Deliverable Reqs: Provisioning-IMEI Master (AT&T)"
+  },
+  {
+    "chapter": "1008.0",
+    "deliverable": "Deliverable Reqs: Provisioning-IMEI ESIM (COU)",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA"
+    ],
+    "device": "ALL DEV",
+    "stage": "SUBMITTED",
+    "completion_criteria": [
+      "All docs, firmware & provisioning datasets submitted",
+      "\u201cReceived\u201d acknowledgments logged"
+    ],
+    "task_name": "Deliverable Reqs: Provisioning-IMEI ESIM (COU)"
   },
   {
     "chapter": "1008.1",
-    "deliverable": "PreAuth",
+    "deliverable": "Compliance Reqs Chapter Reviews",
     "requirement_tag": "Subtask Chapter Master",
-    "issue_types": ["DA IR", "DA MR"],
-    "device_channels": ["CRICKET VITA"],
+    "issue_types": [
+      "DA IR",
+      "DA MR"
+    ],
+    "device_channels": [
+      "CRICKET VITA"
+    ],
     "device": "ALL DEV",
-    "stage": "FORECAST"
+    "stage": "FORECAST",
+    "completion_criteria": [
+      "High-level requirements catalogued",
+      "Chapter owners assigned"
+    ],
+    "task_name": "Compliance Reqs Chapter Reviews"
+  },
+  {
+    "chapter": "1008.1",
+    "deliverable": "Deliverable Reqs: Chapter Reviews",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": [
+      "DA IR",
+      "DA MR"
+    ],
+    "device_channels": [
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "FORECAST",
+    "completion_criteria": [
+      "High-level requirements catalogued",
+      "Chapter owners assigned"
+    ],
+    "task_name": "Deliverable Reqs: Chapter Reviews"
   },
   {
     "chapter": "1008.2",
-    "deliverable": "PreAuth-Testing",
+    "deliverable": "Deliverable Reqs: Samples \u2013 Marketing & Certification (delivery)",
     "requirement_tag": "PTN-10807 Maintenance Results",
-    "issue_types": ["DA IR", "E DA MR", "NDAP IR"],
-    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
+    "issue_types": [
+      "DA IR",
+      "E DA MR",
+      "NDAP IR"
+    ],
+    "device_channels": [
+      "CRICKET IETA",
+      "CRICKET VITA"
+    ],
     "device": "ALL DEV",
-    "stage": "DEVICE ENTRY"
+    "stage": "DEVICE ENTRY",
+    "completion_criteria": [
+      "Devices in lab & registered in LIMS",
+      "Devices labeled and ready for testing"
+    ],
+    "task_name": "Deliverable Reqs: Samples \u2013 Marketing & Certification (delivery)"
+  },
+  {
+    "chapter": "1008.2",
+    "deliverable": "Deliverable Reqs: Testing Confirmation \u2013 AQT (setup)",
+    "requirement_tag": "PTN-10807 Maintenance Results",
+    "issue_types": [
+      "DA IR",
+      "E DA MR",
+      "NDAP IR"
+    ],
+    "device_channels": [
+      "CRICKET IETA",
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "DEVICE ENTRY",
+    "completion_criteria": [
+      "Devices in lab & registered in LIMS",
+      "Devices labeled and ready for testing"
+    ],
+    "task_name": "Deliverable Reqs: Testing Confirmation \u2013 AQT (setup)"
   },
   {
     "chapter": "1009.0",
-    "deliverable": "SYSTEM OPTIMIZE",
+    "deliverable": "Deliverable Reqs: Attestation-RTT",
     "requirement_tag": "ALL CHAPTERS",
-    "issue_types": ["DA IR", "DA MR", "E DA MR"],
-    "device_channels": ["CRICKET IETA"],
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA"
+    ],
     "device": "ALL DEV",
-    "stage": "TAQ REVIEW"
+    "stage": "TAQ REVIEW",
+    "completion_criteria": [
+      "All attestations signed & submitted",
+      "No open technical comments"
+    ],
+    "task_name": "Deliverable Reqs: Attestation-RTT"
+  },
+  {
+    "chapter": "1009.0",
+    "deliverable": "Deliverable Reqs: Attestation-Logs",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA"
+    ],
+    "device": "ALL DEV",
+    "stage": "TAQ REVIEW",
+    "completion_criteria": [
+      "All attestations signed & submitted",
+      "No open technical comments"
+    ],
+    "task_name": "Deliverable Reqs: Attestation-Logs"
+  },
+  {
+    "chapter": "1009.0",
+    "deliverable": "Deliverable Reqs: Attestation-Test Results",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA"
+    ],
+    "device": "ALL DEV",
+    "stage": "TAQ REVIEW",
+    "completion_criteria": [
+      "All attestations signed & submitted",
+      "No open technical comments"
+    ],
+    "task_name": "Deliverable Reqs: Attestation-Test Results"
   },
   {
     "chapter": "1009.1",
-    "deliverable": "Testing",
+    "deliverable": "Deliverable Reqs: PreAuth",
     "requirement_tag": "Subtask Chapter Master",
-    "issue_types": ["DA IR", "DA MR"],
-    "device_channels": ["CRICKET VITA"],
+    "issue_types": [
+      "DA IR",
+      "DA MR"
+    ],
+    "device_channels": [
+      "CRICKET VITA"
+    ],
     "device": "ALL DEV",
-    "stage": "PLANNING"
+    "stage": "PLANNING",
+    "completion_criteria": [
+      "Detailed certification plan approved",
+      "Deliverables & dates locked in"
+    ],
+    "task_name": "Deliverable Reqs: PreAuth"
   },
   {
-    "chapter": "1009.2",
-    "deliverable": "PreAuth-Testing",
-    "requirement_tag": "PTN-10808 Optimization Results",
-    "issue_types": ["DA IR", "E DA MR", "NDAP IR"],
-    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
+    "chapter": "1009.1",
+    "deliverable": "Deliverable Reqs: Samples \u2013 Marketing & Certification",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": [
+      "DA IR",
+      "DA MR"
+    ],
+    "device_channels": [
+      "CRICKET VITA"
+    ],
     "device": "ALL DEV",
-    "stage": "SUBMISSION REVIEW"
+    "stage": "PLANNING",
+    "completion_criteria": [
+      "Detailed certification plan approved",
+      "Deliverables & dates locked in"
+    ],
+    "task_name": "Deliverable Reqs: Samples \u2013 Marketing & Certification"
+  },
+  {
+    "chapter": "1009.1",
+    "deliverable": "Deliverable Reqs: PTCRB",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": [
+      "DA IR",
+      "DA MR"
+    ],
+    "device_channels": [
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "PLANNING",
+    "completion_criteria": [
+      "Detailed certification plan approved",
+      "Deliverables & dates locked in"
+    ],
+    "task_name": "Deliverable Reqs: PTCRB"
+  },
+  {
+    "chapter": "1009.1",
+    "deliverable": "Deliverable Reqs: Certs \u2013 Release Notes",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": [
+      "DA IR",
+      "DA MR"
+    ],
+    "device_channels": [
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "PLANNING",
+    "completion_criteria": [
+      "Detailed certification plan approved",
+      "Deliverables & dates locked in"
+    ],
+    "task_name": "Deliverable Reqs: Certs \u2013 Release Notes"
+  },
+  {
+    "chapter": "1009.1",
+    "deliverable": "Deliverable Reqs: FOTA-16038",
+    "requirement_tag": "Subtask Chapter Master",
+    "issue_types": [
+      "DA IR",
+      "DA MR"
+    ],
+    "device_channels": [
+      "CRICKET VITA"
+    ],
+    "device": "ALL DEV",
+    "stage": "PLANNING",
+    "completion_criteria": [
+      "Detailed certification plan approved",
+      "Deliverables & dates locked in"
+    ],
+    "task_name": "Deliverable Reqs: FOTA-16038"
   },
   {
     "chapter": "1010.0",
-    "deliverable": "SYSTEM REVIEW",
+    "deliverable": "Deliverable Reqs: Upload Lab UE Capability Test Results",
     "requirement_tag": "ALL CHAPTERS",
-    "issue_types": ["DA IR", "DA MR", "E DA MR"],
-    "device_channels": ["CRICKET IETA"],
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA"
+    ],
     "device": "ALL DEV",
-    "stage": "DEVICE TESTING"
+    "stage": "DEVICE TESTING",
+    "completion_criteria": [
+      "All test cases executed and passed (or retested)",
+      "Full results uploaded to authority"
+    ],
+    "task_name": "Deliverable Reqs: Upload Lab UE Capability Test Results"
   },
   {
-    "chapter": "1010.1",
-    "deliverable": "PreAuth",
-    "requirement_tag": "Subtask Chapter Master",
-    "issue_types": ["DA IR", "DA MR"],
-    "device_channels": ["CRICKET VITA"],
-    "device": "ALL DEV",
-    "stage": "TA COMPLETE"
-  },
-  {
-    "chapter": "1010.2",
-    "deliverable": "PreAuth-Testing",
-    "requirement_tag": "PTN-10809 Review Results",
-    "issue_types": ["DA IR", "E DA MR", "NDAP IR"],
-    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
-    "device": "ALL DEV",
-    "stage": "SUBMITTED"
-  },
-  {
-    "chapter": "1011.0",
-    "deliverable": "SYSTEM CLOSE",
+    "chapter": "1010.0",
+    "deliverable": "Deliverable Reqs: Certs",
     "requirement_tag": "ALL CHAPTERS",
-    "issue_types": ["DA IR", "DA MR", "E DA MR"],
-    "device_channels": ["CRICKET IETA"],
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA"
+    ],
     "device": "ALL DEV",
-    "stage": "FORECAST"
+    "stage": "DEVICE TESTING",
+    "completion_criteria": [
+      "All test cases executed and passed (or retested)",
+      "Full results uploaded to authority"
+    ],
+    "task_name": "Deliverable Reqs: Certs"
   },
   {
-    "chapter": "1011.1",
-    "deliverable": "Testing",
-    "requirement_tag": "Subtask Chapter Master",
-    "issue_types": ["DA IR", "DA MR"],
-    "device_channels": ["CRICKET VITA"],
-    "device": "ALL DEV",
-    "stage": "DEVICE ENTRY"
-  },
-  {
-    "chapter": "1011.2",
-    "deliverable": "PreAuth-Testing",
-    "requirement_tag": "PTN-10810 Closure Results",
-    "issue_types": ["DA IR", "E DA MR", "NDAP IR"],
-    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
-    "device": "ALL DEV",
-    "stage": "TAQ REVIEW"
-  },
-  {
-    "chapter": "1012.0",
-    "deliverable": "SYSTEM ARCHIVE",
+    "chapter": "1010.0",
+    "deliverable": "Deliverable Reqs: Certs-VoLTE & WiFi Audio",
     "requirement_tag": "ALL CHAPTERS",
-    "issue_types": ["DA IR", "DA MR", "E DA MR"],
-    "device_channels": ["CRICKET IETA"],
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA"
+    ],
     "device": "ALL DEV",
-    "stage": "PLANNING"
+    "stage": "DEVICE TESTING",
+    "completion_criteria": [
+      "All test cases executed and passed (or retested)",
+      "Full results uploaded to authority"
+    ],
+    "task_name": "Deliverable Reqs: Certs-VoLTE & WiFi Audio"
   },
   {
-    "chapter": "1012.1",
-    "deliverable": "PreAuth",
-    "requirement_tag": "Subtask Chapter Master",
-    "issue_types": ["DA IR", "DA MR"],
-    "device_channels": ["CRICKET VITA"],
-    "device": "ALL DEV",
-    "stage": "SUBMISSION REVIEW"
-  },
-  {
-    "chapter": "1012.2",
-    "deliverable": "PreAuth-Testing",
-    "requirement_tag": "PTN-10811 Archive Results",
-    "issue_types": ["DA IR", "E DA MR", "NDAP IR"],
-    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
-    "device": "ALL DEV",
-    "stage": "DEVICE TESTING"
-  },
-  {
-    "chapter": "1013.0",
-    "deliverable": "SYSTEM AUDIT",
+    "chapter": "1010.0",
+    "deliverable": "Deliverable Reqs: Certs-FirstNet",
     "requirement_tag": "ALL CHAPTERS",
-    "issue_types": ["DA IR", "DA MR", "E DA MR"],
-    "device_channels": ["CRICKET IETA"],
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA"
+    ],
     "device": "ALL DEV",
-    "stage": "TA COMPLETE"
+    "stage": "DEVICE TESTING",
+    "completion_criteria": [
+      "All test cases executed and passed (or retested)",
+      "Full results uploaded to authority"
+    ],
+    "task_name": "Deliverable Reqs: Certs-FirstNet"
   },
   {
-    "chapter": "1013.1",
-    "deliverable": "Testing",
-    "requirement_tag": "Subtask Chapter Master",
-    "issue_types": ["DA IR", "DA MR"],
-    "device_channels": ["CRICKET VITA"],
-    "device": "ALL DEV",
-    "stage": "SUBMITTED"
-  },
-  {
-    "chapter": "1013.2",
-    "deliverable": "PreAuth-Testing",
-    "requirement_tag": "PTN-10812 Audit Results",
-    "issue_types": ["DA IR", "E DA MR", "NDAP IR"],
-    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
-    "device": "ALL DEV",
-    "stage": "FORECAST"
-  },
-  {
-    "chapter": "1014.0",
-    "deliverable": "SYSTEM REPORT",
+    "chapter": "1010.0",
+    "deliverable": "Deliverable Reqs: Certs-Noise & Speech",
     "requirement_tag": "ALL CHAPTERS",
-    "issue_types": ["DA IR", "DA MR", "E DA MR"],
-    "device_channels": ["CRICKET IETA"],
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA"
+    ],
     "device": "ALL DEV",
-    "stage": "DEVICE ENTRY"
+    "stage": "DEVICE TESTING",
+    "completion_criteria": [
+      "All test cases executed and passed (or retested)",
+      "Full results uploaded to authority"
+    ],
+    "task_name": "Deliverable Reqs: Certs-Noise & Speech"
   },
   {
-    "chapter": "1014.1",
-    "deliverable": "PreAuth",
-    "requirement_tag": "Subtask Chapter Master",
-    "issue_types": ["DA IR", "DA MR"],
-    "device_channels": ["CRICKET VITA"],
-    "device": "ALL DEV",
-    "stage": "TAQ REVIEW"
-  },
-  {
-    "chapter": "1014.2",
-    "deliverable": "PreAuth-Testing",
-    "requirement_tag": "PTN-10813 Report Results",
-    "issue_types": ["DA IR", "E DA MR", "NDAP IR"],
-    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
-    "device": "ALL DEV",
-    "stage": "PLANNING"
-  },
-  {
-    "chapter": "1015.0",
-    "deliverable": "SYSTEM FEEDBACK",
+    "chapter": "1010.0",
+    "deliverable": "Deliverable Reqs: FOTA-19612",
     "requirement_tag": "ALL CHAPTERS",
-    "issue_types": ["DA IR", "DA MR", "E DA MR"],
-    "device_channels": ["CRICKET IETA"],
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA"
+    ],
     "device": "ALL DEV",
-    "stage": "SUBMISSION REVIEW"
+    "stage": "DEVICE TESTING",
+    "completion_criteria": [
+      "All test cases executed and passed (or retested)",
+      "Full results uploaded to authority"
+    ],
+    "task_name": "Deliverable Reqs: FOTA-19612"
   },
   {
-    "chapter": "1015.1",
-    "deliverable": "Testing",
-    "requirement_tag": "Subtask Chapter Master",
-    "issue_types": ["DA IR", "DA MR"],
-    "device_channels": ["CRICKET VITA"],
+    "chapter": "1010.0",
+    "deliverable": "Deliverable Reqs: Certs-Battery",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA"
+    ],
     "device": "ALL DEV",
-    "stage": "DEVICE TESTING"
+    "stage": "DEVICE TESTING",
+    "completion_criteria": [
+      "All test cases executed and passed (or retested)",
+      "Full results uploaded to authority"
+    ],
+    "task_name": "Deliverable Reqs: Certs-Battery"
   },
   {
-    "chapter": "1015.2",
-    "deliverable": "PreAuth-Testing",
-    "requirement_tag": "PTN-10814 Feedback Results",
-    "issue_types": ["DA IR", "E DA MR", "NDAP IR"],
-    "device_channels": ["CRICKET IETA", "CRICKET VITA"],
+    "chapter": "1010.0",
+    "deliverable": "Deliverable Rene Testion Confirmation-IODT & IOT",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "CRICKET IETA"
+    ],
     "device": "ALL DEV",
-    "stage": "TA COMPLETE"
+    "stage": "DEVICE TESTING",
+    "completion_criteria": [
+      "All test cases executed and passed (or retested)",
+      "Full results uploaded to authority"
+    ],
+    "task_name": "Deliverable Rene Testion Confirmation-IODT & IOT"
   },
   {
     "chapter": "1016.0",
-    "deliverable": "SYSTEM INTEGRATION",
+    "deliverable": "Compliance Reqs Chapter Reviews",
     "requirement_tag": "ALL CHAPTERS",
-    "issue_types": ["DA IR", "DA MR", "E DA MR"],
-    "device_channels": ["Stock", "CRICKET IETA"],
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "Stock",
+      "CRICKET IETA"
+    ],
     "device": "ALL DEV",
-    "stage": "FORECAST"
+    "stage": "FORECAST",
+    "completion_criteria": [
+      "High-level requirements catalogued",
+      "Chapter owners assigned"
+    ],
+    "task_name": "Compliance Reqs Chapter Reviews"
   },
   {
-    "chapter": "1016.1",
-    "deliverable": "PreAuth",
-    "requirement_tag": "Subtask Chapter Master",
-    "issue_types": ["DA IR", "DA MR"],
-    "device_channels": ["Stock", "CRICKET IETA"],
+    "chapter": "1016.0",
+    "deliverable": "Deliverable Reqs: Chapter Reviews",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "Stock",
+      "CRICKET IETA"
+    ],
     "device": "ALL DEV",
-    "stage": "FORECAST"
-  },
-  {
-    "chapter": "1016.2",
-    "deliverable": "PreAuth-Testing",
-    "requirement_tag": "PTN-10815 Integration Results",
-    "issue_types": ["DA IR", "E DA MR", "NDAP IR"],
-    "device_channels": ["Stock", "CRICKET IETA"],
-    "device": "ALL DEV",
-    "stage": "FORECAST"
-  },
-  {
-    "chapter": "1016.3",
-    "deliverable": "Testing",
-    "requirement_tag": "Integration Validation",
-    "issue_types": ["DA IR", "DA MR"],
-    "device_channels": ["Stock", "CRICKET IETA"],
-    "device": "ALL DEV",
-    "stage": "FORECAST"
+    "stage": "FORECAST",
+    "completion_criteria": [
+      "High-level requirements catalogued",
+      "Chapter owners assigned"
+    ],
+    "task_name": "Deliverable Reqs: Chapter Reviews"
   },
   {
     "chapter": "1017.0",
-    "deliverable": "SYSTEM VERIFICATION",
+    "deliverable": "Deliverable Reqs: Upload Lab UE Capability Test Results",
     "requirement_tag": "ALL CHAPTERS",
-    "issue_types": ["DA IR", "DA MR", "E DA MR"],
-    "device_channels": ["Stock", "CRICKET IETA"],
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "Stock",
+      "CRICKET IETA"
+    ],
     "device": "ALL DEV",
-    "stage": "DEVICE TESTING"
+    "stage": "DEVICE TESTING",
+    "completion_criteria": [
+      "All test cases executed and passed (or retested)",
+      "Full results uploaded to authority"
+    ],
+    "task_name": "Deliverable Reqs: Upload Lab UE Capability Test Results"
   },
   {
-    "chapter": "1017.1",
-    "deliverable": "PreAuth",
-    "requirement_tag": "Subtask Chapter Master",
-    "issue_types": ["DA IR", "DA MR"],
-    "device_channels": ["Stock", "CRICKET IETA"],
+    "chapter": "1017.0",
+    "deliverable": "Deliverable Reqs: Certs",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "Stock",
+      "CRICKET IETA"
+    ],
     "device": "ALL DEV",
-    "stage": "DEVICE TESTING"
+    "stage": "DEVICE TESTING",
+    "completion_criteria": [
+      "All test cases executed and passed (or retested)",
+      "Full results uploaded to authority"
+    ],
+    "task_name": "Deliverable Reqs: Certs"
   },
   {
-    "chapter": "1017.2",
-    "deliverable": "PreAuth-Testing",
-    "requirement_tag": "PTN-10816 Verification Results",
-    "issue_types": ["DA IR", "E DA MR", "NDAP IR"],
-    "device_channels": ["Stock", "CRICKET IETA"],
+    "chapter": "1017.0",
+    "deliverable": "Deliverable Reqs: Certs-VoLTE & WiFi Audio",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "Stock",
+      "CRICKET IETA"
+    ],
     "device": "ALL DEV",
-    "stage": "DEVICE TESTING"
+    "stage": "DEVICE TESTING",
+    "completion_criteria": [
+      "All test cases executed and passed (or retested)",
+      "Full results uploaded to authority"
+    ],
+    "task_name": "Deliverable Reqs: Certs-VoLTE & WiFi Audio"
   },
   {
-    "chapter": "1017.3",
-    "deliverable": "Testing",
-    "requirement_tag": "Verification Validation",
-    "issue_types": ["DA IR", "DA MR"],
-    "device_channels": ["Stock", "CRICKET IETA"],
+    "chapter": "1017.0",
+    "deliverable": "Deliverable Reqs: Certs-FirstNet",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "Stock",
+      "CRICKET IETA"
+    ],
     "device": "ALL DEV",
-    "stage": "DEVICE TESTING"
+    "stage": "DEVICE TESTING",
+    "completion_criteria": [
+      "All test cases executed and passed (or retested)",
+      "Full results uploaded to authority"
+    ],
+    "task_name": "Deliverable Reqs: Certs-FirstNet"
+  },
+  {
+    "chapter": "1017.0",
+    "deliverable": "Deliverable Reqs: Certs-Noise & Speech",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "Stock",
+      "CRICKET IETA"
+    ],
+    "device": "ALL DEV",
+    "stage": "DEVICE TESTING",
+    "completion_criteria": [
+      "All test cases executed and passed (or retested)",
+      "Full results uploaded to authority"
+    ],
+    "task_name": "Deliverable Reqs: Certs-Noise & Speech"
+  },
+  {
+    "chapter": "1017.0",
+    "deliverable": "Deliverable Reqs: FOTA-19612",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "Stock",
+      "CRICKET IETA"
+    ],
+    "device": "ALL DEV",
+    "stage": "DEVICE TESTING",
+    "completion_criteria": [
+      "All test cases executed and passed (or retested)",
+      "Full results uploaded to authority"
+    ],
+    "task_name": "Deliverable Reqs: FOTA-19612"
+  },
+  {
+    "chapter": "1017.0",
+    "deliverable": "Deliverable Reqs: Certs-Battery",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "Stock",
+      "CRICKET IETA"
+    ],
+    "device": "ALL DEV",
+    "stage": "DEVICE TESTING",
+    "completion_criteria": [
+      "All test cases executed and passed (or retested)",
+      "Full results uploaded to authority"
+    ],
+    "task_name": "Deliverable Reqs: Certs-Battery"
+  },
+  {
+    "chapter": "1017.0",
+    "deliverable": "Deliverable Rene Testion Confirmation-IODT & IOT",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "Stock",
+      "CRICKET IETA"
+    ],
+    "device": "ALL DEV",
+    "stage": "DEVICE TESTING",
+    "completion_criteria": [
+      "All test cases executed and passed (or retested)",
+      "Full results uploaded to authority"
+    ],
+    "task_name": "Deliverable Rene Testion Confirmation-IODT & IOT"
   },
   {
     "chapter": "1018.0",
-    "deliverable": "SYSTEM CERTIFICATION",
+    "deliverable": "Bundle approved reports, release notes & attestations",
     "requirement_tag": "ALL CHAPTERS",
-    "issue_types": ["DA IR", "DA MR", "E DA MR"],
-    "device_channels": ["Stock", "CRICKET IETA"],
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "Stock",
+      "CRICKET IETA"
+    ],
     "device": "ALL DEV",
-    "stage": "TA COMPLETE"
+    "stage": "TA COMPLETE",
+    "completion_criteria": [
+      "Certification package uploaded as \u201cready for issuance\u201d"
+    ],
+    "task_name": "Bundle approved reports, release notes & attestations"
   },
   {
-    "chapter": "1018.1",
-    "deliverable": "PreAuth",
-    "requirement_tag": "Subtask Chapter Master",
-    "issue_types": ["DA IR", "DA MR"],
-    "device_channels": ["Stock", "CRICKET IETA"],
+    "chapter": "1018.0",
+    "deliverable": "Prepare \u201cCertification Package\u201d for final upload",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "Stock",
+      "CRICKET IETA"
+    ],
     "device": "ALL DEV",
-    "stage": "TA COMPLETE"
+    "stage": "TA COMPLETE",
+    "completion_criteria": [
+      "Certification package uploaded as \u201cready for issuance\u201d"
+    ],
+    "task_name": "Prepare \u201cCertification Package\u201d for final upload"
   },
   {
-    "chapter": "1018.2",
-    "deliverable": "PreAuth-Testing",
-    "requirement_tag": "PTN-10817 Certification Results",
-    "issue_types": ["DA IR", "E DA MR", "NDAP IR"],
-    "device_channels": ["Stock", "CRICKET IETA"],
+    "chapter": "1018.0",
+    "deliverable": "Collect internal approval signatures",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "Stock",
+      "CRICKET IETA"
+    ],
     "device": "ALL DEV",
-    "stage": "TA COMPLETE"
-  },
-  {
-    "chapter": "1018.3",
-    "deliverable": "Testing",
-    "requirement_tag": "Certification Validation",
-    "issue_types": ["DA IR", "DA MR"],
-    "device_channels": ["Stock", "CRICKET IETA"],
-    "device": "ALL DEV",
-    "stage": "TA COMPLETE"
+    "stage": "TA COMPLETE",
+    "completion_criteria": [
+      "Certification package uploaded as \u201cready for issuance\u201d"
+    ],
+    "task_name": "Collect internal approval signatures"
   },
   {
     "chapter": "1019.0",
-    "deliverable": "SYSTEM SUBMISSION",
+    "deliverable": "Deliverable Reqs: Testing Confirmation \u2013 AQT",
     "requirement_tag": "ALL CHAPTERS",
-    "issue_types": ["DA IR", "DA MR", "E DA MR"],
-    "device_channels": ["Stock", "CRICKET IETA"],
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "Stock",
+      "CRICKET IETA"
+    ],
     "device": "ALL DEV",
-    "stage": "SUBMITTED"
+    "stage": "SUBMITTED",
+    "completion_criteria": [
+      "All docs, firmware & provisioning datasets submitted",
+      "\u201cReceived\u201d acknowledgments logged"
+    ],
+    "task_name": "Deliverable Reqs: Testing Confirmation \u2013 AQT"
   },
   {
-    "chapter": "1019.1",
-    "deliverable": "PreAuth",
-    "requirement_tag": "Subtask Chapter Master",
-    "issue_types": ["DA IR", "DA MR"],
-    "device_channels": ["Stock", "CRICKET IETA"],
+    "chapter": "1019.0",
+    "deliverable": "Deliverable Reqs: Provisioning \u2013 ACS",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "Stock",
+      "CRICKET IETA"
+    ],
     "device": "ALL DEV",
-    "stage": "SUBMITTED"
+    "stage": "SUBMITTED",
+    "completion_criteria": [
+      "All docs, firmware & provisioning datasets submitted",
+      "\u201cReceived\u201d acknowledgments logged"
+    ],
+    "task_name": "Deliverable Reqs: Provisioning \u2013 ACS"
   },
   {
-    "chapter": "1019.2",
-    "deliverable": "PreAuth-Testing",
-    "requirement_tag": "PTN-10818 Submission Results",
-    "issue_types": ["DA IR", "E DA MR", "NDAP IR"],
-    "device_channels": ["Stock", "CRICKET IETA"],
+    "chapter": "1019.0",
+    "deliverable": "Deliverable Reqs: Provisioning \u2013 IMEI",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "Stock",
+      "CRICKET IETA"
+    ],
     "device": "ALL DEV",
-    "stage": "SUBMITTED"
+    "stage": "SUBMITTED",
+    "completion_criteria": [
+      "All docs, firmware & provisioning datasets submitted",
+      "\u201cReceived\u201d acknowledgments logged"
+    ],
+    "task_name": "Deliverable Reqs: Provisioning \u2013 IMEI"
   },
   {
-    "chapter": "1019.3",
-    "deliverable": "Testing",
-    "requirement_tag": "Submission Validation",
-    "issue_types": ["DA IR", "DA MR"],
-    "device_channels": ["Stock", "CRICKET IETA"],
+    "chapter": "1019.0",
+    "deliverable": "Deliverable Reqs: DE \u2013 Device Firmware",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "Stock",
+      "CRICKET IETA"
+    ],
     "device": "ALL DEV",
-    "stage": "SUBMITTED"
+    "stage": "SUBMITTED",
+    "completion_criteria": [
+      "All docs, firmware & provisioning datasets submitted",
+      "\u201cReceived\u201d acknowledgments logged"
+    ],
+    "task_name": "Deliverable Reqs: DE \u2013 Device Firmware"
+  },
+  {
+    "chapter": "1019.0",
+    "deliverable": "Deliverable Reqs: Provisioning-IMEI Central (Cricket)",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "Stock",
+      "CRICKET IETA"
+    ],
+    "device": "ALL DEV",
+    "stage": "SUBMITTED",
+    "completion_criteria": [
+      "All docs, firmware & provisioning datasets submitted",
+      "\u201cReceived\u201d acknowledgments logged"
+    ],
+    "task_name": "Deliverable Reqs: Provisioning-IMEI Central (Cricket)"
+  },
+  {
+    "chapter": "1019.0",
+    "deliverable": "Deliverable Reqs: Provisioning-IMEI Master (AT&T)",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "Stock",
+      "CRICKET IETA"
+    ],
+    "device": "ALL DEV",
+    "stage": "SUBMITTED",
+    "completion_criteria": [
+      "All docs, firmware & provisioning datasets submitted",
+      "\u201cReceived\u201d acknowledgments logged"
+    ],
+    "task_name": "Deliverable Reqs: Provisioning-IMEI Master (AT&T)"
+  },
+  {
+    "chapter": "1019.0",
+    "deliverable": "Deliverable Reqs: Provisioning-IMEI ESIM (COU)",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+      "Stock",
+      "CRICKET IETA"
+    ],
+    "device": "ALL DEV",
+    "stage": "SUBMITTED",
+    "completion_criteria": [
+      "All docs, firmware & provisioning datasets submitted",
+      "\u201cReceived\u201d acknowledgments logged"
+    ],
+    "task_name": "Deliverable Reqs: Provisioning-IMEI ESIM (COU)"
   }
 ]

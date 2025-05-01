@@ -1,0 +1,155 @@
+1. FORECAST
+
+Tasks
+
+    Compliance Reqs Chapter Reviews
+
+    Deliverable Reqs: Chapter Reviews
+
+Completion Criteria
+
+    High-level requirements catalogued
+
+    Chapter owners assigned
+
+2. PLANNING
+
+Tasks
+
+    Deliverable Reqs: PreAuth
+
+    Deliverable Reqs: Samples – Marketing & Certification
+
+    Deliverable Reqs: PTCRB
+
+    Deliverable Reqs: Certs – Release Notes
+
+    Deliverable Reqs: FOTA-16038
+
+Completion Criteria
+
+    Detailed certification plan approved
+
+    Deliverables & dates locked in
+
+3. SUBMITTED
+
+Tasks
+
+    Deliverable Reqs: Testing Confirmation – AQT
+
+    Deliverable Reqs: Provisioning – ACS
+
+    Deliverable Reqs: Provisioning – IMEI
+
+    Deliverable Reqs: DE – Device Firmware
+
+    Deliverable Reqs: Provisioning-IMEI Central (Cricket)
+
+    Deliverable Reqs: Provisioning-IMEI Master (AT&T)
+
+    Deliverable Reqs: Provisioning-IMEI ESIM (COU)
+
+Completion Criteria
+
+    All docs, firmware & provisioning datasets submitted
+
+    “Received” acknowledgments logged
+
+4. SUBMISSION REVIEW
+
+Tasks
+
+    TA Approvals Reqs: FFI
+
+    Deliverable Reqs: Attestation
+
+Completion Criteria
+
+    All RFIs closed
+
+    Submission package formally accepted
+
+5. DEVICE ENTRY
+
+Tasks
+
+    Deliverable Reqs: Samples – Marketing & Certification (delivery)
+
+    Deliverable Reqs: Testing Confirmation – AQT (setup)
+
+Completion Criteria
+
+    Devices in lab & registered in LIMS
+
+    Devices labeled and ready for testing
+
+6. DEVICE TESTING
+
+Tasks
+
+    Deliverable Reqs: Upload Lab UE Capability Test Results
+
+    Deliverable Reqs: Certs
+
+    Deliverable Reqs: Certs-VoLTE & WiFi Audio
+
+    Deliverable Reqs: Certs-FirstNet
+
+    Deliverable Reqs: Certs-Noise & Speech
+
+    Deliverable Reqs: FOTA-19612
+
+    Deliverable Reqs: Certs-Battery
+
+    Deliverable Rene Testion Confirmation-IODT & IOT
+
+Completion Criteria
+
+    All test cases executed and passed (or retested)
+
+    Full results uploaded to authority
+
+7. TAQ REVIEW
+
+Tasks
+
+    Deliverable Reqs: Attestation-RTT
+
+    Deliverable Reqs: Attestation-Logs
+
+    Deliverable Reqs: Attestation-Test Results
+
+Completion Criteria
+
+    All attestations signed & submitted
+
+    No open technical comments
+
+8. TA COMPLETE
+
+Tasks
+
+    Bundle approved reports, release notes & attestations
+
+    Prepare “Certification Package” for final upload
+
+    Collect internal approval signatures
+
+Completion Criteria
+
+    Certification package uploaded as “ready for issuance”
+
+9. CLOSED
+
+Tasks
+
+    Archive all deliverables and lab reports
+
+    Conduct post-mortem / lessons-learned session
+
+Completion Criteria
+
+    Certification closed in tracking system
+
+    Archive and retrospective completed

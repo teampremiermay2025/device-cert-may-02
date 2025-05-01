@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import usersData from '../data/users.json';
 
-const users = JSON.parse(localStorage.getItem('users') || '[]');
+const users = usersData.users;
 
 export const LoginPage = () => {
   const [email, setEmail] = useState('');

@@ -6,9 +6,10 @@ import {
   AdjustmentsHorizontalIcon,
   ShieldCheckIcon
 } from '@heroicons/react/24/outline';
+import usersData from '../data/users.json';
 
-const users = JSON.parse(localStorage.getItem('users') || '[]');
-const roles = JSON.parse(localStorage.getItem('roles') || '{}');
+const users = usersData.users;
+const roles = usersData.roles;
 
 export const TeamManagement = () => {
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
@@ -43,7 +44,7 @@ export const TeamManagement = () => {
       setAddUserError('Please fill in all fields.');
       return;
     }
-    const usersList = JSON.parse(localStorage.getItem('users') || '[]');
+    const usersList = usersData.users;
     if (usersList.some((u: any) => u.email === newUser.email)) {
       setAddUserError('A user with this email already exists.');
       return;
@@ -54,10 +55,11 @@ export const TeamManagement = () => {
       permissions: roles[newUser.role]?.permissions || {},
       avatar: newUser.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(newUser.name)}`,
     };
-    localStorage.setItem('users', JSON.stringify([...usersList, userToAdd]));
+    // In-memory only add (no localStorage)
+    // Optionally: Show a message that adding users will not persist after reload
     setShowAddUser(false);
     setNewUser({ name: '', email: '', role: '', avatar: '' });
-    window.location.reload(); // Quick way to refresh the user list
+    window.location.reload(); // Refresh the user list from JSON
   };
 
   return (
@@ -211,6 +213,7 @@ export const TeamManagement = () => {
               >
                 Add User
               </button>
+              <p className="text-sm text-gray-500">Note: Added users will not persist after page reload.</p>
             </form>
           </div>
         </div>
