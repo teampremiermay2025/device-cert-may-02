@@ -1,9 +1,11 @@
-import { useState, useMemo, useRef, useEffect } from 'react';
+import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { storage } from '../lib/storage';
 import {
   MagnifyingGlassIcon,
-  ChevronUpDownIcon,
 } from '@heroicons/react/24/outline';
+import { AgGridReact } from 'ag-grid-react';
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-alpine.css';
 
 // Define the Device type based on devices.json (using exact keys)
 interface Device {
@@ -28,18 +30,6 @@ interface Device {
   Type: string;
   [key: string]: any; // Allow additional attributes from CSV
 }
-
-// Define table columns based on the screenshot (using exact keys from devices.json)
-const COLUMNS = [
-  { key: 'Device Issue Key', label: 'Key', sortable: true },
-  { key: 'Summary', label: 'Summary', sortable: true },
-  { key: 'Status', label: 'Status', sortable: true },
-  { key: 'Comments', label: 'Comments', sortable: false },
-  { key: 'Assignee', label: 'Assignee', sortable: true },
-  { key: 'priority', label: 'Priority', sortable: true },
-  { key: 'Created Date', label: 'Created', sortable: true },
-  { key: 'actions', label: 'Actions', sortable: false },
-];
 
 // Utility function to parse "YYYY-MM-DD" as a local date
 const parseLocalDate = (dateString: string): Date | null => {
@@ -79,11 +69,89 @@ const parseCSVRow = (row: string): string[] => {
   return result;
 };
 
+// Custom cell renderer for the "Device Issue Key" column
+const DeviceIssueKeyCellRenderer = (props: any) => {
+  return (
+    <div 
+      className="text-blue-600 hover:text-blue-800 cursor-pointer font-medium"
+      onClick={(e) => {
+        e.stopPropagation();
+        alert('View Details functionality to be implemented');
+      }}
+    >
+      {props.value || '-'}
+    </div>
+  );
+};
+
+// Custom cell renderer for the "Status" column
+const StatusCellRenderer = (props: any) => {
+  const statusClass = getStatusColor(props.value);
+  return (
+    <span className={`px-2 py-1 rounded text-xs font-bold ${statusClass}`}>
+      {props.value || '-'}
+    </span>
+  );
+};
+
+// Custom cell renderer for the "Priority" column
+const PriorityCellRenderer = (props: any) => {
+  const priorityClass = getPriorityColor(props.value);
+  return (
+    <span className={`font-semibold ${priorityClass}`}>
+      {props.value || '-'}
+    </span>
+  );
+};
+
+// Custom cell renderer for the "Created Date" column
+const DateCellRenderer = (props: any) => {
+  return props.value ? (
+    <span className="text-gray-700">
+      {parseLocalDate(props.value)?.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) || '-'}
+    </span>
+  ) : '-';
+};
+
+// Custom cell renderer for the "Actions" column
+const ActionsCellRenderer = (props: any) => {
+  return (
+    <button
+      className="text-blue-600 hover:text-blue-800 text-sm"
+      onClick={(e) => {
+        e.stopPropagation();
+        alert('View Details functionality to be implemented');
+      }}
+    >
+      View Details
+    </button>
+  );
+};
+
+// Color functions (moved outside the component to avoid redefinition)
+const getStatusColor = (status: string) => {
+  const colors = {
+    'PLANNING': 'bg-green-100 text-green-800',
+    'IN_PROGRESS': 'bg-blue-100 text-blue-800',
+    'DONE': 'bg-gray-100 text-gray-800',
+  };
+  return colors[status as keyof typeof colors] || 'bg-gray-100 text-gray-800';
+};
+
+const getPriorityColor = (priority: string) => {
+  const colors = {
+    'High': 'text-red-600',
+    'Medium': 'text-orange-600',
+    'Low': 'text-green-600',
+  };
+  return colors[priority as keyof typeof colors] || 'text-gray-600';
+};
+
 export const DeviceListPage = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [allDevices, setAllDevices] = useState<Device[]>(storage.getDevices());
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const gridApi = useRef<any>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Listen for 'devices-updated' event to refresh the device list
   useEffect(() => {
@@ -104,43 +172,119 @@ export const DeviceListPage = () => {
     };
   }, []);
 
-  // Filter and sort devices
-  const filteredDevices = useMemo(() => {
-    let devices = [...allDevices];
+  // Define AG Grid column definitions
+  const columnDefs = useMemo(() => [
+    {
+      field: 'Device Issue Key',
+      headerName: 'Key',
+      filter: 'agTextColumnFilter',
+      cellRenderer: DeviceIssueKeyCellRenderer,
+      cellClass: 'font-medium text-gray-900',
+      minWidth: 150,
+    },
+    {
+      field: 'Summary',
+      headerName: 'Summary',
+      filter: 'agTextColumnFilter',
+      cellClass: 'text-gray-700',
+      minWidth: 200,
+    },
+    {
+      field: 'Status',
+      headerName: 'Status',
+      filter: 'agSetColumnFilter',
+      cellRenderer: StatusCellRenderer,
+      cellClass: 'flex items-center',
+      minWidth: 140,
+    },
+    {
+      field: 'Comments',
+      headerName: 'Comments',
+      filter: 'agTextColumnFilter',
+      cellClass: 'text-blue-600',
+      minWidth: 200,
+    },
+    {
+      field: 'Assignee',
+      headerName: 'Assignee',
+      filter: 'agTextColumnFilter',
+      cellClass: 'text-gray-700',
+      minWidth: 150,
+    },
+    {
+      field: 'priority',
+      headerName: 'Priority',
+      filter: 'agSetColumnFilter',
+      cellRenderer: PriorityCellRenderer,
+      cellClass: 'flex items-center',
+      minWidth: 120,
+    },
+    {
+      field: 'Created Date',
+      headerName: 'Created',
+      filter: 'agDateColumnFilter',
+      cellRenderer: DateCellRenderer,
+      sort: 'desc',
+      minWidth: 130,
+    },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      filter: false,
+      sortable: false,
+      cellRenderer: ActionsCellRenderer,
+      minWidth: 120,
+    },
+  ], []);
 
-    // Apply search
-    if (searchTerm) {
-      devices = devices.filter(device =>
-        (device["Device Issue Key"] || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (device.Summary || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (device.Assignee || '').toLowerCase().includes(searchTerm.toLowerCase())
-      );
+  const defaultColDef = useMemo(() => ({
+    sortable: true,
+    filter: true,
+    resizable: true,
+    floatingFilter: true,
+    enableRowGroup: true,
+    enablePivot: true,
+    enableValue: true,
+    cellClass: 'py-2',
+  }), []);
+
+  const gridTheme = useMemo(() => ({
+    '--ag-font-family': 'Inter, system-ui, sans-serif',
+    '--ag-font-size': '14px',
+    '--ag-cell-horizontal-padding': '1rem',
+    '--ag-header-column-separator-display': 'none',
+    '--ag-header-foreground-color': '#1f2937',
+    '--ag-header-background-color': '#f9fafb',
+    '--ag-row-hover-color': 'rgb(243 244 246)',
+    '--ag-selected-row-background-color': 'rgb(239 246 255)',
+    '--ag-odd-row-background-color': '#ffffff',
+    '--ag-row-border-color': 'rgb(243 244 246)',
+    '--ag-border-color': 'rgb(229 231 235)',
+    '--ag-secondary-border-color': 'rgb(229 231 235)',
+    '--ag-header-column-resize-handle-color': 'rgb(229 231 235)',
+    '--ag-range-selection-border-color': 'rgb(59 130 246)',
+    '--ag-checkbox-checked-color': 'rgb(59 130 246)',
+    '--ag-checkbox-unchecked-color': '#9ca3af',
+    '--ag-row-height': '48px',
+    '--ag-header-height': '48px',
+    '--ag-list-item-height': '40px',
+  }), []);
+
+  const onGridReady = useCallback((params: any) => {
+    gridApi.current = params.api;
+    params.api.sizeColumnsToFit();
+  }, []);
+
+  // Handle global search
+  const onFilterTextBoxChanged = useCallback(() => {
+    if (gridApi.current) {
+      gridApi.current.setQuickFilter(searchTerm);
     }
+  }, [searchTerm]);
 
-    // Apply sorting
-    if (sortConfig) {
-      devices.sort((a, b) => {
-        const aValue = a[sortConfig.key] ?? '';
-        const bValue = b[sortConfig.key] ?? '';
-
-        if (!aValue && !bValue) return 0;
-        if (!aValue) return 1;
-        if (!bValue) return -1;
-
-        const comparison = aValue > bValue ? 1 : -1;
-        return sortConfig.direction === 'asc' ? comparison : -comparison;
-      });
-    }
-
-    return devices;
-  }, [allDevices, searchTerm, sortConfig]);
-
-  const handleSort = (key: string) => {
-    setSortConfig(current => ({
-      key,
-      direction: current?.key === key && current.direction === 'asc' ? 'desc' : 'asc',
-    }));
-  };
+  useEffect(() => {
+    onFilterTextBoxChanged();
+  }, [searchTerm, onFilterTextBoxChanged]);
 
   // Handle bulk import
   const handleBulkImport = () => {
@@ -158,7 +302,6 @@ export const DeviceListPage = () => {
         const rows = text.split('\n').map(row => row.trim()).filter(row => row);
         if (rows.length === 0) return;
 
-        // Parse CSV headers
         const headers = parseCSVRow(rows[0]);
         const requiredHeaders = ['Device Issue Key', 'Summary', 'Status', 'Comments', 'priority', 'Created Date'];
         const missingHeaders = requiredHeaders.filter(header => !headers.includes(header));
@@ -167,7 +310,6 @@ export const DeviceListPage = () => {
           return;
         }
 
-        // Parse CSV rows into device objects
         const newDevices: Device[] = rows.slice(1).map(row => {
           const values = parseCSVRow(row);
           const device: { [key: string]: any } = {};
@@ -175,9 +317,8 @@ export const DeviceListPage = () => {
             device[header] = values[index] || '';
           });
 
-          // Use the exact keys from devices.json
           return {
-            id: crypto.randomUUID(), // Generate a unique ID
+            id: crypto.randomUUID(),
             "Device Issue Key": device["Device Issue Key"],
             Summary: device.Summary,
             Status: device.Status,
@@ -185,7 +326,6 @@ export const DeviceListPage = () => {
             Assignee: device.Assignee || '',
             priority: device.priority,
             "Created Date": device["Created Date"],
-            // Include additional attributes from CSV
             "Device Vendor": device["Device Vendor"] || '',
             "Device Type": device["Device Type"] || '',
             "Device Model": device["Device Model"] || '',
@@ -197,16 +337,14 @@ export const DeviceListPage = () => {
             "Device Payment Type": device["Device Payment Type"] || '',
             "Device Channel": device["Device Channel"] || '',
             Type: device.Type || '',
-            ...device, // Preserve any additional fields
+            ...device,
           };
         });
 
-        // Update localStorage
         const existingDevices = storage.getDevices();
         const updatedDevices = [...existingDevices, ...newDevices];
         storage.saveDevices(updatedDevices);
 
-        // Reset file input
         if (fileInputRef.current) {
           fileInputRef.current.value = '';
         }
@@ -220,24 +358,6 @@ export const DeviceListPage = () => {
       alert('Failed to read the CSV file. Please ensure it is valid and try again.');
     };
     reader.readAsText(file);
-  };
-
-  const getStatusColor = (status: string) => {
-    const colors = {
-      'PLANNING': 'bg-green-100 text-green-800',
-      'IN_PROGRESS': 'bg-blue-100 text-blue-800',
-      'DONE': 'bg-gray-100 text-gray-800',
-    };
-    return colors[status as keyof typeof colors] || 'bg-gray-100 text-gray-800';
-  };
-
-  const getPriorityColor = (priority: string) => {
-    const colors = {
-      'High': 'text-red-600',
-      'Medium': 'text-orange-600',
-      'Low': 'text-green-600',
-    };
-    return colors[priority as keyof typeof colors] || 'text-gray-600';
   };
 
   return (
@@ -282,61 +402,49 @@ export const DeviceListPage = () => {
         </div>
       </div>
 
-      {/* Devices Table */}
-      <div className="bg-white border rounded-2xl overflow-hidden shadow-lg">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-blue-50">
-            <tr>
-              {COLUMNS.map(column => (
-                <th
-                  key={column.key}
-                  onClick={() => column.sortable && handleSort(column.key)}
-                  className={`px-6 py-3 text-left text-xs font-bold text-blue-700 uppercase tracking-wider ${column.sortable ? 'cursor-pointer select-none hover:text-blue-900' : ''}`}
-                >
-                  <span className="flex items-center gap-1">
-                    {column.label}
-                    {column.sortable && <ChevronUpDownIcon className="w-4 h-4 inline-block align-middle" />}
-                  </span>
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-100">
-            {filteredDevices.length === 0 && (
-              <tr>
-                <td colSpan={COLUMNS.length} className="text-center text-blue-300 py-8 text-lg italic">No devices found.</td>
-              </tr>
-            )}
-            {filteredDevices.map(device => (
-              <tr
-                key={device.id}
-                className="hover:bg-blue-50 transition cursor-pointer"
-                onClick={() => alert('View Details functionality to be implemented')}
-              >
-                <td className="px-6 py-3 font-semibold text-blue-900">{device["Device Issue Key"] || '-'}</td>
-                <td className="px-6 py-3 text-sm text-gray-700 truncate max-w-xs">{device.Summary || '-'}</td>
-                <td className="px-6 py-3">
-                  <span className={`px-2 py-1 rounded text-xs font-bold ${getStatusColor(device.Status)}`}>
-                    {device.Status || '-'}
-                  </span>
-                </td>
-                <td className="px-6 py-3 text-sm text-blue-600">{device.Comments || '-'}</td>
-                <td className="px-6 py-3 text-sm text-gray-700">{device.Assignee || '-'}</td>
-                <td className="px-6 py-3">
-                  <span className={`font-semibold ${getPriorityColor(device.priority)}`}>
-                    {device.priority || '-'}
-                  </span>
-                </td>
-                <td className="px-6 py-3 text-xs text-gray-600">
-                  {device["Created Date"]
-                    ? parseLocalDate(device["Created Date"])?.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) || '-'
-                    : '-'}
-                </td>
-                <td className="px-6 py-3 text-sm text-blue-600">View Details</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {/* AG Grid */}
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200">
+        <div 
+          className="ag-theme-alpine w-full"
+          style={{ 
+            height: 'calc(100vh - 300px)',
+            ...gridTheme
+          }}
+        >
+          <AgGridReact
+            rowData={allDevices}
+            columnDefs={columnDefs}
+            defaultColDef={defaultColDef}
+            onGridReady={onGridReady}
+            rowSelection="multiple"
+            enableRangeSelection={true}
+            copyHeadersToClipboard={true}
+            rowGroupPanelShow="always"
+            groupDisplayType="multipleColumns"
+            animateRows={true}
+            suppressRowClickSelection={true}
+            suppressCellFocus={true}
+            sideBar={{
+              toolPanels: [
+                {
+                  id: 'columns',
+                  labelDefault: 'Columns',
+                  labelKey: 'columns',
+                  iconKey: 'columns',
+                  toolPanel: 'agColumnsToolPanel',
+                },
+                {
+                  id: 'filters',
+                  labelDefault: 'Filters',
+                  labelKey: 'filters',
+                  iconKey: 'filter',
+                  toolPanel: 'agFiltersToolPanel',
+                },
+              ],
+              defaultToolPanel: 'columns',
+            }}
+          />
+        </div>
       </div>
     </div>
   );

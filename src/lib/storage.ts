@@ -5,30 +5,45 @@ const STORAGE_KEYS = {
   WORKFLOWS: 'workflows',
   DASHBOARDS: 'dashboards',
   DEVICES: 'devices',
+  TASK_TEST_CASES: 'taskTestCases',
 } as const;
 
 // Define the Device interface based on devices.json
 interface Device {
   id: string;
-  deviceIssueKey: string;
-  summary: string;
-  status: string;
-  comments: string;
-  assignee?: string;
+  "Device Issue Key": string;
+  Summary: string;
+  Status: string;
+  Comments: string;
+  Assignee?: string;
   priority: string;
-  createdDate: string;
-  deviceVendor: string;
-  deviceType: string;
-  deviceModel: string;
-  deviceMarketingName: string;
-  deviceCodeName: string;
-  deviceOS: string;
-  deviceOSVersion: string;
-  deviceHardwareVersion: string;
-  devicePaymentType: string;
-  deviceChannel: string;
-  type: string;
+  "Created Date": string;
+  "Device Vendor": string;
+  "Device Type": string;
+  "Device Model": string;
+  "Device Marketing Name": string;
+  "Device Code Name": string;
+  "Device OS": string;
+  "Device OS Version": string;
+  "Device Hardware Version": string;
+  "Device Payment Type": string;
+  "Device Channel": string;
+  Type: string;
   [key: string]: any;
+}
+
+// Define the TestCase interface (extended with assigned_to and status)
+interface TestCase {
+  test_case_id: string;
+  test_case_description: string;
+  acceptance_criteria: string[];
+  assigned_to: string;
+  status: string;
+}
+
+// Define the structure for taskTestCases in localStorage
+interface TaskTestCases {
+  [taskId: string]: TestCase[];
 }
 
 const initialCertifications: CertificationRequest[] = [
@@ -107,6 +122,10 @@ interface Storage {
   getDevices: () => Device[];
   saveDevices: (devices: Device[]) => void;
   updateDevice: (device: Device) => void;
+  getTaskTestCases: () => TaskTestCases;
+  saveTaskTestCases: (taskTestCases: TaskTestCases) => void;
+  getTestCasesForTask: (taskId: string) => TestCase[];
+  saveTestCasesForTask: (taskId: string, testCases: TestCase[]) => void;
 }
 
 export const storage: Storage = {
@@ -167,5 +186,26 @@ export const storage: Storage = {
       device.id === updatedDevice.id ? updatedDevice : device
     );
     this.saveDevices(updatedDevices);
+  },
+
+  getTaskTestCases(): TaskTestCases {
+    const data = localStorage.getItem(STORAGE_KEYS.TASK_TEST_CASES);
+    return data ? JSON.parse(data) : {};
+  },
+
+  saveTaskTestCases(taskTestCases: TaskTestCases) {
+    localStorage.setItem(STORAGE_KEYS.TASK_TEST_CASES, JSON.stringify(taskTestCases));
+    window.dispatchEvent(new Event('task-test-cases-updated'));
+  },
+
+  getTestCasesForTask(taskId: string): TestCase[] {
+    const taskTestCases = this.getTaskTestCases();
+    return taskTestCases[taskId] || [];
+  },
+
+  saveTestCasesForTask(taskId: string, testCases: TestCase[]) {
+    const taskTestCases = this.getTaskTestCases();
+    taskTestCases[taskId] = testCases;
+    this.saveTaskTestCases(taskTestCases);
   },
 };
