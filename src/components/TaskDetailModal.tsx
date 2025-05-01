@@ -1,4 +1,4 @@
-import { FC, useState, useRef, MouseEvent } from 'react';
+import { FC, useState, useRef, useEffect, MouseEvent } from 'react';
 import { Dialog } from '@headlessui/react';
 import { 
   PaperClipIcon, 
@@ -11,8 +11,12 @@ import {
   SparklesIcon,
   ChevronDownIcon,
   ChevronUpIcon,
+  PencilIcon,
+  CheckIcon,
+  XMarkIcon,
 } from '@heroicons/react/24/outline';
 import { CertificationTask, TaskPriority, TaskStatus } from '../types';
+import { storage } from '../lib/storage';
 import testCasesData from '../data/testcases.json';
 
 interface TaskDetailModalProps {
@@ -26,6 +30,8 @@ interface TestCase {
   test_case_id: string;
   test_case_description: string;
   acceptance_criteria: string[];
+  assigned_to: string;
+  status: string;
 }
 
 export const TaskDetailModal: FC<TaskDetailModalProps> = ({
@@ -42,9 +48,22 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
   const [showAITestCaseSection, setShowAITestCaseSection] = useState(false);
   const [aiStep, setAIStep] = useState<'idle' | 'processing' | 'understanding' | 'typing' | 'done'>('idle');
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const [aiTestCases, setAITestCases] = useState<TestCase[]>([]); // Store full test case objects
-  const [expandedTestCases, setExpandedTestCases] = useState<{ [key: string]: boolean }>({}); // Track expanded state
+  const [aiTestCases, setAITestCases] = useState<TestCase[]>([]);
+  const [expandedTestCases, setExpandedTestCases] = useState<{ [key: string]: boolean }>({});
+  const [editingTestCaseId, setEditingTestCaseId] = useState<string | null>(null);
+  const [editedTestCase, setEditedTestCase] = useState<Partial<TestCase>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Load test cases from localStorage and set showAITestCaseSection when the modal opens
+  useEffect(() => {
+    if (isOpen) {
+      const savedTestCases = storage.getTestCasesForTask(task.id);
+      console.log('Loaded test cases for task', task.id, ':', savedTestCases);
+      setAITestCases(savedTestCases);
+      // Show the test case section if there are saved test cases
+      setShowAITestCaseSection(savedTestCases.length > 0);
+    }
+  }, [isOpen, task.id]);
 
   const handleStatusChange = (status: TaskStatus) => {
     setEditedTask({ ...editedTask, status });
@@ -56,6 +75,7 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
 
   const handleSave = () => {
     onUpdate(editedTask);
+    onClose(); // Explicitly close the modal after saving
   };
 
   const handleAddComment = () => {
@@ -107,8 +127,7 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
     setShowAITestCaseSection(true);
     setAIStep('idle');
     setUploadedFile(null);
-    setAITestCases([]);
-    setExpandedTestCases({}); // Reset expanded state
+    setExpandedTestCases({});
   };
 
   // Handler for file drop
@@ -139,6 +158,48 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
     }));
   };
 
+  // Remove a test case and update localStorage
+  const handleRemoveTestCase = (testCaseId: string) => {
+    const updatedTestCases = aiTestCases.filter(tc => tc.test_case_id !== testCaseId);
+    setAITestCases(updatedTestCases);
+    storage.saveTestCasesForTask(task.id, updatedTestCases);
+  };
+
+  // Start editing a test case
+  const handleEditTestCase = (tc: TestCase) => {
+    setEditingTestCaseId(tc.test_case_id);
+    setEditedTestCase({
+      test_case_description: tc.test_case_description,
+      acceptance_criteria: [...tc.acceptance_criteria],
+      assigned_to: tc.assigned_to,
+    });
+  };
+
+  // Save edited test case and update localStorage
+  const handleSaveTestCase = (testCaseId: string) => {
+    const updatedTestCases = aiTestCases.map(tc =>
+      tc.test_case_id === testCaseId
+        ? {
+            ...tc,
+            test_case_description: editedTestCase.test_case_description || tc.test_case_description,
+            acceptance_criteria: editedTestCase.acceptance_criteria || tc.acceptance_criteria,
+            assigned_to: editedTestCase.assigned_to || tc.assigned_to,
+          }
+        : tc
+    );
+    setAITestCases(updatedTestCases);
+    storage.saveTestCasesForTask(task.id, updatedTestCases);
+    setEditingTestCaseId(null);
+    setEditedTestCase({});
+  };
+
+  // Handle changes to acceptance criteria during editing
+  const handleAcceptanceCriteriaChange = (index: number, value: string) => {
+    const updatedCriteria = [...(editedTestCase.acceptance_criteria || [])];
+    updatedCriteria[index] = value;
+    setEditedTestCase({ ...editedTestCase, acceptance_criteria: updatedCriteria });
+  };
+
   // Simulate AI processing steps
   const startAIProcessing = () => {
     setAIStep('processing');
@@ -148,8 +209,6 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
         setAIStep('typing');
         setTimeout(() => {
           setAIStep('done');
-          // Extract requirement_tag from editedTask.description
-          // Expected format: "<requirement_tag>"
           const description = editedTask?.description || '';
           let requirementTag = description;
 
@@ -160,7 +219,6 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
             return;
           }
 
-          // Filter test cases from testcases.json based on requirement_tag
           console.log('Matching requirement tag:', requirementTag);
           const matchingChapters = testCasesData.filter(
             (chapter) => chapter.requirement_tag === requirementTag
@@ -168,9 +226,14 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
           console.log('Matching chapters:', matchingChapters);
 
           if (matchingChapters.length > 0) {
-            // Collect all test cases from all matching chapters
             const allTestCases = matchingChapters.flatMap(chapter => chapter.test_cases);
-            setAITestCases(allTestCases);
+            const enrichedTestCases = allTestCases.map(tc => ({
+              ...tc,
+              assigned_to: tc.assigned_to || '',
+              status: tc.status || 'Not Started',
+            }));
+            setAITestCases(enrichedTestCases);
+            storage.saveTestCasesForTask(task.id, enrichedTestCases);
           } else {
             setAITestCases(['No test cases found for requirement tag: ' + requirementTag] as any);
           }
@@ -371,6 +434,11 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
                       <div className="mt-4">
                         <div className="text-green-700 font-semibold mb-2">Test Cases Generated:</div>
                         <div className="bg-white rounded-lg border max-h-64 overflow-y-auto">
+                          {aiTestCases.length === 0 && (
+                            <div className="p-4 text-gray-700">
+                              No test cases available. Upload a requirement file to generate test cases.
+                            </div>
+                          )}
                           {aiTestCases.map((tc, idx) => (
                             typeof tc === 'string' ? (
                               <div
@@ -390,26 +458,110 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
                                   className="p-4 flex items-center justify-between cursor-pointer"
                                   onClick={() => toggleTestCase(tc.test_case_id)}
                                 >
-                                  <span className="text-gray-700 font-medium">{tc.test_case_id}</span>
-                                  {expandedTestCases[tc.test_case_id] ? (
-                                    <ChevronUpIcon className="w-5 h-5 text-gray-500" />
-                                  ) : (
-                                    <ChevronDownIcon className="w-5 h-5 text-gray-500" />
-                                  )}
+                                  <div className="flex-1 flex items-center space-x-2">
+                                    <span className="text-gray-700 font-medium">{tc.test_case_id}</span>
+                                    <span className="text-gray-500 text-sm">({tc.status})</span>
+                                    <span className="text-gray-500 text-sm">Assigned to: {tc.assigned_to || 'Unassigned'}</span>
+                                  </div>
+                                  <div className="flex items-center space-x-2">
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleRemoveTestCase(tc.test_case_id);
+                                      }}
+                                      className="text-red-500 hover:text-red-700"
+                                    >
+                                      <XMarkIcon className="w-5 h-5" />
+                                    </button>
+                                    {expandedTestCases[tc.test_case_id] ? (
+                                      <ChevronUpIcon className="w-5 h-5 text-gray-500" />
+                                    ) : (
+                                      <ChevronDownIcon className="w-5 h-5 text-gray-500" />
+                                    )}
+                                  </div>
                                 </div>
                                 {expandedTestCases[tc.test_case_id] && (
                                   <div className="px-4 pb-4 text-gray-600">
-                                    <div className="mb-2">
-                                      <span className="font-semibold">Description: </span>
-                                      <span>{tc.test_case_description}</span>
-                                    </div>
-                                    <div>
-                                      <span className="font-semibold">Acceptance Criteria:</span>
-                                      <ul className="list-disc pl-5 mt-1">
-                                        {tc.acceptance_criteria.map((criterion, critIdx) => (
-                                          <li key={critIdx} className="text-sm">{criterion}</li>
-                                        ))}
-                                      </ul>
+                                    {editingTestCaseId === tc.test_case_id ? (
+                                      <div>
+                                        <div className="mb-2">
+                                          <span className="font-semibold">Description: </span>
+                                          <input
+                                            type="text"
+                                            value={editedTestCase.test_case_description || ''}
+                                            onChange={(e) =>
+                                              setEditedTestCase({
+                                                ...editedTestCase,
+                                                test_case_description: e.target.value,
+                                              })
+                                            }
+                                            className="w-full border rounded-lg p-2"
+                                          />
+                                        </div>
+                                        <div className="mb-2">
+                                          <span className="font-semibold">Assigned To: </span>
+                                          <input
+                                            type="text"
+                                            value={editedTestCase.assigned_to || ''}
+                                            onChange={(e) =>
+                                              setEditedTestCase({
+                                                ...editedTestCase,
+                                                assigned_to: e.target.value,
+                                              })
+                                            }
+                                            className="w-full border rounded-lg p-2"
+                                          />
+                                        </div>
+                                        <div>
+                                          <span className="font-semibold">Acceptance Criteria:</span>
+                                          <ul className="list-disc pl-5 mt-1">
+                                            {(editedTestCase.acceptance_criteria || tc.acceptance_criteria).map((criterion, critIdx) => (
+                                              <li key={critIdx} className="text-sm">
+                                                <input
+                                                  type="text"
+                                                  value={criterion}
+                                                  onChange={(e) =>
+                                                    handleAcceptanceCriteriaChange(critIdx, e.target.value)
+                                                  }
+                                                  className="w-full border rounded-lg p-1"
+                                                />
+                                              </li>
+                                            ))}
+                                          </ul>
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      <div>
+                                        <div className="mb-2">
+                                          <span className="font-semibold">Description: </span>
+                                          <span>{tc.test_case_description}</span>
+                                        </div>
+                                        <div>
+                                          <span className="font-semibold">Acceptance Criteria:</span>
+                                          <ul className="list-disc pl-5 mt-1">
+                                            {tc.acceptance_criteria.map((criterion, critIdx) => (
+                                              <li key={critIdx} className="text-sm">{criterion}</li>
+                                            ))}
+                                          </ul>
+                                        </div>
+                                      </div>
+                                    )}
+                                    <div className="mt-2 flex justify-end">
+                                      {editingTestCaseId === tc.test_case_id ? (
+                                        <button
+                                          onClick={() => handleSaveTestCase(tc.test_case_id)}
+                                          className="text-green-500 hover:text-green-700"
+                                        >
+                                          <CheckIcon className="w-5 h-5" />
+                                        </button>
+                                      ) : (
+                                        <button
+                                          onClick={() => handleEditTestCase(tc)}
+                                          className="text-gray-500 hover:text-gray-700"
+                                        >
+                                          <PencilIcon className="w-5 h-5" />
+                                        </button>
+                                      )}
                                     </div>
                                   </div>
                                 )}

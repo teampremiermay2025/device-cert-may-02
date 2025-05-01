@@ -31,7 +31,9 @@
 
           "No disconnections or packet loss during the test."
 
-        ]
+        ],
+        "assigned_to": "John Doe",
+        "status": "In Progress"
 
       }
 
