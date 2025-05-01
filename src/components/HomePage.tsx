@@ -3,6 +3,7 @@ import { PlusIcon } from '@heroicons/react/24/outline';
 import { Dashboard } from '../types';
 import { storage } from '../lib/storage';
 import { Dialog } from '@headlessui/react';
+import { useNavigate } from 'react-router-dom';
 
 interface NewDashboardFormData {
   title: string;
@@ -21,6 +22,7 @@ export const HomePage: FC = () => {
     sharedWith: [],
   });
   const [newSharedUser, setNewSharedUser] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleDashboardsUpdate = () => {
@@ -35,8 +37,6 @@ export const HomePage: FC = () => {
     };
   }, []);
 
-
-  
   const handleCreateDashboard = () => {
     const newDashboard: Dashboard = {
       id: crypto.randomUUID(),
@@ -79,9 +79,9 @@ export const HomePage: FC = () => {
 
   const handleNavigate = (dashboardId: string) => {
     if (dashboardId === 'main-dashboard') {
-      window.location.hash = '#/dashboard';
+      navigate('/dashboard');
     } else {
-      window.location.hash = `#/dashboards/${dashboardId}`;
+      navigate(`/dashboards/${dashboardId}`);
     }
   };
 

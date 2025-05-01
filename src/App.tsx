@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { Sidebar } from './components/Sidebar';
-import { Dashboard } from './components/Dashboard';
+import { Dashboard } from './components/Projects';
 import { HomePage } from './components/HomePage';
 import { NewCertificationModal } from './components/NewCertificationModal';
 import JiraWorkflowEditor from './components/JiraWorkflowEditor';
@@ -48,7 +48,7 @@ const AppContent = () => {
           <Route path="/home" element={<HomePage />} />
        
           <Route path="/projects" element={<Dashboard onNewCertification={handleNewCertification} />} />
-          <Route path="/dashboards/:id" element={<DashboardContainer dashboardId="" />} />
+          <Route path="/dashboards/:id" element={<DashboardContainerWithId />} />
           <Route path="/workflows" element={<JiraWorkflowEditor />} />
           <Route path="/command-search" element={
             <div className="p-8">
@@ -94,6 +94,12 @@ const AppContent = () => {
       <ToastContainer />
     </div>
   );
+};
+
+const DashboardContainerWithId = () => {
+  const { id } = useParams();
+  // Fix for TS: ensure dashboardId is always a string
+  return <DashboardContainer dashboardId={id ?? ''} />;
 };
 
 function App() {
