@@ -6,12 +6,16 @@ import {
   ChatBubbleLeftIcon,
   PencilIcon,
   ArrowPathIcon,
-  EllipsisHorizontalIcon,
   StarIcon,
   ChevronDownIcon,
   ChevronUpIcon,
   DevicePhoneMobileIcon,
   CalendarIcon,
+  ShareIcon,
+  ArrowDownTrayIcon,
+  UserCircleIcon,
+  ClockIcon,
+  EyeIcon,
 } from '@heroicons/react/24/outline';
 import { CertificationRequest, CertificationTask, CertificationStage, TaskStatus } from '../types';
 import { TaskBoard } from './TaskBoard';
@@ -19,6 +23,7 @@ import { getStageColor } from '../lib/workflow';
 import { storage } from '../lib/storage';
 import taskStepsData from '../data/ruleset.json';
 import { TaskDetailModal } from './TaskDetailModal';
+import usersData from '../data/users.json';
 
 interface ViewCertificationPanelProps {
   certification: CertificationRequest;
@@ -26,6 +31,40 @@ interface ViewCertificationPanelProps {
   onUpdateNoClose: (certification: CertificationRequest) => void;
   onCancel: () => void;
 }
+
+const UserBubble: FC<{ userId: string; size?: 'sm' | 'md' }> = ({ userId, size = 'md' }) => {
+  const user = usersData.users.find(u => u.id === userId);
+  if (!user) return null;
+
+  const getInitials = (name: string) => {
+    const parts = name.split(' ');
+    return parts.length > 1 
+      ? `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase()
+      : name.slice(0, 2).toUpperCase();
+  };
+
+  const sizeClasses = {
+    sm: 'w-6 h-6 text-xs',
+    md: 'w-8 h-8 text-sm'
+  };
+
+  return (
+    <div className="flex items-center gap-2" title={user.name}>
+      {user.avatar ? (
+        <img
+          src={user.avatar}
+          alt={user.name}
+          className={`${sizeClasses[size]} rounded-full border border-gray-200`}
+        />
+      ) : (
+        <div className={`${sizeClasses[size]} rounded-full bg-blue-500 text-white flex items-center justify-center font-medium`}>
+          {getInitials(user.name)}
+        </div>
+      )}
+      <span className="text-sm font-medium text-gray-700">{user.name}</span>
+    </div>
+  );
+};
 
 export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
   certification,
@@ -40,7 +79,40 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
   const [expandedSections, setExpandedSections] = useState({
     deviceDetails: true,
     forecastedDates: true,
+    people: false,
+    activity: true,
   });
+
+  // Mock activity data - in real app this would come from your backend
+  const activities = [
+    {
+      id: '1',
+      type: 'status_change',
+      user: usersData.users[0],
+      action: 'changed status to',
+      target: 'PLANNING',
+      timestamp: new Date(Date.now() - 3600000).toISOString(),
+    },
+    {
+      id: '2',
+      type: 'comment',
+      user: usersData.users[1],
+      action: 'commented',
+      content: 'All initial requirements have been reviewed.',
+      timestamp: new Date(Date.now() - 7200000).toISOString(),
+    },
+    {
+      id: '3',
+      type: 'task_update',
+      user: usersData.users[2],
+      action: 'completed task',
+      target: 'Initial Setup',
+      timestamp: new Date(Date.now() - 86400000).toISOString(),
+    },
+  ];
+
+  // Mock watchers - in real app this would be part of your certification data
+  const watchers = [usersData.users[0].id, usersData.users[1].id];
 
   useEffect(() => {
     const saved = localStorage.getItem('jiraWorkflows');
@@ -210,168 +282,247 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
               {certification.status}
             </span>
             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-             {certification.type}
-           </span>
+              {certification.type}
+            </span>
           </div>
           <span className="text-lg text-gray-600">{certification.projectName}</span>
         </div>
-        <div className="flex gap-2 flex-wrap">
-          <div className="flex bg-white rounded-lg shadow-sm border border-gray-100 p-1">
-            <button className="p-2 hover:bg-blue-50 rounded-md transition-colors" title="Star">
-              <StarIcon className="w-5 h-5 text-blue-500" />
-            </button>
-            <button className="p-2 hover:bg-blue-50 rounded-md transition-colors" title="Add User">
-              <UserPlusIcon className="w-5 h-5 text-blue-500" />
-            </button>
-            <button className="p-2 hover:bg-blue-50 rounded-md transition-colors" title="Comments">
-              <ChatBubbleLeftIcon className="w-5 h-5 text-blue-500" />
-            </button>
-            <button className="p-2 hover:bg-blue-50 rounded-md transition-colors" title="Edit">
-              <PencilIcon className="w-5 h-5 text-blue-500" />
-            </button>
-            <button className="p-2 hover:bg-blue-50 rounded-md transition-colors" title="Refresh">
-              <ArrowPathIcon className="w-5 h-5 text-blue-500" />
-            </button>
-            <button className="p-2 hover:bg-blue-50 rounded-md transition-colors" title="More">
-              <EllipsisHorizontalIcon className="w-5 h-5 text-blue-500" />
-            </button>
-          </div>
+        <div className="flex items-center gap-3">
+          <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="Add to Favorites">
+            <StarIcon className="w-5 h-5 text-gray-500" />
+          </button>
+          <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="Share">
+            <ShareIcon className="w-5 h-5 text-gray-500" />
+          </button>
+          <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="Export">
+            <ArrowDownTrayIcon className="w-5 h-5 text-gray-500" />
+          </button>
           <button
-            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium text-gray-700 transition-colors"
             onClick={onCancel}
+            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium text-gray-700 transition-colors"
           >
-            Cancel
+            Close
           </button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 cursor-pointer"
-            onClick={() => toggleSection('deviceDetails')}
-          >
-            <div className="flex items-center gap-2">
-              <DevicePhoneMobileIcon className="w-5 h-5 text-gray-500" />
-              <h3 className="text-lg font-semibold text-gray-900">Device Details</h3>
+        <div className="lg:col-span-2 space-y-4">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 cursor-pointer"
+              onClick={() => toggleSection('deviceDetails')}
+            >
+              <div className="flex items-center gap-2">
+                <DevicePhoneMobileIcon className="w-5 h-5 text-gray-500" />
+                <h3 className="text-lg font-semibold text-gray-900">Device Details</h3>
+              </div>
+              {expandedSections.deviceDetails ? (
+                <ChevronUpIcon className="w-5 h-5 text-gray-500" />
+              ) : (
+                <ChevronDownIcon className="w-5 h-5 text-gray-500" />
+              )}
             </div>
-            {expandedSections.deviceDetails ? (
-              <ChevronUpIcon className="w-5 h-5 text-gray-500" />
-            ) : (
-              <ChevronDownIcon className="w-5 h-5 text-gray-500" />
+            {expandedSections.deviceDetails && (
+              <div className="p-4">
+                <dl className="grid grid-cols-1 gap-x-2 gap-y-3 sm:grid-cols-3">
+                  <div className="flex items-center gap-2">
+                    <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                      <UserPlusIcon className="w-5 h-5" /> Vendor:
+                    </dt>
+                    <dd className="text-sm text-gray-900">{certification.vendor || '-'}</dd>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                      <DevicePhoneMobileIcon className="w-5 h-5" /> Device Type:
+                    </dt>
+                    <dd className="text-sm text-gray-900">{certification.deviceType || '-'}</dd>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                      <DevicePhoneMobileIcon className="w-5 h-5" /> Model:
+                    </dt>
+                    <dd className="text-sm text-gray-900">{certification.deviceModel || '-'}</dd>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                      <PencilIcon className="w-5 h-5" /> Marketing Name:
+                    </dt>
+                    <dd className="text-sm text-gray-900">{certification.deviceMarketingName || '-'}</dd>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                      <DevicePhoneMobileIcon className="w-5 h-5" /> OS Version:
+                    </dt>
+                    <dd className="text-sm text-gray-900">{certification.deviceOS} {certification.deviceOSVersion}</dd>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                      <DevicePhoneMobileIcon className="w-5 h-5" /> Hardware Version:
+                    </dt>
+                    <dd className="text-sm text-gray-900">{certification.deviceHardwareVersion || '-'}</dd>
+                  </div>
+                </dl>
+              </div>
             )}
           </div>
-          {expandedSections.deviceDetails && (
-            <div className="p-4">
-              <dl className="grid grid-cols-1 gap-x-2 gap-y-3 sm:grid-cols-3">
-                <div className="flex items-center gap-2">
-                  <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
-                    <UserPlusIcon className="w-5 h-5" /> Vendor:
-                  </dt>
-                  <dd className="text-sm text-gray-900">{certification.vendor || '-'}</dd>
-                </div>
-                <div className="flex items-center gap-2">
-                  <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
-                    <DevicePhoneMobileIcon className="w-5 h-5" /> Device Type:
-                  </dt>
-                  <dd className="text-sm text-gray-900">{certification.deviceType || '-'}</dd>
-                </div>
-                <div className="flex items-center gap-2">
-                  <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
-                    <DevicePhoneMobileIcon className="w-5 h-5" /> Model:
-                  </dt>
-                  <dd className="text-sm text-gray-900">{certification.deviceModel || '-'}</dd>
-                </div>
-                <div className="flex items-center gap-2">
-                  <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
-                    <PencilIcon className="w-5 h-5" /> Marketing Name:
-                  </dt>
-                  <dd className="text-sm text-gray-900">{certification.deviceMarketingName || '-'}</dd>
-                </div>
-                <div className="flex items-center gap-2">
-                  <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
-                    <DevicePhoneMobileIcon className="w-5 h-5" /> OS Version:
-                  </dt>
-                  <dd className="text-sm text-gray-900">{certification.deviceOS} {certification.deviceOSVersion}</dd>
-                </div>
-                <div className="flex items-center gap-2">
-                  <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
-                    <DevicePhoneMobileIcon className="w-5 h-5" /> Hardware Version:
-                  </dt>
-                  <dd className="text-sm text-gray-900">{certification.deviceHardwareVersion || '-'}</dd>
-                </div>
-              </dl>
+
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 cursor-pointer"
+              onClick={() => toggleSection('forecastedDates')}
+            >
+              <div className="flex items-center gap-2">
+                <CalendarIcon className="w-5 h-5 text-gray-500" />
+                <h3 className="text-lg font-semibold text-gray-900">Forecasted Dates</h3>
+              </div>
+              {expandedSections.forecastedDates ? (
+                <ChevronUpIcon className="w-5 h-5 text-gray-500" />
+              ) : (
+                <ChevronDownIcon className="w-5 h-5 text-gray-500" />
+              )}
+            </div>
+            {expandedSections.forecastedDates && (
+              <div className="p-4">
+                <dl className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2">
+                  <div className="flex items-center gap-2">
+                    <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                      <CalendarIcon className="w-5 h-5" /> Device Entry:
+                    </dt>
+                    <dd className="text-sm text-gray-900">{certification.forecastedDEDate || '-'}</dd>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                      <CalendarIcon className="w-5 h-5" /> FFW Date:
+                    </dt>
+                    <dd className="text-sm text-gray-900">{certification.forecastedFFWDate || '-'}</dd>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                      <CalendarIcon className="w-5 h-5" /> TA Date:
+                    </dt>
+                    <dd className="text-sm text-gray-900">{certification.forecastedTADate || '-'}</dd>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                      <CalendarIcon className="w-5 h-5" /> Launch Date:
+                    </dt>
+                    <dd className="text-sm text-gray-900">{certification.forecastedLaunchDate || '-'}</dd>
+                  </div>
+                </dl>
+              </div>
+            )}
+          </div>
+
+          {certification.issues && certification.issues.length > 0 && (
+            <div className="bg-white rounded-xl border border-yellow-200 shadow-sm p-6">
+              <h3 className="text-lg font-bold mb-4 text-yellow-700 flex items-center gap-2">
+                <ExclamationTriangleIcon className="w-5 h-5 text-yellow-600" />
+                Issues
+              </h3>
+              <div className="space-y-2">
+                {certification.issues.map((issue, index) => (
+                  <div key={index} className="flex items-start gap-2">
+                    <ExclamationTriangleIcon className="w-4 h-4 text-yellow-600 mt-1" />
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">{issue.title}</p>
+                      <p className="text-sm text-gray-700">{issue.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>
 
-        <div className="lg:col-span-1 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 cursor-pointer"
-            onClick={() => toggleSection('forecastedDates')}
-          >
-            <div className="flex items-center gap-2">
-              <CalendarIcon className="w-5 h-5 text-gray-500" />
-              <h3 className="text-lg font-semibold text-gray-900">Forecasted Dates</h3>
+        <div className="space-y-4">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 cursor-pointer"
+              onClick={() => toggleSection('people')}
+            >
+              <div className="flex items-center gap-2">
+                <UserCircleIcon className="w-5 h-5 text-gray-500" />
+                <h3 className="text-lg font-semibold text-gray-900">People</h3>
+              </div>
+              {expandedSections.people ? (
+                <ChevronUpIcon className="w-5 h-5 text-gray-500" />
+              ) : (
+                <ChevronDownIcon className="w-5 h-5 text-gray-500" />
+              )}
             </div>
-            {expandedSections.forecastedDates ? (
-              <ChevronUpIcon className="w-5 h-5 text-gray-500" />
-            ) : (
-              <ChevronDownIcon className="w-5 h-5 text-gray-500" />
+            {expandedSections.people && (
+              <div className="p-4 space-y-4">
+                <div>
+                  <h4 className="text-sm font-medium text-gray-500 mb-2">Reporter</h4>
+                  {certification.reporter ? (
+                    <UserBubble userId={certification.reporter} />
+                  ) : (
+                    <span className="text-sm text-gray-500">No reporter assigned</span>
+                  )}
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-gray-500 mb-2">Assignee</h4>
+                  {certification.assignee ? (
+                    <UserBubble userId={certification.assignee} />
+                  ) : (
+                    <span className="text-sm text-gray-500">No assignee</span>
+                  )}
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-gray-500 mb-2">Watchers</h4>
+                  <div className="space-y-2">
+                    {watchers.map(watcherId => (
+                      <UserBubble key={watcherId} userId={watcherId} size="sm" />
+                    ))}
+                  </div>
+                </div>
+              </div>
             )}
           </div>
-          {expandedSections.forecastedDates && (
-            <div className="p-4">
-              <dl className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2">
-                <div className="flex items-center gap-2">
-                  <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
-                    <CalendarIcon className="w-5 h-5" /> Device Entry:
-                  </dt>
-                  <dd className="text-sm text-gray-900">{certification.forecastedDEDate || '-'}</dd>
-                </div>
-                <div className="flex items-center gap-2">
-                  <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
-                    <CalendarIcon className="w-5 h-5" /> FFW Date:
-                  </dt>
-                  <dd className="text-sm text-gray-900">{certification.forecastedFFWDate || '-'}</dd>
-                </div>
-                <div className="flex items-center gap-2">
-                  <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
-                    <CalendarIcon className="w-5 h-5" /> TA Date:
-                  </dt>
-                  <dd className="text-sm text-gray-900">{certification.forecastedTADate || '-'}</dd>
-                </div>
-                <div className="flex items-center gap-2">
-                  <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
-                    <CalendarIcon className="w-5 h-5" /> Launch Date:
-                  </dt>
-                  <dd className="text-sm text-gray-900">{certification.forecastedLaunchDate || '-'}</dd>
-                </div>
-              </dl>
+
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 cursor-pointer"
+              onClick={() => toggleSection('activity')}
+            >
+              <div className="flex items-center gap-2">
+                <ClockIcon className="w-5 h-5 text-gray-500" />
+                <h3 className="text-lg font-semibold text-gray-900">Activity</h3>
+              </div>
+              {expandedSections.activity ? (
+                <ChevronUpIcon className="w-5 h-5 text-gray-500" />
+              ) : (
+                <ChevronDownIcon className="w-5 h-5 text-gray-500" />
+              )}
             </div>
-          )}
+            {expandedSections.activity && (
+              <div className="p-4">
+                <div className="space-y-4">
+                  {activities.map(activity => (
+                    <div key={activity.id} className="flex items-start gap-3">
+                      <UserBubble userId={activity.user.id} size="sm" />
+                      <div className="flex-1">
+                        <div className="text-sm">
+                          <span className="font-medium">{activity.user.name}</span>
+                          {' '}{activity.action}{' '}
+                          {activity.target && (
+                            <span className="font-medium">{activity.target}</span>
+                          )}
+                        </div>
+                        {activity.content && (
+                          <p className="text-sm text-gray-600 mt-1">{activity.content}</p>
+                        )}
+                        <span className="text-xs text-gray-500">
+                          {new Date(activity.timestamp).toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      {certification.issues && certification.issues.length > 0 && (
-        <div className="bg-white rounded-xl border border-yellow-200 shadow-sm p-6">
-          <h3 className="text-lg font-bold mb-4 text-yellow-700 flex items-center gap-2">
-            <ExclamationTriangleIcon className="w-5 h-5 text-yellow-600" />
-            Issues
-          </h3>
-          <div className="space-y-2">
-            {certification.issues.map((issue, index) => (
-              <div key={index} className="flex items-start gap-2">
-                <ExclamationTriangleIcon className="w-4 h-4 text-yellow-600 mt-1" />
-                <div>
-                  <p className="text-sm font-medium text-gray-900">{issue.title}</p>
-                  <p className="text-sm text-gray-700">{issue.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 mt-4">
         <div className="flex justify-between items-center">
           <div className="flex gap-2">
             <button
