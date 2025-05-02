@@ -20,6 +20,8 @@ import './App.css';
 import { TasksPage } from './components/TasksPage';
 import { LearnPage } from './components/LearnPage';
 import { initializeLocalStorage } from './localStorageInit';
+import { DeviceListPage } from './components/DeviceListPage';
+import { DevicesView } from './components/DevicesView';
 
 // Initialize localStorage with seed data if not already present
 initializeLocalStorage();
@@ -84,6 +86,7 @@ const AppContent = () => {
               <p className="text-gray-600 mt-2">AI assistant features coming soon...</p>
             </div>
           } />
+          <Route path="/device-view" element={<DevicesView/>} />
         </Routes>
       </main>
 

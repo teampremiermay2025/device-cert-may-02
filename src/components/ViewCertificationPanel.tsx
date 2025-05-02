@@ -6,42 +6,130 @@ import {
   ChatBubbleLeftIcon,
   PencilIcon,
   ArrowPathIcon,
-  EllipsisHorizontalIcon,
   StarIcon,
   ChevronDownIcon,
   ChevronUpIcon,
   DevicePhoneMobileIcon,
   CalendarIcon,
+  ShareIcon,
+  ArrowDownTrayIcon,
+  UserCircleIcon,
+  ClockIcon,
+  EyeIcon,
 } from '@heroicons/react/24/outline';
-import { CertificationRequest, CertificationTask, CertificationStage, TaskStatus } from '../types';
+import { CertificationRequest, CertificationTask, CertificationStage, TaskStatus, Activity } from '../types';
 import { TaskBoard } from './TaskBoard';
 import { getStageColor } from '../lib/workflow';
 import { storage } from '../lib/storage';
 import taskStepsData from '../data/ruleset.json';
 import { TaskDetailModal } from './TaskDetailModal';
+import usersData from '../data/users.json';
 
 interface ViewCertificationPanelProps {
   certification: CertificationRequest;
   onUpdate: (certification: CertificationRequest) => void;
+  onUpdateNoClose: (certification: CertificationRequest) => void;
   onCancel: () => void;
 }
+
+const UserBubble: FC<{ userId: string; size?: 'sm' | 'md' }> = ({ userId, size = 'md' }) => {
+  const user = usersData.users.find(u => u.id === userId);
+  if (!user) return null;
+
+  const getInitials = (name: string) => {
+    const parts = name.split(' ');
+    return parts.length > 1 
+      ? `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase()
+      : name.slice(0, 2).toUpperCase();
+  };
+
+  const sizeClasses = {
+    sm: 'w-6 h-6 text-xs',
+    md: 'w-8 h-8 text-sm'
+  };
+
+  return (
+    <div className="flex items-center gap-2" title={user.name}>
+      {user.avatar ? (
+        <img
+          src={user.avatar}
+          alt={user.name}
+          className={`${sizeClasses[size]} rounded-full border border-gray-200`}
+        />
+      ) : (
+        <div className={`${sizeClasses[size]} rounded-full bg-blue-500 text-white flex items-center justify-center font-medium`}>
+          {getInitials(user.name)}
+        </div>
+      )}
+      <span className="text-sm font-medium text-gray-700">{user.name}</span>
+    </div>
+  );
+};
+
+const ActivityItem: FC<{ activity: Activity }> = ({ activity }) => {
+  const user = usersData.users.find(u => u.id === activity.userId);
+  if (!user) return null;
+
+  const getActivityMessage = () => {
+    switch (activity.type) {
+      case 'certification_created':
+        return `created certification "${activity.details.projectName}"`;
+      case 'certification_updated':
+        return 'updated certification details';
+      case 'task_created':
+        return `created task "${activity.details.taskName}"`;
+      case 'task_updated':
+        return `updated task "${activity.details.taskName}"`;
+      case 'task_status_changed':
+        return `changed status of "${activity.details.taskName}" from ${activity.details.oldStatus} to ${activity.details.newStatus}`;
+      case 'task_assigned':
+        const oldAssignee = activity.details.oldAssignee ? usersData.users.find(u => u.id === activity.details.oldAssignee)?.name : 'unassigned';
+        const newAssignee = activity.details.newAssignee ? usersData.users.find(u => u.id === activity.details.newAssignee)?.name : 'unassigned';
+        return `reassigned task "${activity.details.taskName}" from ${oldAssignee} to ${newAssignee}`;
+      case 'comment_added':
+        return `commented on task "${activity.details.taskName}"`;
+      case 'attachment_added':
+        return `added attachment "${activity.details.attachmentName}" to task "${activity.details.taskName}"`;
+      case 'stage_changed':
+        return `moved certification from ${activity.details.oldStage} to ${activity.details.newStage}`;
+      default:
+        return 'performed an action';
+    }
+  };
+
+  return (
+    <div className="flex items-start gap-3 py-3">
+      <UserBubble userId={activity.userId} size="sm" />
+      <div className="flex-1 min-w-0">
+        <div className="text-sm">
+          <span className="font-medium">{user.name}</span>
+          {' '}{getActivityMessage()}
+        </div>
+        <span className="text-xs text-gray-500">
+          {new Date(activity.timestamp).toLocaleString()}
+        </span>
+      </div>
+    </div>
+  );
+};
 
 export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
   certification,
   onUpdate,
+  onUpdateNoClose,
   onCancel,
 }) => {
   const [selectedTask, setSelectedTask] = useState<CertificationTask | null>(null);
   const [view, setView] = useState<'list' | 'board'>('board');
   const [workflow, setWorkflow] = useState<any>(null);
 
-  // State for expandable sections
   const [expandedSections, setExpandedSections] = useState({
-    deviceDetails: false,
-    forecastedDates: false,
+    deviceDetails: true,
+    forecastedDates: true,
+    people: false,
+    activity: true,
   });
 
-  // Load the workflow associated with the certification
   useEffect(() => {
     const saved = localStorage.getItem('jiraWorkflows');
     if (saved) {
@@ -87,7 +175,6 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
     setSelectedTask(task);
   };
 
-  // Function to filter tasks from ruleset.json based on projectType, deviceChannel, and stage
   const filterTasksFromRuleset = (stage: string, projectType: string, deviceChannel: string): CertificationTask[] => {
     const filteredTasks = taskStepsData.filter((task) => {
       const matchesIssueType = task.issue_types.includes(projectType);
@@ -110,10 +197,13 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
       timeSpent: undefined,
       labels: [],
       stage: stage.toUpperCase() as CertificationStage,
+      createdAt: new Date().toISOString(),
+      createdBy: certification.assignee || 'system'
     }));
   };
 
   const handleTaskUpdate = (updatedTask: CertificationTask) => {
+    const originalTask = certification.tasks.find(t => t.id === updatedTask.id);
     const updatedTasks = certification.tasks.map(task =>
       task.id === updatedTask.id ? updatedTask : task
     );
@@ -123,6 +213,26 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
       tasks: updatedTasks,
       lastUpdated: new Date().toISOString(),
     };
+
+    // Track task status change
+    if (originalTask && originalTask.status !== updatedTask.status) {
+      storage.addActivity(certification.id, 'task_status_changed', certification.assignee, {
+        taskId: updatedTask.id,
+        taskName: updatedTask.name,
+        oldStatus: originalTask.status,
+        newStatus: updatedTask.status
+      });
+    }
+
+    // Track task assignment change
+    if (originalTask && originalTask.assignee !== updatedTask.assignee) {
+      storage.addActivity(certification.id, 'task_assigned', certification.assignee, {
+        taskId: updatedTask.id,
+        taskName: updatedTask.name,
+        oldAssignee: originalTask.assignee,
+        newAssignee: updatedTask.assignee
+      });
+    }
 
     const currentStageTasks = updatedCertification.tasks.filter(
       task => task.stage === certification.status
@@ -138,6 +248,12 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
         const nextStage = stageOrder[nextStageIndex] as CertificationStage;
         const newTasks = filterTasksFromRuleset(nextStage, certification.type, certification.deviceChannel);
 
+        // Track stage change
+        storage.addActivity(certification.id, 'stage_changed', certification.assignee, {
+          oldStage: certification.status,
+          newStage: nextStage
+        });
+
         updatedCertification = {
           ...updatedCertification,
           status: nextStage,
@@ -146,12 +262,94 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
             ...newTasks,
           ],
         };
+
+        // Track new tasks creation
+        newTasks.forEach(task => {
+          storage.addActivity(certification.id, 'task_created', certification.assignee, {
+            taskId: task.id,
+            taskName: task.name
+          });
+        });
       }
     }
 
     storage.updateCertification(updatedCertification);
-    onUpdate(updatedCertification);
+    onUpdateNoClose(updatedCertification);
     setSelectedTask(null);
+  };
+
+  const handleTaskUpdateNoClose = (updatedTask: CertificationTask) => {
+    const originalTask = certification.tasks.find(t => t.id === updatedTask.id);
+    const updatedTasks = certification.tasks.map(task =>
+      task.id === updatedTask.id ? updatedTask : task
+    );
+
+    let updatedCertification = {
+      ...certification,
+      tasks: updatedTasks,
+      lastUpdated: new Date().toISOString(),
+    };
+
+    // Track task updates
+    if (originalTask) {
+      if (originalTask.status !== updatedTask.status) {
+        storage.addActivity(certification.id, 'task_status_changed', certification.assignee, {
+          taskId: updatedTask.id,
+          taskName: updatedTask.name,
+          oldStatus: originalTask.status,
+          newStatus: updatedTask.status
+        });
+      }
+
+      if (originalTask.assignee !== updatedTask.assignee) {
+        storage.addActivity(certification.id, 'task_assigned', certification.assignee, {
+          taskId: updatedTask.id,
+          taskName: updatedTask.name,
+          oldAssignee: originalTask.assignee,
+          newAssignee: updatedTask.assignee
+        });
+      }
+    }
+
+    const currentStageTasks = updatedCertification.tasks.filter(
+      task => task.stage === certification.status
+    );
+    const allTasksDone = currentStageTasks.every(task => task.status === 'DONE');
+
+    if (allTasksDone && workflow) {
+      const stageOrder = workflow.stages.map((stage: any) => stage.name);
+      const currentStageIndex = stageOrder.indexOf(certification.status);
+      const nextStageIndex = currentStageIndex + 1;
+
+      if (nextStageIndex < stageOrder.length) {
+        const nextStage = stageOrder[nextStageIndex] as CertificationStage;
+        const newTasks = filterTasksFromRuleset(nextStage, certification.type, certification.deviceChannel);
+
+        storage.addActivity(certification.id, 'stage_changed', certification.assignee, {
+          oldStage: certification.status,
+          newStage: nextStage
+        });
+
+        updatedCertification = {
+          ...updatedCertification,
+          status: nextStage,
+          tasks: [
+            ...updatedCertification.tasks,
+            ...newTasks,
+          ],
+        };
+
+        newTasks.forEach(task => {
+          storage.addActivity(certification.id, 'task_created', certification.assignee, {
+            taskId: task.id,
+            taskName: task.name
+          });
+        });
+      }
+    }
+
+    storage.updateCertification(updatedCertification);
+    onUpdateNoClose(updatedCertification);
   };
 
   const currentStageTasks = certification.tasks.filter(
@@ -159,189 +357,233 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
   );
 
   return (
-    <div className="view-certification-panel bg-white rounded-2xl shadow-xl p-10 w-full mx-auto min-h-[70vh] flex flex-col gap-8">
-      {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-2 border-b pb-4">
-        <div className="flex flex-col gap-1">
-          <h2 className="text-3xl font-extrabold text-blue-900 flex items-center gap-3">
-            {certification.darpKey}
-            <span className={`px-3 py-1 rounded-full text-base font-semibold ${getStageColor(certification.status)}`}>{certification.status}</span>
-          </h2>
+    <div className="view-certification-panel bg-gradient-to-br from-gray-50 to-white rounded-2xl shadow-xl p-6 w-full mx-auto min-h-[70vh] flex flex-col gap-4">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 pb-4 border-b border-gray-200">
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-3">
+            <h2 className="text-3xl font-extrabold bg-gradient-to-r from-blue-900 to-blue-700 bg-clip-text text-transparent">
+              {certification.darpKey}
+            </h2>
+            <span className={`px-3 py-1 rounded-full text-base font-semibold ${getStageColor(certification.status)}`}>
+              {certification.status}
+            </span>
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+              {certification.type}
+            </span>
+          </div>
           <span className="text-lg text-gray-600">{certification.projectName}</span>
         </div>
-        <div className="flex gap-2 flex-wrap">
-          <button className="p-2 hover:bg-blue-50 rounded-lg" title="Star">
-            <StarIcon className="w-6 h-6 text-blue-400" />
+        <div className="flex items-center gap-3">
+          <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="Add to Favorites">
+            <StarIcon className="w-5 h-5 text-gray-500" />
           </button>
-          <button className="p-2 hover:bg-blue-50 rounded-lg" title="Add User">
-            <UserPlusIcon className="w-6 h-6 text-blue-400" />
+          <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="Share">
+            <ShareIcon className="w-5 h-5 text-gray-500" />
           </button>
-          <button className="p-2 hover:bg-blue-50 rounded-lg" title="Comments">
-            <ChatBubbleLeftIcon className="w-6 h-6 text-blue-400" />
-          </button>
-          <button className="p-2 hover:bg-blue-50 rounded-lg" title="Edit">
-            <PencilIcon className="w-6 h-6 text-blue-400" />
-          </button>
-          <button className="p-2 hover:bg-blue-50 rounded-lg" title="Refresh">
-            <ArrowPathIcon className="w-6 h-6 text-blue-400" />
-          </button>
-          <button className="p-2 hover:bg-blue-50 rounded-lg" title="More">
-            <EllipsisHorizontalIcon className="w-6 h-6 text-blue-400" />
+          <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="Export">
+            <ArrowDownTrayIcon className="w-5 h-5 text-gray-500" />
           </button>
           <button
-            className="px-5 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg font-semibold text-gray-700 ml-4"
             onClick={onCancel}
+            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium text-gray-700 transition-colors"
           >
-            Cancel
+            Close
           </button>
         </div>
       </div>
 
-      {/* Basic Details Section (already improved) */}
-      <div className="bg-gradient-to-tr from-blue-50 to-white rounded-xl border border-blue-100 p-6 shadow-sm">
-        <h3 className="text-lg font-bold mb-6 text-blue-900 flex items-center gap-2">
-          <span className="inline-block w-2 h-6 bg-blue-500 rounded-full mr-2"></span>
-          Basic Details
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="flex flex-col">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">DARP Key</span>
-            <span className="text-base font-medium text-gray-900 mt-1 break-all">{certification.darpKey}</span>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="lg:col-span-2 space-y-4">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 cursor-pointer"
+              onClick={() => toggleSection('deviceDetails')}
+            >
+              <div className="flex items-center gap-2">
+                <DevicePhoneMobileIcon className="w-5 h-5 text-gray-500" />
+                <h3 className="text-lg font-semibold text-gray-900">Device Details</h3>
+              </div>
+              {expandedSections.deviceDetails ? (
+                <ChevronUpIcon className="w-5 h-5 text-gray-500" />
+              ) : (
+                <ChevronDownIcon className="w-5 h-5 text-gray-500" />
+              )}
+            </div>
+            {expandedSections.deviceDetails && (
+              <div className="p-4">
+                <dl className="grid grid-cols-1 gap-x-2 gap-y-3 sm:grid-cols-3">
+                  <div className="flex items-center gap-2">
+                    <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                      <UserPlusIcon className="w-5 h-5" /> Vendor:
+                    </dt>
+                    <dd className="text-sm text-gray-900">{certification.vendor || '-'}</dd>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                      <DevicePhoneMobileIcon className="w-5 h-5" /> Device Type:
+                    </dt>
+                    <dd className="text-sm text-gray-900">{certification.deviceType || '-'}</dd>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                      <DevicePhoneMobileIcon className="w-5 h-5" /> Model:
+                    </dt>
+                    <dd className="text-sm text-gray-900">{certification.deviceModel || '-'}</dd>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                      <PencilIcon className="w-5 h-5" /> Marketing Name:
+                    </dt>
+                    <dd className="text-sm text-gray-900">{certification.deviceMarketingName || '-'}</dd>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                      <DevicePhoneMobileIcon className="w-5 h-5" /> OS Version:
+                    </dt>
+                    <dd className="text-sm text-gray-900">{certification.deviceOS} {certification.deviceOSVersion}</dd>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                      <DevicePhoneMobileIcon className="w-5 h-5" /> Hardware Version:
+                    </dt>
+                    <dd className="text-sm text-gray-900">{certification.deviceHardwareVersion || '-'}</dd>
+                  </div>
+                </dl>
+              </div>
+            )}
           </div>
-          <div className="flex flex-col">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Project Name</span>
-            <span className="text-base font-medium text-gray-900 mt-1">{certification.projectName}</span>
+
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 cursor-pointer"
+              onClick={() => toggleSection('forecastedDates')}
+            >
+              <div className="flex items-center gap-2">
+                <CalendarIcon className="w-5 h-5 text-gray-500" />
+                <h3 className="text-lg font-semibold text-gray-900">Forecasted Dates</h3>
+              </div>
+              {expandedSections.forecastedDates ? (
+                <ChevronUpIcon className="w-5 h-5 text-gray-500" />
+              ) : (
+                <ChevronDownIcon className="w-5 h-5 text-gray-500" />
+              )}
+            </div>
+            {expandedSections.forecastedDates && (
+              <div className="p-4">
+                <dl className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2">
+                  <div className="flex items-center gap-2">
+                    <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                      <CalendarIcon className="w-5 h-5" /> Device Entry:
+                    </dt>
+                    <dd className="text-sm text-gray-900">{certification.forecastedDEDate || '-'}</dd>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                      <CalendarIcon className="w-5 h-5" /> FFW Date:
+                    </dt>
+                    <dd className="text-sm text-gray-900">{certification.forecastedFFWDate || '-'}</dd>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                      <CalendarIcon className="w-5 h-5" /> TA Date:
+                    </dt>
+                    <dd className="text-sm text-gray-900">{certification.forecastedTADate || '-'}</dd>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                      <CalendarIcon className="w-5 h-5" /> Launch Date:
+                    </dt>
+                    <dd className="text-sm text-gray-900">{certification.forecastedLaunchDate || '-'}</dd>
+                  </div>
+                </dl>
+              </div>
+            )}
           </div>
-          <div className="flex flex-col">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Type</span>
-            <span className="inline-block mt-1 px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold shadow-sm">{certification.type}</span>
-          </div>
+
+          {certification.issues && certification.issues.length > 0 && (
+            <div className="bg-white rounded-xl border border-yellow-200 shadow-sm p-6">
+              <h3 className="text-lg font-bold mb-4 text-yellow-700 flex items-center gap-2">
+                <ExclamationTriangleIcon className="w-5 h-5 text-yellow-600" />
+                Issues
+              </h3>
+              <div className="space-y-2">
+                {certification.issues.map((issue, index) => (
+                  <div key={index} className="flex items-start gap-2">
+                    <ExclamationTriangleIcon className="w-4 h-4 text-yellow-600 mt-1" />
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">{issue.title}</p>
+                      <p className="text-sm text-gray-700">{issue.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
-      </div>
 
-      {/* Device Details Section */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
-        <button
-          className="w-full p-5 flex justify-between items-center hover:bg-blue-50 rounded-t-xl transition"
-          onClick={() => toggleSection('deviceDetails')}
-        >
-          <div className="flex items-center">
-            <DevicePhoneMobileIcon className="w-6 h-6 mr-2 text-blue-400" />
-            <h3 className="text-lg font-semibold">Device Details</h3>
-          </div>
-          {expandedSections.deviceDetails ? (
-            <ChevronUpIcon className="w-6 h-6 text-blue-400" />
-          ) : (
-            <ChevronDownIcon className="w-6 h-6 text-blue-400" />
-          )}
-        </button>
-        {expandedSections.deviceDetails && (
-          <div className="px-6 pb-6 pt-2">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Vendor</p>
-                <p className="text-base text-gray-800">{certification.vendor}</p>
+        <div className="space-y-4">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 cursor-pointer"
+              onClick={() => toggleSection('people')}
+            >
+              <div className="flex items-center gap-2">
+                <UserCircleIcon className="w-5 h-5 text-gray-500" />
+                <h3 className="text-lg font-semibold text-gray-900">People</h3>
               </div>
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Device Type</p>
-                <p className="text-base text-gray-800">{certification.deviceType}</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Model</p>
-                <p className="text-base text-gray-800">{certification.deviceModel}</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Marketing Name</p>
-                <p className="text-base text-gray-800">{certification.deviceMarketingName}</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Code Name</p>
-                <p className="text-base text-gray-800">{certification.deviceCodeName}</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">OS</p>
-                <p className="text-base text-gray-800">{certification.deviceOS} {certification.deviceOSVersion}</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Hardware Version</p>
-                <p className="text-base text-gray-800">{certification.deviceHardwareVersion}</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Payment Type</p>
-                <p className="text-base text-gray-800">{certification.devicePaymentType}</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Channel</p>
-                <p className="text-base text-gray-800">{certification.deviceChannel}</p>
-              </div>
+              {expandedSections.people ? (
+                <ChevronUpIcon className="w-5 h-5 text-gray-500" />
+              ) : (
+                <ChevronDownIcon className="w-5 h-5 text-gray-500" />
+              )}
             </div>
-          </div>
-        )}
-      </div>
-
-      {/* Forecasted Dates Section */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
-        <button
-          className="w-full p-5 flex justify-between items-center hover:bg-blue-50 rounded-t-xl transition"
-          onClick={() => toggleSection('forecastedDates')}
-        >
-          <div className="flex items-center">
-            <CalendarIcon className="w-6 h-6 mr-2 text-blue-400" />
-            <h3 className="text-lg font-semibold">Forecasted Dates</h3>
-          </div>
-          {expandedSections.forecastedDates ? (
-            <ChevronUpIcon className="w-6 h-6 text-blue-400" />
-          ) : (
-            <ChevronDownIcon className="w-6 h-6 text-blue-400" />
-          )}
-        </button>
-        {expandedSections.forecastedDates && (
-          <div className="px-6 pb-6 pt-2">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Device Entry (DE) Date</p>
-                <p className="text-base text-gray-800">{certification.forecastedDEDate || 'Not specified'}</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">FFW Date</p>
-                <p className="text-base text-gray-800">{certification.forecastedFFWDate || 'Not specified'}</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">TA Date</p>
-                <p className="text-base text-gray-800">{certification.forecastedTADate || 'Not specified'}</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Launch Date</p>
-                <p className="text-base text-gray-800">{certification.forecastedLaunchDate || 'Not specified'}</p>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Issues Section */}
-      {certification.issues && certification.issues.length > 0 && (
-        <div className="bg-white rounded-xl border border-yellow-200 shadow-sm p-6">
-          <h3 className="text-lg font-bold mb-4 text-yellow-700 flex items-center gap-2">
-            <ExclamationTriangleIcon className="w-5 h-5 text-yellow-600" />
-            Issues
-          </h3>
-          <div className="space-y-2">
-            {certification.issues.map((issue, index) => (
-              <div key={index} className="flex items-start gap-2">
-                <ExclamationTriangleIcon className="w-4 h-4 text-yellow-600 mt-1" />
+            {expandedSections.people && (
+              <div className="p-4 space-y-4">
                 <div>
-                  <p className="text-sm font-semibold text-yellow-900">{issue.title}</p>
-                  <p className="text-sm text-yellow-700">{issue.description}</p>
+                  <h4 className="text-sm font-medium text-gray-500 mb-2">Reporter</h4>
+                  {certification.reporter ? (
+                    <UserBubble userId={certification.reporter} />
+                  ) : (
+                    <span className="text-sm text-gray-500">No reporter assigned</span>
+                  )}
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-gray-500 mb-2">Assignee</h4>
+                  {certification.assignee ? (
+                    <UserBubble userId={certification.assignee} />
+                  ) : (
+                    <span className="text-sm text-gray-500">No assignee</span>
+                  )}
                 </div>
               </div>
-            ))}
+            )}
+          </div>
+
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 cursor-pointer"
+              onClick={() => toggleSection('activity')}
+            >
+              <div className="flex items-center gap-2">
+                <ClockIcon className="w-5 h-5 text-gray-500" />
+                <h3 className="text-lg font-semibold text-gray-900">Activity</h3>
+              </div>
+              {expandedSections.activity ? (
+                <ChevronUpIcon className="w-5 h-5 text-gray-500" />
+              ) : (
+                <ChevronDownIcon className="w-5 h-5 text-gray-500" />
+              )}
+            </div>
+            {expandedSections.activity && (
+              <div className="p-4">
+                <div className="space-y-2 max-h-[400px] overflow-y-auto">
+                  {certification.activities?.map((activity) => (
+                    <ActivityItem key={activity.id} activity={activity} />
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
-      )}
+      </div>
 
-      {/* Task View Switcher & List/Board */}
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 mt-4">
         <div className="flex justify-between items-center">
           <div className="flex gap-2">
             <button
@@ -362,7 +604,7 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
           {view === 'board' ? (
             <TaskBoard
               tasks={currentStageTasks}
-              onTaskUpdate={handleTaskUpdate}
+              onTaskUpdate={handleTaskUpdateNoClose}
               onTaskClick={handleTaskSelect}
             />
           ) : (
@@ -409,13 +651,10 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
         </div>
       </div>
 
-      {/* Task Detail Modal (inline) */}
       {selectedTask && (
         <TaskDetailModal
           isOpen={true}
-          onClose={() => {
-            onCancel();
-          }}
+          onClose={() => setSelectedTask(null)}
           task={selectedTask}
           onUpdate={handleTaskUpdate}
         />
