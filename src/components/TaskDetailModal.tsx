@@ -15,7 +15,7 @@ import {
   CheckIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline';
-import { CertificationTask, TaskPriority, TaskStatus } from '../types';
+import { CertificationTask, TaskPriority, CertificationStage } from '../types';
 import { storage } from '../lib/storage';
 import testCasesData from '../data/testcases.json';
 
@@ -34,6 +34,16 @@ interface TestCase {
   status: string;
 }
 
+// Function to get background color for test case status (similar to workflow stages)
+const getTestCaseStatusColor = (status: string): string => {
+  const colors: Record<string, string> = {
+    'NOT STARTED': 'bg-gray-100 text-gray-800',
+    'IN PROGRESS': 'bg-blue-100 text-blue-800',
+    'DONE': 'bg-green-100 text-green-800',
+  };
+  return colors[status] || 'bg-gray-100 text-gray-800';
+};
+
 export const TaskDetailModal: FC<TaskDetailModalProps> = ({
   isOpen,
   onClose,
@@ -46,26 +56,49 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
 
   // State for AI test case generation UI
   const [showAITestCaseSection, setShowAITestCaseSection] = useState(false);
-  const [aiStep, setAIStep] = useState<'idle' | 'processing' | 'understanding' | 'typing' | 'done'>('idle');
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  // Initialize aiStep from localStorage if available, otherwise default to 'idle'
+  const initialAIStep = localStorage.getItem(`aiStep-${task.id}`) as 'idle' | 'extracting' | 'thinking' | 'understanding' | 'generating' | 'done' | null;
+  const [aiStep, setAIStep] = useState<'idle' | 'extracting' | 'thinking' | 'understanding' | 'generating' | 'done'>(initialAIStep || 'idle');
   const [aiTestCases, setAITestCases] = useState<TestCase[]>([]);
   const [expandedTestCases, setExpandedTestCases] = useState<{ [key: string]: boolean }>({});
   const [editingTestCaseId, setEditingTestCaseId] = useState<string | null>(null);
   const [editedTestCase, setEditedTestCase] = useState<Partial<TestCase>>({});
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isInitialRender, setIsInitialRender] = useState(true);
 
-  // Load test cases from localStorage and set showAITestCaseSection when the modal opens
+  // Load test cases and set showAITestCaseSection when the modal opens
   useEffect(() => {
     if (isOpen) {
+      console.log('Task details on modal open:', {
+        status: editedTask.status,
+        name: editedTask.name,
+        nameIncludesTesting: editedTask.name.toLowerCase().includes('testing'),
+        aiStep: aiStep,
+      });
       const savedTestCases = storage.getTestCasesForTask(task.id);
       console.log('Loaded test cases for task', task.id, ':', savedTestCases);
       setAITestCases(savedTestCases);
-      // Show the test case section if there are saved test cases
       setShowAITestCaseSection(savedTestCases.length > 0);
+      setIsInitialRender(false);
+    }
+  }, [isOpen, task.id, editedTask.status, editedTask.name]);
+
+  // Save aiStep to localStorage whenever it changes
+  useEffect(() => {
+    if (isOpen && !isInitialRender) {
+      console.log('Saving aiStep to localStorage:', aiStep);
+      localStorage.setItem(`aiStep-${task.id}`, aiStep);
+    }
+  }, [aiStep, task.id, isOpen, isInitialRender]);
+
+  // Clean up localStorage when the modal closes (optional)
+  useEffect(() => {
+    if (!isOpen) {
+      // Optionally clean up aiStep if needed
+      // localStorage.removeItem(`aiStep-${task.id}`);
     }
   }, [isOpen, task.id]);
 
-  const handleStatusChange = (status: TaskStatus) => {
+  const handleStatusChange = (status: CertificationStage) => {
     setEditedTask({ ...editedTask, status });
   };
 
@@ -75,7 +108,7 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
 
   const handleSave = () => {
     onUpdate(editedTask);
-    onClose(); // Explicitly close the modal after saving
+    onClose();
   };
 
   const handleAddComment = () => {
@@ -122,35 +155,12 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
     setSelectedFile(null);
   };
 
-  // Handler for AI Test Case button
   const handleAITestCaseClick = () => {
     setShowAITestCaseSection(true);
-    setAIStep('idle');
-    setUploadedFile(null);
-    setExpandedTestCases({});
+    setAIStep('extracting');
+    startAIProcessing();
   };
 
-  // Handler for file drop
-  const handleFileDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      setUploadedFile(e.dataTransfer.files[0]);
-      startAIProcessing();
-    }
-  };
-
-  const handleBrowseClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleTestFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setUploadedFile(e.target.files[0]);
-      startAIProcessing();
-    }
-  };
-
-  // Toggle expand/collapse for a test case
   const toggleTestCase = (testCaseId: string) => {
     setExpandedTestCases((prev) => ({
       ...prev,
@@ -158,24 +168,21 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
     }));
   };
 
-  // Remove a test case and update localStorage
   const handleRemoveTestCase = (testCaseId: string) => {
     const updatedTestCases = aiTestCases.filter(tc => tc.test_case_id !== testCaseId);
     setAITestCases(updatedTestCases);
     storage.saveTestCasesForTask(task.id, updatedTestCases);
   };
 
-  // Start editing a test case
   const handleEditTestCase = (tc: TestCase) => {
     setEditingTestCaseId(tc.test_case_id);
     setEditedTestCase({
       test_case_description: tc.test_case_description,
-      acceptance_criteria: [...tc.acceptance_criteria],
+      acceptance_criteria: tc.acceptance_criteria,
       assigned_to: tc.assigned_to,
     });
   };
 
-  // Save edited test case and update localStorage
   const handleSaveTestCase = (testCaseId: string) => {
     const updatedTestCases = aiTestCases.map(tc =>
       tc.test_case_id === testCaseId
@@ -193,61 +200,55 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
     setEditedTestCase({});
   };
 
-  // Handle changes to acceptance criteria during editing
-  const handleAcceptanceCriteriaChange = (index: number, value: string) => {
-    const updatedCriteria = [...(editedTestCase.acceptance_criteria || [])];
-    updatedCriteria[index] = value;
+  const handleAcceptanceCriteriaChange = (value: string) => {
+    const updatedCriteria = value.split('\n').filter(criterion => criterion.trim() !== '');
     setEditedTestCase({ ...editedTestCase, acceptance_criteria: updatedCriteria });
   };
 
-  // Simulate AI processing steps
   const startAIProcessing = () => {
-    setAIStep('processing');
+    setAIStep('extracting');
     setTimeout(() => {
-      setAIStep('understanding');
+      setAIStep('thinking');
       setTimeout(() => {
-        setAIStep('typing');
+        setAIStep('understanding');
         setTimeout(() => {
-          setAIStep('done');
-          const description = editedTask?.description || '';
-          let requirementTag = description;
+          setAIStep('generating');
+          setTimeout(() => {
+            setAIStep('done');
+            const description = editedTask?.description || '';
+            let requirementTag = description;
 
-          console.log('Extracted requirement tag:', requirementTag);
+            console.log('Extracted requirement tag:', requirementTag);
 
-          if (!requirementTag) {
-            setAITestCases(['No matching test cases found for this requirement tag.'] as any);
-            return;
-          }
+            if (!requirementTag) {
+              setAITestCases(['No matching test cases found for this requirement tag.'] as any);
+              return;
+            }
 
-          console.log('Matching requirement tag:', requirementTag);
-          const matchingChapters = testCasesData.filter(
-            (chapter) => chapter.requirement_tag === requirementTag
-          );
-          console.log('Matching chapters:', matchingChapters);
+            console.log('Matching requirement tag:', requirementTag);
+            const matchingChapters = testCasesData.filter(
+              (chapter) => chapter.requirement_tag === requirementTag
+            );
+            console.log('Matching chapters:', matchingChapters);
 
-          if (matchingChapters.length > 0) {
-            const allTestCases = matchingChapters.flatMap(chapter => chapter.test_cases);
-            const enrichedTestCases = allTestCases.map(tc => ({
-              ...tc,
-              assigned_to: tc.assigned_to || '',
-              status: tc.status || 'Not Started',
-            }));
-            setAITestCases(enrichedTestCases);
-            storage.saveTestCasesForTask(task.id, enrichedTestCases);
-          } else {
-            setAITestCases(['No test cases found for requirement tag: ' + requirementTag] as any);
-          }
-        }, 2500);
+            if (matchingChapters.length > 0) {
+              const allTestCases = matchingChapters.flatMap(chapter => chapter.test_cases);
+              const enrichedTestCases = allTestCases.map(tc => ({
+                ...tc,
+                assigned_to: tc.assigned_to || '',
+                status: tc.status || 'Not Started',
+              }));
+              setAITestCases(enrichedTestCases);
+              storage.saveTestCasesForTask(task.id, enrichedTestCases);
+            } else {
+              setAITestCases(['No test cases found for requirement tag: ' + requirementTag] as any);
+            }
+          }, 2500);
+        }, 2000);
       }, 2000);
     }, 2000);
   };
 
-  // Drag & drop helpers
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-  };
-
-  // Prevent modal from closing when clicking inside
   const handleDialogClick = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
@@ -270,15 +271,17 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
                 <Dialog.Title className="text-xl font-bold">
                   {editedTask.name}
                 </Dialog.Title>
-                <button
-                  onClick={handleAITestCaseClick}
-                  className="p-1 bg-pink-500 text-white rounded hover:bg-blue-600 flex items-center"
-                  title="Generate AI Test Case"
-                  disabled={showAITestCaseSection}
-                >
-                  <SparklesIcon className="w-5 h-5 mr-2 text-white" />
-                  <span className="inline-block align-middle">Generate Test Cases</span>
-                </button>
+                {editedTask.name.toLowerCase().includes('testing') && (
+                  <button
+                    onClick={handleAITestCaseClick}
+                    className="p-1 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center"
+                    title="Generate AI Test Case"
+                    disabled={showAITestCaseSection}
+                  >
+                    <SparklesIcon className="w-5 h-5 mr-2 text-white" />
+                    <span className="inline-block align-middle">Generate Test Cases</span>
+                  </button>
+                )}
               </div>
               <button
                 onClick={onClose}
@@ -383,51 +386,33 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
                 {/* AI Test Case Generation Section */}
                 {showAITestCaseSection && (
                   <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                    {aiStep === 'idle' && (
-                      <div
-                        className="flex flex-col items-center justify-center border-2 border-dashed border-blue-400 rounded-lg p-6 cursor-pointer hover:bg-blue-100 transition"
-                        onDrop={handleFileDrop}
-                        onDragOver={handleDragOver}
-                        onClick={handleBrowseClick}
-                        style={{ minHeight: 120 }}
-                      >
-                        <input
-                          ref={fileInputRef}
-                          type="file"
-                          accept=".pdf,.doc,.docx,.txt"
-                          className="hidden"
-                          onChange={handleTestFileChange}
-                        />
-                        <div className="text-blue-500 font-semibold text-lg">Drag & Drop requirement file here</div>
-                        <div className="text-gray-500 mt-2">or <span className="underline cursor-pointer text-blue-700">Browse</span></div>
-                      </div>
-                    )}
-                    {uploadedFile && aiStep !== 'done' && (
+                    {aiStep !== 'done' && (
                       <div className="flex flex-col items-center py-8">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="font-medium text-blue-600">{uploadedFile.name}</span>
-                        </div>
-                        {aiStep === 'processing' && (
-                          <div className="flex flex-col items-center">
-                            <div className="loader mb-2"></div>
-                            <span className="text-blue-700 font-medium animate-pulse">Processing...</span>
-                          </div>
-                        )}
-                        {aiStep === 'understanding' && (
-                          <div className="flex flex-col items-center">
-                            <div className="loader mb-2"></div>
-                            <span className="text-blue-700 font-medium animate-pulse">Understanding Requirement...</span>
-                          </div>
-                        )}
-                        {aiStep === 'typing' && (
-                          <div className="flex flex-col items-center">
-                            <div className="loader mb-2"></div>
-                            <span className="text-blue-700 font-medium animate-pulse">Creating Test Cases...</span>
-                            <div className="mt-4 w-full max-w-md bg-white border border-gray-200 rounded-lg p-4 h-24 overflow-y-auto animate-pulse">
-                              <span className="typing">Generating test cases...</span>
+                        <div className="w-full max-w-md">
+                          <div className="relative pt-1">
+                            <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-blue-200">
+                              <div
+                                style={{
+                                  width:
+                                    aiStep === 'extracting'
+                                      ? '25%'
+                                      : aiStep === 'thinking'
+                                      ? '50%'
+                                      : aiStep === 'understanding'
+                                      ? '75%'
+                                      : '100%',
+                                }}
+                                className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-500 transition-all duration-500"
+                              ></div>
+                            </div>
+                            <div className="text-center text-blue-700 font-medium animate-pulse">
+                              {aiStep === 'extracting' && 'Extracting requirement document...'}
+                              {aiStep === 'thinking' && 'Thinking...'}
+                              {aiStep === 'understanding' && 'Understanding the requirement...'}
+                              {aiStep === 'generating' && 'Generating test cases...'}
                             </div>
                           </div>
-                        )}
+                        </div>
                       </div>
                     )}
                     {aiStep === 'done' && (
@@ -436,7 +421,7 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
                         <div className="bg-white rounded-lg border max-h-64 overflow-y-auto">
                           {aiTestCases.length === 0 && (
                             <div className="p-4 text-gray-700">
-                              No test cases available. Upload a requirement file to generate test cases.
+                              No test cases available.
                             </div>
                           )}
                           {aiTestCases.map((tc, idx) => (
@@ -460,10 +445,19 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
                                 >
                                   <div className="flex-1 flex items-center space-x-2">
                                     <span className="text-gray-700 font-medium">{tc.test_case_id}</span>
-                                    <span className="text-gray-500 text-sm">({tc.status})</span>
-                                    <span className="text-gray-500 text-sm">Assigned to: {tc.assigned_to || 'Unassigned'}</span>
                                   </div>
                                   <div className="flex items-center space-x-2">
+                                    <span className={`px-2 py-1 rounded text-xs font-bold ${getTestCaseStatusColor(tc.status)}`}>
+                                      {tc.status.toUpperCase()}
+                                    </span>
+                                    <div className="flex items-center space-x-2">
+                                      <img
+                                        src="https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg"
+                                        alt="User Avatar"
+                                        className="w-6 h-6 rounded-full object-cover"
+                                      />
+                                      <span className="text-gray-500 text-sm">{tc.assigned_to || 'Unassigned'}</span>
+                                    </div>
                                     <button
                                       onClick={(e) => {
                                         e.stopPropagation();
@@ -514,20 +508,12 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
                                         </div>
                                         <div>
                                           <span className="font-semibold">Acceptance Criteria:</span>
-                                          <ul className="list-disc pl-5 mt-1">
-                                            {(editedTestCase.acceptance_criteria || tc.acceptance_criteria).map((criterion, critIdx) => (
-                                              <li key={critIdx} className="text-sm">
-                                                <input
-                                                  type="text"
-                                                  value={criterion}
-                                                  onChange={(e) =>
-                                                    handleAcceptanceCriteriaChange(critIdx, e.target.value)
-                                                  }
-                                                  className="w-full border rounded-lg p-1"
-                                                />
-                                              </li>
-                                            ))}
-                                          </ul>
+                                          <textarea
+                                            value={(editedTestCase.acceptance_criteria || tc.acceptance_criteria).join('\n')}
+                                            onChange={(e) => handleAcceptanceCriteriaChange(e.target.value)}
+                                            className="w-full border rounded-lg p-2 mt-1 min-h-[100px]"
+                                            placeholder="Enter acceptance criteria, one per line..."
+                                          />
                                         </div>
                                       </div>
                                     ) : (
@@ -582,7 +568,7 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
                       Status
                     </h3>
                     <div className="flex flex-wrap gap-2">
-                      {(['TODO', 'IN_PROGRESS', 'REVIEW', 'DONE'] as TaskStatus[]).map((status) => (
+                      {(['FORECAST', 'PLANNING', 'SUBMITTED', 'SUBMISSION_REVIEW', 'DEVICE_ENTRY', 'DEVICE_TESTING', 'TAQ_REVIEW', 'TA_COMPLETE', 'CLOSED'] as CertificationStage[]).map((status) => (
                         <button
                           key={status}
                           onClick={() => handleStatusChange(status)}
