@@ -94,3 +94,25 @@ supabase/
 # Bolt & Ignore
 .bolt/
 .bolt/ignore
+
+
+mockData.ts
+src/components/Carousel.tsx
+src/components/CompanyCard.tsx
+src/components/CompanyDashboard.tsx
+src/components/CompanyDetail.tsx
+src/components/Heirarchy.tsx
+src/components/OrganizationChart.tsx
+src/components/PreviewCard.tsx
+src/components/RecentCard.tsx
+src/components/RecentCompanyCard.tsx
+src/components/SiteCard.tsx
+src/components/SitesManager.tsx
+src/components/UserProfileSidebar.tsx
+src/data/mockData.ts
+src/hooks/Fan.ts
+src/hooks/index.ts
+src/hooks/organizationChartHelper.ts
+src/hooks/useCompanyData.ts
+src/hooks/useFanData.ts
+src/hooks/useFanProfile.ts
