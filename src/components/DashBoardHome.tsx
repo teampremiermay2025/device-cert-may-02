@@ -305,6 +305,8 @@ const DashboardWidgets: React.FC<{ styles: any }> = ({ }) => {
       gap: '16px',
       width: '100%',
       height: '400px',
+      padding: '16px',
+      paddingLeft: '52px',
     },
     widget: {
       backgroundColor: '#ffffff',
@@ -315,7 +317,7 @@ const DashboardWidgets: React.FC<{ styles: any }> = ({ }) => {
       display: 'flex',
       flexDirection: 'column' as const,
       justifyContent: 'space-between',
-      width: '290px',
+      width: '400px',
     },
     widgetTitle: {
       fontSize: '16px',
