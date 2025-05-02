@@ -4,6 +4,7 @@ import { Sidebar } from './components/Sidebar';
 import { Dashboard } from './components/Projects';
 import { DashBoardHome } from './components/DashBoardHome';
 import { HomePage } from './components/HomePage';
+import { DashboardProjects } from './components/DashBoardProjects';
 import { NewCertificationModal } from './components/NewCertificationModal';
 import JiraWorkflowEditor from './components/JiraWorkflowEditor';
 import { DashboardContainer } from './components/dashboard/DashboardContainer';
@@ -76,6 +77,7 @@ const AppContent = () => {
             </ProtectedRoute>
           } />
           <Route path="/home" element={< DashBoardHome/>} />
+          <Route path="/homeProjects" element={< DashboardProjects/>} />
           <Route path="/reports" element={
             <div className="p-8">
               <h1 className="text-2xl font-bold">Reports</h1>
