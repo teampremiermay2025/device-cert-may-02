@@ -6,6 +6,7 @@ import {
   horizontalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { DashboardProjects } from './DashBoardProjects';
 import { 
   PencilIcon, 
   TrashIcon,
@@ -123,7 +124,7 @@ const SortableCard: React.FC<{
 };
 
 // DashboardWidgets Component
-const DashboardWidgets: React.FC<{ styles: any }> = ({ styles }) => {
+const DashboardWidgets: React.FC<{ styles: any }> = ({ }) => {
   const widgetData = [
     {
       title: "IR",
@@ -245,6 +246,7 @@ const DashboardWidgets: React.FC<{ styles: any }> = ({ styles }) => {
       display: 'flex',
       flexDirection: 'column' as const,
       justifyContent: 'space-between',
+      width: '290px',
     },
     widgetTitle: {
       fontSize: '16px',
@@ -285,7 +287,7 @@ const DashboardWidgets: React.FC<{ styles: any }> = ({ styles }) => {
 };
 
 // New Grid Component for Inflight Work in Progress
-const InflightWorkGrid: React.FC<{ styles: any }> = ({ styles }) => {
+const InflightWorkGrid: React.FC<{ styles: any }> = ({}) => {
   const dummyData = [
     {
       id: "WIP001",
@@ -785,7 +787,8 @@ export const DashBoardHome = () => {
           <DashboardWidgets styles={styles} />
         </div>
       </div>
-      <InflightWorkGrid styles={styles} />
+      {/* <InflightWorkGrid styles={styles} /> */}
+      <DashboardProjects/>
     </div>
   );
 };
