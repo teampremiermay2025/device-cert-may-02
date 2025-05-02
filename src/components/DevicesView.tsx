@@ -1,6 +1,6 @@
 import React, { FC, useState, useCallback, useMemo } from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
-import { DevicePhoneMobileIcon, ComputerDesktopIcon, TvIcon, ClockIcon, LightBulbIcon, LockClosedIcon, HeartIcon, CloudIcon, SpeakerWaveIcon, Bars4Icon, TableCellsIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { DevicePhoneMobileIcon, ComputerDesktopIcon, TvIcon, ClockIcon, LightBulbIcon, LockClosedIcon, HeartIcon, CloudIcon, SpeakerWaveIcon, Bars4Icon, TableCellsIcon, MagnifyingGlassIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 import { DeviceDetailsModal } from './DeviceDetailsModal';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
@@ -27,8 +27,8 @@ interface Device {
 const devicesData: { nonIot: Device[]; iot: Device[] } = {
   nonIot: [
     // Apple Devices
-    { id: 'DARP-1', name: 'DARP 1', vendor: 'Apple', type: 'Smartphone', model: 'iPhone 16', codeName: 'Code-iPhone-16', os: 'iOS', osVersion: '18.0', hardwareVersion: '1.0', paymentType: 'Post-Paid', channel: 'Retail', image: "./public/assets/apple-logo.svg", releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/15/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/15/2025: Initial release completed successfully'] },
-    { id: 'DARP-123', name: 'DARP 123', vendor: 'Apple', type: 'Laptop', model: 'MacBook Pro 2025', codeName: 'Code-MacBook-Pro-2025', os: 'macOS', osVersion: '15.0', hardwareVersion: '2.0', paymentType: 'Pre-Paid', channel: 'Online', image: './apple-log.svg',releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/20/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/20/2025: Initial release completed successfully'] },
+    { id: 'DARP-1', name: 'DARP 1', vendor: 'Apple', type: 'Smartphone', model: 'iPhone 16', codeName: 'Code-iPhone-16', os: 'iOS', osVersion: '18.0', hardwareVersion: '1.0', paymentType: 'Post-Paid', channel: 'Retail', image: "./public/assets/iPhone16Pro.png", releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/15/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/15/2025: Initial release completed successfully'] },
+    { id: 'DARP-123', name: 'DARP 123', vendor: 'Apple', type: 'Laptop', model: 'MacBook Pro 2025', codeName: 'Code-MacBook-Pro-2025', os: 'macOS', osVersion: '15.0', hardwareVersion: '2.0', paymentType: 'Pre-Paid', channel: 'Online', image: './public/assets/mac.png',releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/20/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/20/2025: Initial release completed successfully'] },
     { id: 'DARP-124', name: 'DARP 124', vendor: 'Apple', type: 'Smartwatch', model: 'Apple Watch Series 10', codeName: 'Code-Apple-Watch-10', os: 'watchOS', osVersion: '11.0', hardwareVersion: '1.0', paymentType: 'Post-Paid', channel: 'Retail',image: './apple-log.svg', releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/22/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/22/2025: Initial release completed successfully'] },
     { id: 'DARP-125', name: 'DARP 125', vendor: 'Apple', type: 'Tablet', model: 'iPad Pro 2025', codeName: 'Code-iPad-Pro-2025', os: 'iPadOS', osVersion: '18.0', hardwareVersion: '1.0', paymentType: 'Pre-Paid', channel: 'Online', image: './apple-log.svg',releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/25/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/25/2025: Initial release completed successfully'] },
     // Samsung Devices
@@ -83,6 +83,16 @@ const deviceIcons: Record<string, JSX.Element> = {
   'Smart Fitness Tracker': <HeartIcon className="w-10 h-10 text-blue-500" />,
 };
 
+// Map OEMs to their specific images
+const oemImages: Record<string, string> = {
+  Apple: '/assets/apple-oem-logo.svg',
+  Samsung: '/assets/samsung-oem-logo.svg',
+  Google: '/assets/google-oem-logo.svg',
+  'IoT-HomeTech': '/assets/iot-hometech-oem-logo.svg',
+  SmartCityCorp: '/assets/smartcitycorp-oem-logo.svg',
+  HealthTechIoT: '/assets/healthtechiot-oem-logo.svg',
+};
+
 // Ag-Grid cell renderer for device name (clickable to open modal)
 const DeviceNameCellRenderer = (props: any) => {
   return (
@@ -104,6 +114,15 @@ export const DevicesView: FC = () => {
   const [gridApi, setGridApi] = useState<GridApi | null>(null);
   const [columnApi, setColumnApi] = useState<ColumnApi | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [expandedOems, setExpandedOems] = useState<Record<string, boolean>>({});
+
+  // Toggle expand/collapse for an OEM section
+  const toggleOemSection = (oem: string) => {
+    setExpandedOems(prev => ({
+      ...prev,
+      [oem]: !prev[oem],
+    }));
+  };
 
   // Get unique OEMs for the filter based on viewType
   const oems = useMemo(() => {
@@ -209,6 +228,7 @@ export const DevicesView: FC = () => {
       cellRenderer: DeviceNameCellRenderer,
       cellClass: 'font-medium text-gray-900',
       minWidth: 150,
+      editable: false, // Name opens modal, so not editable directly
     },
     {
       field: 'vendor',
@@ -216,6 +236,7 @@ export const DevicesView: FC = () => {
       filter: 'agSetColumnFilter',
       cellClass: 'text-gray-700',
       minWidth: 150,
+      editable: true, // Allow editing
     },
     {
       field: 'type',
@@ -223,6 +244,7 @@ export const DevicesView: FC = () => {
       filter: 'agSetColumnFilter',
       cellClass: 'text-gray-700',
       minWidth: 120,
+      editable: true, // Allow editing
     },
     {
       field: 'model',
@@ -230,6 +252,7 @@ export const DevicesView: FC = () => {
       filter: 'agTextColumnFilter',
       cellClass: 'text-gray-700',
       minWidth: 150,
+      editable: true, // Allow editing
     },
     {
       field: 'codeName',
@@ -237,6 +260,7 @@ export const DevicesView: FC = () => {
       filter: 'agTextColumnFilter',
       cellClass: 'text-gray-700',
       minWidth: 150,
+      editable: true, // Allow editing
     },
     {
       field: 'os',
@@ -244,6 +268,7 @@ export const DevicesView: FC = () => {
       filter: 'agTextColumnFilter',
       cellClass: 'text-gray-700',
       minWidth: 120,
+      editable: true, // Allow editing
     },
     {
       field: 'osVersion',
@@ -251,6 +276,7 @@ export const DevicesView: FC = () => {
       filter: 'agTextColumnFilter',
       cellClass: 'text-gray-700',
       minWidth: 120,
+      editable: true, // Allow editing
     },
     {
       field: 'hardwareVersion',
@@ -258,6 +284,7 @@ export const DevicesView: FC = () => {
       filter: 'agTextColumnFilter',
       cellClass: 'text-gray-700',
       minWidth: 150,
+      editable: true, // Allow editing
     },
   ], []);
 
@@ -274,8 +301,14 @@ export const DevicesView: FC = () => {
   }, []);
 
   const onRowDoubleClicked = useCallback((event: any) => {
-    setSelectedDevice(event.data);
-  }, []);
+    // Start editing on double-click
+    if (gridApi) {
+      gridApi.startEditingCell({
+        rowIndex: event.rowIndex,
+        colKey: 'vendor', // Start editing the first editable column
+      });
+    }
+  }, [gridApi]);
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-6">
@@ -370,61 +403,74 @@ export const DevicesView: FC = () => {
       {/* Devices Display */}
       {viewMode === 'tiles' ? (
         <DragDropContext onDragEnd={onDragEnd}>
-          <div className="space-y-10">
+          <div className="space-y-6">
             {Object.keys(groupedDevices).map(oem => (
               <div key={oem}>
-                <div className="flex items-center mb-6">
-                  {/* OEM Image */}
-                  {groupedDevices[oem].length > 0 && (
+                {/* OEM Header with Box Layout and Collapse/Expand */}
+                <div
+                  className="flex items-center justify-between bg-white border border-gray-200 rounded-lg p-4 mb-4 cursor-pointer hover:bg-gray-50 transition-colors"
+                  onClick={() => toggleOemSection(oem)}
+                >
+                  <div className="flex items-center">
+                    {/* OEM Image */}
                     <img
-                      src={groupedDevices[oem][0].image}
+                      src={oemImages[oem] || '/assets/default-oem-logo.svg'} // Fallback image if OEM not found
                       alt={`${oem} logo`}
                       className="w-16 h-16 rounded-full object-contain mr-4"
                     />
+                    {/* OEM Name */}
+                    <h2 className="text-xl font-semibold text-gray-900">{oem}</h2>
+                  </div>
+                  {/* Collapse/Expand Icon */}
+                  {expandedOems[oem] ? (
+                    <ChevronUpIcon className="w-6 h-6 text-gray-600" />
+                  ) : (
+                    <ChevronDownIcon className="w-6 h-6 text-gray-600" />
                   )}
-                  {/* OEM Name */}
-                  <h2 className="text-xl font-semibold text-gray-900">{oem}</h2>
                 </div>
-                <Droppable droppableId={oem} direction="horizontal">
-                  {(provided) => (
-                    <div
-                      className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 justify-items-center"
-                      {...provided.droppableProps}
-                      ref={provided.innerRef}
-                    >
-                      {groupedDevices[oem].map((device, index) => (
-                        <Draggable key={device.id} draggableId={device.id} index={index}>
-                          {(provided) => (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                              className="w-64 bg-white rounded-xl shadow-md border border-gray-200 hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1"
-                              onClick={() => setSelectedDevice(device)}
-                            >
-                              <div className="p-4 flex flex-col items-center">
-                                {/* Device Image */}
-                                <img
-                                  src={device.image}
-                                  alt={`${device.name} logo`}
-                                  className="w-16 h-16 rounded-full object-contain mb-4"
-                                />
-                                <h3 className="text-lg font-semibold text-gray-900 mb-2">{device.name}</h3>
-                                <p className="text-sm text-gray-600"><span className="font-medium">Vendor:</span> {device.vendor}</p>
-                                <p className="text-sm text-gray-600"><span className="font-medium">Type:</span> {device.type}</p>
-                                <p className="text-sm text-gray-600"><span className="font-medium">Model:</span> {device.model}</p>
-                                <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors">
-                                  View Details
-                                </button>
+                {/* Devices Grid (Collapsible) */}
+                {expandedOems[oem] && (
+                  <Droppable droppableId={oem} direction="horizontal">
+                    {(provided) => (
+                      <div
+                        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 justify-items-center"
+                        {...provided.droppableProps}
+                        ref={provided.innerRef}
+                      >
+                        {groupedDevices[oem].map((device, index) => (
+                          <Draggable key={device.id} draggableId={device.id} index={index}>
+                            {(provided) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                                className="w-64 bg-white rounded-xl shadow-md border border-gray-200 hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1"
+                                onClick={() => setSelectedDevice(device)}
+                              >
+                                <div className="p-4 flex flex-col items-center">
+                                  {/* Device Image */}
+                                  <img
+                                    src={device.image}
+                                    alt={`${device.name} logo`}
+                                    className="w-16 h-16 object-contain mb-4"
+                                  />
+                                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{device.name}</h3>
+                                  <p className="text-sm text-gray-600"><span className="font-medium">Vendor:</span> {device.vendor}</p>
+                                  <p className="text-sm text-gray-600"><span className="font-medium">Type:</span> {device.type}</p>
+                                  <p className="text-sm text-gray-600"><span className="font-medium">Model:</span> {device.model}</p>
+                                  <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors">
+                                    View Details
+                                  </button>
+                                </div>
                               </div>
-                            </div>
-                          )}
-                        </Draggable>
-                      ))}
-                      {provided.placeholder}
-                    </div>
-                  )}
-                </Droppable>
+                            )}
+                          </Draggable>
+                        ))}
+                        {provided.placeholder}
+                      </div>
+                    )}
+                  </Droppable>
+                )}
               </div>
             ))}
           </div>
@@ -473,6 +519,19 @@ export const DevicesView: FC = () => {
                   },
                 ],
                 defaultToolPanel: 'columns',
+              }}
+              editType="fullRow" // Enable full row editing
+              onCellValueChanged={(event) => {
+                // Update the devices state with edited values
+                const updatedDevices = [...devices[viewType]];
+                const index = updatedDevices.findIndex(device => device.id === event.data.id);
+                if (index !== -1) {
+                  updatedDevices[index] = event.data;
+                  setDevices({
+                    ...devices,
+                    [viewType]: updatedDevices,
+                  });
+                }
               }}
             />
           </div>
