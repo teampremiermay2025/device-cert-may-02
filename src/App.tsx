@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { Sidebar } from './components/Sidebar';
 import { Dashboard } from './components/Projects';
+import { DashBoardHome } from './components/DashBoardHome';
 import { HomePage } from './components/HomePage';
 import { NewCertificationModal } from './components/NewCertificationModal';
 import JiraWorkflowEditor from './components/JiraWorkflowEditor';
@@ -74,6 +75,7 @@ const AppContent = () => {
               <TeamManagement />
             </ProtectedRoute>
           } />
+          <Route path="/dashboardhome" element={< DashBoardHome/>} />
           <Route path="/reports" element={
             <div className="p-8">
               <h1 className="text-2xl font-bold">Reports</h1>
