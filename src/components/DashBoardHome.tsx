@@ -28,6 +28,7 @@ import {
   Filler,
 } from 'chart.js';
 import usersData from '../data/users.json';
+import { useNavigate } from 'react-router-dom';
 
 // Register Chart.js components
 ChartJS.register(
@@ -55,6 +56,7 @@ const SortableCard: React.FC<{
   removeCard: (id: string) => void;
   styles: any;
 }> = ({ card, removeCard, styles }) => {
+  const navigate = useNavigate();
   const {
     attributes,
     listeners,
@@ -115,6 +117,11 @@ const SortableCard: React.FC<{
               button.style === 'view'
                 ? styles.viewButton
                 : styles.actionButton
+            }
+            onClick={
+              button.style === 'view'
+                ? () => navigate('/projects')
+                : undefined
             }
           >
             {button.label}
