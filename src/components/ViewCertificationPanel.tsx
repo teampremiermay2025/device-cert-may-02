@@ -61,7 +61,7 @@ const UserBubble: FC<{ userId: string; size?: 'sm' | 'md' }> = ({ userId, size =
           {getInitials(user.name)}
         </div>
       )}
-      <span className="text-sm font-medium text-gray-700">{user.name}</span>
+      <span className="text-sm font-medium text-gray-700"></span>
     </div>
   );
 };
@@ -103,11 +103,11 @@ const ActivityItem: FC<{ activity: Activity }> = ({ activity }) => {
     <div className="flex items-start gap-3 py-3">
       <UserBubble userId={activity.userId} size="sm" />
       <div className="flex-1 min-w-0">
-        <div className="text-sm">
+        <div className="text-sm text-left">
           <span className="font-medium">{user.name}</span>
           {' '}{getActivityMessage()}
         </div>
-        <span className="text-xs text-gray-500">
+        <span className="text-xs text-gray-500 ">
           {new Date(activity.timestamp).toLocaleString()}
         </span>
       </div>
