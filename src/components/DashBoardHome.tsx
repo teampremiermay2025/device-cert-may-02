@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -12,6 +12,7 @@ import {
   TrashIcon,
   CloudIcon, 
   ComputerDesktopIcon,
+  BellIcon,
 } from '@heroicons/react/24/outline';
 import { Bar, Line } from 'react-chartjs-2';
 import {
@@ -26,6 +27,7 @@ import {
   Legend,
   Filler,
 } from 'chart.js';
+import usersData from '../data/users.json';
 
 // Register Chart.js components
 ChartJS.register(
@@ -118,6 +120,66 @@ const SortableCard: React.FC<{
             {button.label}
           </button>
         ))}
+      </div>
+    </div>
+  );
+};
+
+// ActivityItem for notifications
+const ActivityItem: React.FC<{ activity: any }> = ({ activity }) => {
+  const user = usersData.users.find(u => u.id === activity.userId);
+  if (!user) return null;
+  const getInitials = (name: string) => {
+    const parts = name.split(' ');
+    return parts.length > 1 
+      ? `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase()
+      : name.slice(0, 2).toUpperCase();
+  };
+  const getActivityMessage = () => {
+    switch (activity.type) {
+      case 'certification_created':
+        return `created certification "${activity.details.projectName}"`;
+      case 'certification_updated':
+        return 'updated certification details';
+      case 'task_created':
+        return `created task "${activity.details.taskName}"`;
+      case 'task_updated':
+        return `updated task "${activity.details.taskName}"`;
+      case 'task_status_changed':
+        return `changed status of "${activity.details.taskName}" from ${activity.details.oldStatus} to ${activity.details.newStatus}`;
+      case 'task_assigned':
+        const oldAssignee = activity.details.oldAssignee ? usersData.users.find(u => u.id === activity.details.oldAssignee)?.name : 'unassigned';
+        const newAssignee = activity.details.newAssignee ? usersData.users.find(u => u.id === activity.details.newAssignee)?.name : 'unassigned';
+        return `reassigned task "${activity.details.taskName}" from ${oldAssignee} to ${newAssignee}`;
+      case 'comment_added':
+        return `commented on task "${activity.details.taskName}"`;
+      case 'attachment_added':
+        return `added attachment "${activity.details.attachmentName}" to task "${activity.details.taskName}"`;
+      case 'stage_changed':
+        return `moved certification from ${activity.details.oldStage} to ${activity.details.newStage}`;
+      default:
+        return 'performed an action';
+    }
+  };
+  return (
+    <div className="flex items-start gap-3 py-3 text-left">
+      <div className="flex items-center gap-2" title={user.name}>
+      {user.avatar ? (
+        <img src={user.avatar} alt={user.name} className="w-6 h-6 rounded-full border border-gray-200" />
+      ) : (
+        <div className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-medium">
+        {getInitials(user.name)}
+        </div>
+      )}
+      </div>
+      <div className="flex-1 min-w-0">
+      <div className="text-sm">
+        <span className="font-medium">{user.name}</span>
+        {' '}{getActivityMessage()}
+      </div>
+      <span className="text-xs text-gray-500">
+        {new Date(activity.timestamp).toLocaleString()}
+      </span>
       </div>
     </div>
   );
@@ -433,6 +495,40 @@ export const DashBoardHome = () => {
   ];
 
   const [cards, setCards] = useState<CardData[]>(initialCards);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const notificationRef = useRef<HTMLDivElement>(null);
+
+  // Close notifications when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
+        setShowNotifications(false);
+      }
+    }
+    if (showNotifications) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showNotifications]);
+
+  // Aggregate all activities from all certifications
+  const allActivities = (() => {
+    let activities: any[] = [];
+    try {
+      const certs = JSON.parse(localStorage.getItem('certifications') || '[]');
+      certs.forEach((cert: any) => {
+        if (cert.activities && Array.isArray(cert.activities)) {
+          activities = activities.concat(cert.activities.map((a: any) => ({...a, certification: cert})));
+        }
+      });
+    } catch {}
+    // Sort by timestamp descending
+    return activities.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+  })();
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -721,6 +817,33 @@ export const DashBoardHome = () => {
     <div style={styles.dashboardContainer}>
       <div style={styles.header}>
         <h1 style={styles.headerTitle}>Welcome, Michel</h1>
+        <div style={{ position: 'relative' }} ref={notificationRef}>
+          <button
+            onClick={() => setShowNotifications(v => !v)}
+            className="p-2 rounded-full hover:bg-gray-100 relative"
+            aria-label="Notifications"
+          >
+            <BellIcon className="w-7 h-7 text-gray-500" />
+            {allActivities.length > 0 && (
+              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+            )}
+          </button>
+          {showNotifications && (
+            <div className="absolute right-0 mt-2 w-96 max-h-[500px] bg-white border border-gray-200 rounded-2xl shadow-2xl z-50 overflow-y-auto animate-fade-in"
+                 style={{ boxShadow: '0 8px 32px rgba(30, 64, 175, 0.18)', border: 'none' }}>
+              <div className="p-4 border-b font-semibold text-gray-700 bg-gradient-to-r from-blue-50 to-white rounded-t-2xl">Notifications</div>
+              <div className="p-4 space-y-2 max-h-[400px] overflow-y-auto">
+                {allActivities.length === 0 ? (
+                  <div className="text-gray-400 text-sm text-center py-8">No recent activity</div>
+                ) : (
+                  allActivities.slice(0, 30).map((activity, idx) => (
+                    <ActivityItem key={activity.id + idx} activity={activity} />
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
       <div style={styles.actionItems}>
         <span style={styles.actionTitle}>
