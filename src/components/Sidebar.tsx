@@ -165,6 +165,17 @@ export const Sidebar: FC<SidebarProps> = ({ onNavigate, onNewCertification }) =>
                 </li>
                 <li>
                   <button 
+                    onClick={() => onNavigate('/sites-manage')}
+                    className={`flex items-center space-x-3 w-full px-3 py-2 text-blue-100 hover:bg-blue-800 rounded-lg ${
+                      isActive('/sites-manage') ? 'bg-blue-800' : ''
+                    }`}
+                  >
+                    <UserGroupIcon className="w-5 h-5" />
+                    <span>Access Control</span>
+                  </button>
+                </li>
+                <li>
+                  <button 
                     onClick={() => onNavigate('/teams')}
                     className={`flex items-center space-x-3 w-full px-3 py-2 text-blue-100 hover:bg-blue-800 rounded-lg ${
                       isActive('/teams') ? 'bg-blue-800' : ''

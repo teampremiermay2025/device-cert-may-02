@@ -24,7 +24,8 @@ import { LearnPage } from './components/LearnPage';
 import { initializeLocalStorage } from './localStorageInit';
 import { DeviceListPage } from './components/DeviceListPage';
 import { DevicesView } from './components/DevicesView';
-
+import  CompanyDashboard  from './components/CompanyDashboard';
+import  Heirarchy from './components/Heirarchy';
 // Initialize localStorage with seed data if not already present
 initializeLocalStorage();
 
@@ -91,6 +92,8 @@ const AppContent = () => {
             </div>
           } />
           <Route path="/device-view" element={<DevicesView/>} />
+          <Route path="/sites-manage" element={<CompanyDashboard />} />
+          <Route path="/treeview" element={<Heirarchy />} />
         </Routes>
       </main>
 
