@@ -41,6 +41,7 @@ const statusOptions = [
 ];
 
 const getStatusColor = (status: CertificationStage): string => {
+  
   const colors: Record<CertificationStage, string> = {
     'FORECAST': 'bg-purple-100 text-purple-800',
     'PLANNING': 'bg-blue-100 text-blue-800',
@@ -52,7 +53,7 @@ const getStatusColor = (status: CertificationStage): string => {
     'TA_COMPLETE': 'bg-green-100 text-green-800',
     'CLOSED': 'bg-gray-100 text-gray-800'
   };
-  return colors[status];
+  return colors[status.replace(/\s+/g, '_').toUpperCase() as CertificationStage];
 };
 
 const getTypeColor = (type: string): string => {
@@ -435,7 +436,7 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
 
   const statusCounts = statusOrder.map(stage => ({
     stage,
-    total: certifications.filter(cert => cert.status === stage).length,
+    total: certifications.filter(cert => (cert.status || '').replace(/\s+/g, '_') === stage).length,
   }));
 
   const projectTypeCounts = projectTypes.map(type => ({

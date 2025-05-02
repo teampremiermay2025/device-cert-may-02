@@ -79,7 +79,10 @@ export const KanbanReleasesBoard: React.FC = () => {
       CLOSED: [],
     };
     filteredReleases.forEach(rel => {
-      result[rel.status].push(rel);
+      if (rel.status && result[rel.status]) {
+        result[rel.status].push(rel);
+      }
+      // Optionally handle releases with invalid status here
     });
     return result;
   }, [filteredReleases]);
