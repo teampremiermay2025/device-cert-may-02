@@ -538,16 +538,26 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
             </div>
             {expandedSections.people && (
               <div className="p-4 space-y-4">
-                <div>
-                  <h4 className="text-sm font-medium text-gray-500 mb-2">Reporter</h4>
+                <div className="flex items-center gap-4">
+                  <div>
+                  <h4 className="text-sm font-medium text-gray-500">Reporter</h4>
                   {certification.reporter ? (
                     <UserBubble userId={certification.reporter} />
                   ) : (
                     <span className="text-sm text-gray-500">No reporter assigned</span>
                   )}
+                  </div>
+                  <div>
+                  <h4 className="text-sm font-medium text-gray-500">Assignee</h4>
+                  {certification.assignee ? (
+                    <UserBubble userId={certification.assignee} />
+                  ) : (
+                    <span className="text-sm text-gray-500">No assignee</span>
+                  )}
+                  </div>
                 </div>
                 <div>
-                  <h4 className="text-sm font-medium text-gray-500 mb-2">Assignee</h4>
+                  <h4 className="text-sm font-medium text-gray-500 mb-2">Watchers</h4>
                   {certification.assignee ? (
                     <UserBubble userId={certification.assignee} />
                   ) : (
