@@ -1,5 +1,27 @@
 [
   {
+    "chapter": "1017.0",
+    "deliverable": "Deliverable Reqs: Testing",
+    "requirement_tag": "ALL CHAPTERS",
+    "issue_types": [
+      "DA IR",
+      "DA MR",
+      "E DA MR"
+    ],
+    "device_channels": [
+     "CRICKET IETA",
+      "CRICKET VITA",
+      "PLANNING","STOCK"
+    ],
+    "device": "ALL DEV",
+    "stage": "DEVICE TESTING",
+    "completion_criteria": [
+      "Create test cases based on the requirements",
+      "All test cases executed and passed (or retested)"
+    ],
+    "task_name": "Deliverable Reqs: Testing"
+  },
+  {
     "chapter": "1000.0",
     "deliverable": "Deliverable Reqs: PreAuth",
     "requirement_tag": "ALL CHAPTERS",

@@ -46,6 +46,43 @@ const getTestCaseStatusColor = (status: string): string => {
   return colors[status] || 'bg-gray-100 text-gray-800';
 };
 
+const UserBubble: FC<{ userId: string; onRemove?: () => void }> = ({ userId, onRemove }) => {
+  const user = usersData.users.find(u => u.id === userId);
+  if (!user) return null;
+
+  const getInitials = (name: string) => {
+    const parts = name.split(' ');
+    return parts.length > 1 
+      ? `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase()
+      : name.slice(0, 2).toUpperCase();
+  };
+
+  return (
+    <div className="flex items-center gap-2 bg-blue-50 px-3 py-1.5 rounded-full">
+      {user.avatar ? (
+        <img
+          src={user.avatar}
+          alt={user.name}
+          className="w-6 h-6 rounded-full"
+        />
+      ) : (
+        <div className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-medium">
+          {getInitials(user.name)}
+        </div>
+      )}
+      <span className="text-sm font-medium text-blue-700">{user.name}</span>
+      {onRemove && (
+        <button
+          onClick={onRemove}
+          className="text-blue-400 hover:text-blue-600"
+        >
+          <XMarkIcon className="w-4 h-4" />
+        </button>
+      )}
+    </div>
+  );
+};
+
 export const TaskDetailModal: FC<TaskDetailModalProps> = ({
   isOpen,
   onClose,
@@ -57,7 +94,6 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editedDescription, setEditedDescription] = useState(task.description || '');
-
   const [showAITestCaseSection, setShowAITestCaseSection] = useState(false);
   const initialAIStep = localStorage.getItem(`aiStep-${task.id}`) as 'idle' | 'extracting' | 'thinking' | 'understanding' | 'generating' | 'done' | null;
   const [aiStep, setAIStep] = useState<'idle' | 'extracting' | 'thinking' | 'understanding' | 'generating' | 'done'>(initialAIStep || 'idle');
@@ -65,14 +101,48 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
   const [expandedTestCases, setExpandedTestCases] = useState<{ [key: string]: boolean }>({});
   const [editingTestCaseId, setEditingTestCaseId] = useState<string | null>(null);
   const [editedTestCase, setEditedTestCase] = useState<Partial<TestCase>>({});
+  const [showAssigneeDropdown, setShowAssigneeDropdown] = useState(false);
+  const [assigneeSearch, setAssigneeSearch] = useState('');
+  const assigneeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (isOpen) {
+      console.log('TaskDetailModal opened for task:', task.id);
       const savedTestCases = storage.getTestCasesForTask(task.id);
+      console.log('Saved test cases:', savedTestCases);
       setAITestCases(savedTestCases);
-      setShowAITestCaseSection(savedTestCases.length > 0);
+      if (savedTestCases.length > 0) {
+        setShowAITestCaseSection(true);
+        setAIStep('done');
+      } else {
+        setShowAITestCaseSection(false);
+        setAIStep(initialAIStep || 'idle');
+      }
     }
   }, [isOpen, task.id]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (assigneeRef.current && !assigneeRef.current.contains(event.target as Node)) {
+        setShowAssigneeDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside as any);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside as any);
+    };
+  }, []);
+
+  const filteredUsers = usersData.users.filter(user =>
+    user.name.toLowerCase().includes(assigneeSearch.toLowerCase())
+  );
+
+  const handleAssigneeSelect = (userId: string) => {
+    setEditedTask({ ...editedTask, assignee: userId });
+    setShowAssigneeDropdown(false);
+    setAssigneeSearch('');
+  };
 
   const handleStatusChange = (status: TaskStatus) => {
     setEditedTask({ ...editedTask, status });
@@ -168,6 +238,34 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
     const updatedTestCases = aiTestCases.filter(tc => tc.test_case_id !== testCaseId);
     setAITestCases(updatedTestCases);
     storage.saveTestCasesForTask(task.id, updatedTestCases);
+  };
+
+  const handleEditTestCase = (tc: TestCase) => {
+    setEditingTestCaseId(tc.test_case_id);
+    setEditedTestCase({
+      test_case_description: tc.test_case_description,
+      acceptance_criteria: tc.acceptance_criteria,
+      assigned_to: tc.assigned_to,
+      status: tc.status
+    });
+  };
+
+  const handleSaveTestCase = (testCaseId: string) => {
+    const updatedTestCases = aiTestCases.map(tc =>
+      tc.test_case_id === testCaseId
+        ? {
+            ...tc,
+            test_case_description: editedTestCase.test_case_description || tc.test_case_description,
+            acceptance_criteria: editedTestCase.acceptance_criteria || tc.acceptance_criteria,
+            assigned_to: editedTestCase.assigned_to || tc.assigned_to,
+            status: editedTestCase.status || tc.status
+          }
+        : tc
+    );
+    setAITestCases(updatedTestCases);
+    storage.saveTestCasesForTask(task.id, updatedTestCases);
+    setEditingTestCaseId(null);
+    setEditedTestCase({});
   };
 
   const startAIProcessing = () => {
@@ -427,6 +525,9 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
                                   <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getTestCaseStatusColor(tc.status)}`}>
                                     {tc.status}
                                   </span>
+                                  {tc.assigned_to && (
+                                    <UserBubble userId={tc.assigned_to} />
+                                  )}
                                 </div>
                                 <div className="flex items-center gap-2">
                                   <button
@@ -447,13 +548,118 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
                               </div>
                               {expandedTestCases[tc.test_case_id] && (
                                 <div className="p-4 bg-gray-50 border-t">
-                                  <p className="text-sm text-gray-700 mb-3">{tc.test_case_description}</p>
-                                  <h4 className="text-xs font-medium text-gray-700 mb-2">Acceptance Criteria:</h4>
-                                  <ul className="list-disc pl-5 space-y-1">
-                                    {tc.acceptance_criteria.map((criterion, idx) => (
-                                      <li key={idx} className="text-sm text-gray-600">{criterion}</li>
-                                    ))}
-                                  </ul>
+                                  {editingTestCaseId === tc.test_case_id ? (
+                                    <div className="space-y-4">
+                                      <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                                        <input
+                                          type="text"
+                                          value={editedTestCase.test_case_description || ''}
+                                          onChange={(e) => setEditedTestCase({
+                                            ...editedTestCase,
+                                            test_case_description: e.target.value,
+                                          })}
+                                          className="w-full border rounded-lg p-2"
+                                        />
+                                      </div>
+                                      <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Assignee</label>
+                                        <select
+                                          value={editedTestCase.assigned_to || ''}
+                                          onChange={(e) => setEditedTestCase({
+                                            ...editedTestCase,
+                                            assigned_to: e.target.value,
+                                          })}
+                                          className="w-full border rounded-lg p-2"
+                                        >
+                                          <option value="">Unassigned</option>
+                                          {usersData.users.map(user => (
+                                            <option key={user.id} value={user.id}>{user.name}</option>
+                                          ))}
+                                        </select>
+                                      </div>
+                                      <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                                        <select
+                                          value={editedTestCase.status || ''}
+                                          onChange={(e) => setEditedTestCase({
+                                            ...editedTestCase,
+                                            status: e.target.value,
+                                          })}
+                                          className="w-full border rounded-lg p-2"
+                                        >
+                                          <option value="TODO">Todo</option>
+                                          <option value="IN PROGRESS">In Progress</option>
+                                          <option value="DONE">Done</option>
+                                        </select>
+                                      </div>
+                                      <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Acceptance Criteria</label>
+                                        <textarea
+                                          value={(editedTestCase.acceptance_criteria || []).join('\n')}
+                                          onChange={(e) => setEditedTestCase({
+                                            ...editedTestCase,
+                                            acceptance_criteria: e.target.value.split('\n').filter(Boolean),
+                                          })}
+                                          className="w-full border rounded-lg p-2 min-h-[100px]"
+                                          placeholder="Enter acceptance criteria, one per line..."
+                                        />
+                                      </div>
+                                      <div className="flex justify-end gap-2">
+                                        <button
+                                          onClick={() => {
+                                            setEditingTestCaseId(null);
+                                            setEditedTestCase({});
+                                          }}
+                                          className="px-3 py-1.5 text-gray-600 hover:text-gray-800"
+                                        >
+                                          Cancel
+                                        </button>
+                                        <button
+                                          onClick={() => handleSaveTestCase(tc.test_case_id)}
+                                          className="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                                        >
+                                          Save
+                                        </button>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <div>
+                                      <div className="mb-4">
+                                        <h4 className="text-sm font-medium text-gray-700">Description</h4>
+                                        <p className="text-sm text-gray-600 mt-1">{tc.test_case_description}</p>
+                                      </div>
+                                      <div className="mb-4">
+                                        <h4 className="text-sm font-medium text-gray-700">Assignee</h4>
+                                        <div className="mt-1">
+                                          {tc.assigned_to ? (
+                                            <UserBubble userId={tc.assigned_to} />
+                                          ) : (
+                                            <span className="text-sm text-gray-500">Unassigned</span>
+                                          )}
+                                        </div>
+                                      </div>
+                                      <div className="mb-4">
+                                        <h4 className="text-sm font-medium text-gray-700">Acceptance Criteria</h4>
+                                        <ul className="mt-1 space-y-1">
+                                          {tc.acceptance_criteria.map((criterion, idx) => (
+                                            <li key={idx} className="text-sm text-gray-600 flex items-start gap-2">
+                                              <span className="text-gray-400">•</span>
+                                              <span>{criterion}</span>
+                                            </li>
+                                          ))}
+                                        </ul>
+                                      </div>
+                                      <div className="flex justify-end">
+                                        <button
+                                          onClick={() => handleEditTestCase(tc)}
+                                          className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                                        >
+                                          Edit
+                                        </button>
+                                      </div>
+                                    </div>
+                                  )}
                                 </div>
                               )}
                             </div>
@@ -511,14 +717,57 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
 
                   <div>
                     <h3 className="text-sm font-medium text-gray-700 mb-2">Assignee</h3>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        value={editedTask.assignee || ''}
-                        onChange={(e) => setEditedTask({ ...editedTask, assignee: e.target.value })}
-                        className="w-full px-3 py-2 bg-white border rounded-lg text-sm"
-                        placeholder="Assign to..."
-                      />
+                    <div className="relative" ref={assigneeRef}>
+                      {editedTask.assignee ? (
+                        <UserBubble
+                          userId={editedTask.assignee}
+                          onRemove={() => setEditedTask({ ...editedTask, assignee: '' })}
+                        />
+                      ) : (
+                        <div
+                          onClick={() => setShowAssigneeDropdown(true)}
+                          className="w-full px-3 py-2 bg-white border rounded-lg text-sm cursor-pointer hover:border-blue-500"
+                        >
+                          <span className="text-gray-500">Assign to...</span>
+                        </div>
+                      )}
+                      
+                      {showAssigneeDropdown && (
+                        <div className="absolute top-full left-0 right-0 mt-1 bg-white border rounded-lg shadow-lg z-50">
+                          <div className="p-2">
+                            <input
+                              type="text"
+                              value={assigneeSearch}
+                              onChange={(e) => setAssigneeSearch(e.target.value)}
+                              placeholder="Search users..."
+                              className="w-full px-3 py-2 border rounded-lg text-sm mb-2"
+                              autoFocus
+                            />
+                          </div>
+                          <div className="max-h-48 overflow-y-auto">
+                            {filteredUsers.map(user => (
+                              <div
+                                key={user.id}
+                                className="px-3 py-2 hover:bg-gray-50 cursor-pointer flex items-center gap-2"
+                                onClick={() => handleAssigneeSelect(user.id)}
+                              >
+                                {user.avatar ? (
+                                  <img
+                                    src={user.avatar}
+                                    alt={user.name}
+                                    className="w-6 h-6 rounded-full"
+                                  />
+                                ) : (
+                                  <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-medium">
+                                    {user.name.split(' ').map(n => n[0]).join('')}
+                                  </div>
+                                )}
+                                <span className="text-sm">{user.name}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
 
