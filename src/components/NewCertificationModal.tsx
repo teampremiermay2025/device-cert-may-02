@@ -1,10 +1,9 @@
-import { FC, FormEvent, useState, useEffect, useMemo } from 'react';
+import { FC, FormEvent, useState, useEffect, useMemo, useCallback } from 'react';
 import { Dialog } from '@headlessui/react';
 import { DocumentTextIcon, ClockIcon, ArrowUpTrayIcon } from '@heroicons/react/24/outline';
 import { CertificationRequest, CertificationStage, CertificationTask, TaskStatus, TaskPriority } from '../types';
 import { storage } from '../lib/storage';
 import { useWorkflowStore } from '../store/workflowStore';
-import { createTasksForStage } from '../lib/workflow';
 import deviceData from '../data/devices.json';
 import taskStepsData from '../data/ruleset.json';
 import usersData from '../data/users.json';
@@ -151,8 +150,10 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
 
   const { selectedWorkflow: defaultWorkflow, setSelectedWorkflow: setStoreSelectedWorkflow } = useWorkflowStore();
 
-  // Load saved workflows from localStorage
+  // Load saved workflows from localStorage only when modal opens
   useEffect(() => {
+    if (!isOpen) return;
+
     console.log('Loading jiraWorkflows from localStorage');
     const saved = localStorage.getItem("jiraWorkflows");
     console.log('Raw jiraWorkflows:', saved);
@@ -170,92 +171,107 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
         setErrorMessage("Error loading workflows. Using default workflow.");
       }
     }
-  }, [isOpen]); // Reload when modal opens
+  }, [isOpen]); // Only run when modal opens
 
-  // Memoize defaultWorkflow to prevent unnecessary re-renders
-  const memoizedDefaultWorkflow = useMemo(() => defaultWorkflow, [defaultWorkflow]);
-
-  // Match project type to a workflow when projectType changes
-  useEffect(() => {
-    console.log('Matching workflow for projectType:', formData.projectType);
-    console.log('Current savedWorkflows:', savedWorkflows);
-    if (formData.projectType) {
-      try {
-        const matchedWorkflow = savedWorkflows.find(
-          (w) => w.name && w.name.toLowerCase() === formData.projectType.toLowerCase()
-        );
-        console.log('Matched workflow:', matchedWorkflow);
-
-        if (matchedWorkflow) {
-          if (!matchedWorkflow.id) throw new Error("Matched workflow missing 'id'");
-          if (!matchedWorkflow.name) throw new Error("Matched workflow missing 'name'");
-          if (!Array.isArray(matchedWorkflow.nodes)) {
-            console.warn("Matched workflow 'nodes' is not an array, defaulting to []");
-            matchedWorkflow.nodes = [];
-          }
-          if (!Array.isArray(matchedWorkflow.edges)) {
-            console.warn("Matched workflow 'edges' is not an array, defaulting to []");
-            matchedWorkflow.edges = [];
-          }
-          if (typeof matchedWorkflow.tasks !== 'object' || matchedWorkflow.tasks === null) {
-            console.warn("Matched workflow 'tasks' is not an object, defaulting to {}");
-            matchedWorkflow.tasks = {};
-          }
-
-          const transformedWorkflow = {
-            id: matchedWorkflow.id,
-            name: matchedWorkflow.name,
-            description: matchedWorkflow.description || '',
-            status: matchedWorkflow.status || 'active',
-            version: matchedWorkflow.version || 1,
-            nodes: matchedWorkflow.nodes,
-            edges: matchedWorkflow.edges,
-            createdAt: matchedWorkflow.createdAt || new Date().toISOString(),
-            updatedAt: matchedWorkflow.updatedAt || new Date().toISOString(),
-            stages: matchedWorkflow.nodes
-              .filter((node: any) => node && node.type === "customNode")
-              .map((node: any) => ({
-                id: node.id || crypto.randomUUID(),
-                name: node.data?.label.toUpperCase() || 'FORECAST',
-                tasks: [], // We'll populate tasks from ruleset.json
-              })),
-            tasks: matchedWorkflow.tasks,
-          };
-
-          if (JSON.stringify(selectedWorkflow) !== JSON.stringify(transformedWorkflow)) {
-            setSelectedWorkflow(transformedWorkflow);
-          }
-
-          setErrorMessage('');
-        } else {
-          console.warn(`No workflow found for project type "${formData.projectType}". Using default workflow.`);
-          if (JSON.stringify(selectedWorkflow) !== JSON.stringify(memoizedDefaultWorkflow)) {
-            setSelectedWorkflow(memoizedDefaultWorkflow);
-          }
-          setErrorMessage(`No workflow found for project type "${formData.projectType}". Using default workflow.`);
-        }
-      } catch (error) {
-        console.error("Error matching or transforming workflow:", error);
-        if (JSON.stringify(selectedWorkflow) !== JSON.stringify(memoizedDefaultWorkflow)) {
-          setSelectedWorkflow(memoizedDefaultWorkflow);
-        }
-        setErrorMessage("Error processing workflow. Using default workflow.");
-      }
-    } else {
-      if (JSON.stringify(selectedWorkflow) !== JSON.stringify(memoizedDefaultWorkflow)) {
-        setSelectedWorkflow(memoizedDefaultWorkflow);
-      }
-      setErrorMessage('');
+  // Memoize the function to match and transform workflows
+  const matchWorkflow = useCallback((projectType: string, workflows: any[], defaultWorkflow: any) => {
+    console.log('Matching workflow for projectType:', projectType);
+    console.log('Current savedWorkflows:', workflows);
+    if (!projectType) {
+      return defaultWorkflow;
     }
-  }, [formData.projectType, savedWorkflows, memoizedDefaultWorkflow]);
 
-  // Synchronize selectedWorkflow with the store
-  useEffect(() => {
-    if (selectedWorkflow && JSON.stringify(selectedWorkflow) !== JSON.stringify(memoizedDefaultWorkflow)) {
-      console.log('Synchronizing selectedWorkflow with store:', selectedWorkflow);
-      setStoreSelectedWorkflow(selectedWorkflow);
+    try {
+      const matchedWorkflow = workflows.find(
+        (w) => w.name && w.name.toLowerCase() === projectType.toLowerCase()
+      );
+      console.log('Matched workflow:', matchedWorkflow);
+
+      if (matchedWorkflow) {
+        if (!matchedWorkflow.id) throw new Error("Matched workflow missing 'id'");
+        if (!matchedWorkflow.name) throw new Error("Matched workflow missing 'name'");
+        if (!Array.isArray(matchedWorkflow.nodes)) {
+          console.warn("Matched workflow 'nodes' is not an array, defaulting to []");
+          matchedWorkflow.nodes = [];
+        }
+        if (!Array.isArray(matchedWorkflow.edges)) {
+          console.warn("Matched workflow 'edges' is not an array, defaulting to []");
+          matchedWorkflow.edges = [];
+        }
+        if (typeof matchedWorkflow.tasks !== 'object' || matchedWorkflow.tasks === null) {
+          console.warn("Matched workflow 'tasks' is not an object, defaulting to {}");
+          matchedWorkflow.tasks = {};
+        }
+
+        const transformedWorkflow = {
+          id: matchedWorkflow.id,
+          name: matchedWorkflow.name,
+          description: matchedWorkflow.description || '',
+          status: matchedWorkflow.status || 'active',
+          version: matchedWorkflow.version || 1,
+          nodes: matchedWorkflow.nodes,
+          edges: matchedWorkflow.edges,
+          createdAt: matchedWorkflow.createdAt || new Date().toISOString(),
+          updatedAt: matchedWorkflow.updatedAt || new Date().toISOString(),
+          stages: matchedWorkflow.nodes
+            .filter((node: any) => node && node.type === "customNode")
+            .map((node: any) => ({
+              id: node.id || crypto.randomUUID(),
+              name: node.data?.label.toUpperCase() || 'FORECAST',
+              tasks: [], // We'll populate tasks from ruleset.json
+            })),
+          tasks: matchedWorkflow.tasks,
+        };
+
+        return transformedWorkflow;
+      } else {
+        console.warn(`No workflow found for project type "${projectType}". Using default workflow.`);
+        return defaultWorkflow;
+      }
+    } catch (error) {
+      console.error("Error matching or transforming workflow:", error);
+      return defaultWorkflow;
     }
-  }, [selectedWorkflow, memoizedDefaultWorkflow, setStoreSelectedWorkflow]);
+  }, []);
+
+  // State to track whether synchronization has occurred
+  const [hasSynced, setHasSynced] = useState(false);
+
+  // Match project type to a workflow when projectType or savedWorkflows change
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const newWorkflow = matchWorkflow(formData.projectType, savedWorkflows, defaultWorkflow);
+    if (JSON.stringify(newWorkflow) !== JSON.stringify(selectedWorkflow)) {
+      setSelectedWorkflow(newWorkflow);
+      setErrorMessage(newWorkflow === defaultWorkflow && formData.projectType
+        ? `No workflow found for project type "${formData.projectType}". Using default workflow.`
+        : '');
+      setHasSynced(false); // Reset sync flag when workflow changes
+    }
+  }, [formData.projectType, savedWorkflows, defaultWorkflow, matchWorkflow, isOpen]);
+
+  // Synchronize selectedWorkflow with the store only once after workflow selection
+  useEffect(() => {
+    if (!isOpen || hasSynced || !selectedWorkflow) return;
+
+    const syncWorkflow = async () => {
+      if (JSON.stringify(selectedWorkflow) !== JSON.stringify(defaultWorkflow)) {
+        console.log('Synchronizing selectedWorkflow with store:', selectedWorkflow);
+        await setStoreSelectedWorkflow(selectedWorkflow);
+        setHasSynced(true); // Mark as synced to prevent further updates
+      }
+    };
+
+    syncWorkflow();
+  }, [selectedWorkflow, defaultWorkflow, setStoreSelectedWorkflow, hasSynced, isOpen]);
+
+  // Reset hasSynced when modal closes or project type changes
+  useEffect(() => {
+    if (!isOpen) {
+      setHasSynced(false);
+    }
+  }, [isOpen, formData.projectType]);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -315,8 +331,8 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
     });
   }
 
-  // Function to filter tasks from ruleset.json based on projectType, deviceChannel, and stage
-  const filterTasksFromRuleset = (stage: string, projectType: string, deviceChannel: string): CertificationTask[] => {
+  // Memoized function to filter tasks from ruleset.json
+  const filterTasksFromRuleset = useCallback((stage: string, projectType: string, deviceChannel: string): CertificationTask[] => {
     console.log('filterTasksFromRuleset filters:', {
       stage,
       projectType,
@@ -335,7 +351,7 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
       const matchesStage = task.stage.toUpperCase() === stage.toUpperCase();
       return matchesIssueType && matchesDeviceChannel && matchesStage;
     });
-    console.log('Before Tasks after filteredTasks:', filteredTasks); 
+    console.log('Before Tasks after filteredTasks:', filteredTasks);
     // Create tasks without assignee first
     let tasks = filteredTasks.map((task) => ({
       id: crypto.randomUUID(),
@@ -352,27 +368,28 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
       labels: [],
       stage: stage.toUpperCase() as CertificationStage,
     }));
-  
+
     // Distribute assignees
     tasks = assignTasksToOemMembers(tasks, formData.targetDate);
-   
+
     return tasks;
-  };
+  }, [formData.targetDate]); // Only re-create if formData.targetDate changes
+
+  // Memoize initial tasks to prevent recalculation on every render
+  const selectedDevice = useMemo(() => deviceData.find(device => device['Device Issue Key'] === formData.deviceModel), [formData.deviceModel]);
+  const deviceChannel = selectedDevice?.['Device Channel'] || '';
+  const initialTasks = useMemo(() => filterTasksFromRuleset('FORECAST', formData.projectType, deviceChannel), [formData.projectType, deviceChannel, filterTasksFromRuleset]);
 
   const handleConfirm = () => {
     if (!selectedWorkflow) return;
 
-    const selectedDevice = deviceData.find(device => device['Device Issue Key'] === formData.deviceModel);
-    const deviceChannel = selectedDevice?.['Device Channel'] || '';
     const projectType = formData.projectType;
-
     // Get initial tasks for the "FORECAST" stage from ruleset.json
     const initialStage = 'FORECAST';
     const tasks = filterTasksFromRuleset(initialStage, projectType, deviceChannel);
-    console.log('Tasks created in handleConfirm:', tasks); // Debug: Log tasks at creation
+    console.log('Tasks created in handleConfirm:', tasks);
 
     const now = new Date().toISOString();
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
     const newCertification: CertificationRequest = {
       id: crypto.randomUUID(),
       darpKey: formData.darpKey,
@@ -384,23 +401,8 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
       lastUpdated: now,
       tasks,
       issues: [],
-      activities: [
-      {
-        id: crypto.randomUUID(),
-        type: 'certification_created',
-        timestamp: now,
-        userId: formData.assignee || 'system',
-        details: {
-        message: 'Certification request created',
-        projectName: formData.projectName,
-        projectType: formData.projectType,
-        deviceModel: selectedDevice?.['Device Model'] || '',
-        }
-      }
-      ],
       workflow: selectedWorkflow.id,
       assignee: formData.assignee,
-      reporter: user.id || '',
       vendor: selectedDevice?.['Device Vendor'] || '',
       deviceType: selectedDevice?.['Device Type'] || '',
       deviceModel: selectedDevice?.['Device Model'] || '',
@@ -412,6 +414,7 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
       devicePaymentType: selectedDevice?.['Device Payment Type'] || '',
       deviceChannel: deviceChannel,
       securityLevel: '',
+      reporter: '',
       primaryPC: '',
       vendorProjectLead: '',
       createdAt: now,
@@ -446,11 +449,6 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
       oemDocuments: prev.oemDocuments.filter((_, i) => i !== index),
     }));
   };
-
-  // Get initial tasks for display in the review step
-  const selectedDevice = deviceData.find(device => device['Device Issue Key'] === formData.deviceModel);
-  const deviceChannel = selectedDevice?.['Device Channel'] || '';
-  const initialTasks = filterTasksFromRuleset('FORECAST', formData.projectType, deviceChannel);
 
   return (
     <Dialog open={isOpen} onClose={onClose} className="relative z-50">
