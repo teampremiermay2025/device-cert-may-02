@@ -48,7 +48,7 @@ const AppContent = () => {
       />
       <main className="flex-1 overflow-auto">
         <Routes>
-          <Route path="/home" element={<HomePage />} />
+         {/*  <Route path="/home" element={<HomePage />} /> */}
        
           <Route path="/projects" element={<Dashboard onNewCertification={handleNewCertification} />} />
           <Route path="/dashboards/:id" element={<DashboardContainerWithId />} />
@@ -75,7 +75,7 @@ const AppContent = () => {
               <TeamManagement />
             </ProtectedRoute>
           } />
-          <Route path="/dashboardhome" element={< DashBoardHome/>} />
+          <Route path="/home" element={< DashBoardHome/>} />
           <Route path="/reports" element={
             <div className="p-8">
               <h1 className="text-2xl font-bold">Reports</h1>
