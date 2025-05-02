@@ -1,5 +1,5 @@
 import { FC, useState, useEffect, useMemo, useCallback } from 'react';
-import { PlusIcon, FunnelIcon, Bars4Icon, TableCellsIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, FunnelIcon, Bars4Icon, TableCellsIcon, ChevronDownIcon, ChevronUpIcon, MagnifyingGlassIcon, ShareIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 import { CertificationRequest, CertificationStage } from '../types';
 import { ViewCertificationPanel } from './ViewCertificationPanel';
 import { CertificationCard } from './CertificationCard';
@@ -131,6 +131,49 @@ const AssigneeEditor = (props: any) => {
   );
 };
 
+const getRandomColor = (str: string) => {
+  const colors = [
+    'bg-blue-500',
+    'bg-green-500',
+    'bg-purple-500',
+    'bg-pink-500',
+    'bg-indigo-500',
+    'bg-red-500',
+    'bg-yellow-500',
+    'bg-teal-500'
+  ];
+  
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  
+  return colors[Math.abs(hash) % colors.length];
+};
+
+const UserBubble: FC<{ user: any }> = ({ user }) => {
+  const getInitials = (name: string) => {
+    const parts = name.split(' ');
+    return parts.length > 1 
+      ? `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase()
+      : name.slice(0, 2).toUpperCase();
+  };
+
+  const bgColorClass = getRandomColor(user.name);
+
+  return (
+    <div 
+      className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium border-2 border-white shadow-sm hover:scale-110 transition-transform cursor-pointer"
+      title={user.name}
+      style={{ marginLeft: '-0.5rem' }}
+    > 
+      <span className={`w-6 h-6 flex items-center justify-center rounded-full ${bgColorClass} text-white text-xs font-medium`}>
+        {getInitials(user.name)}
+      </span>
+    </div>
+  );
+};
+
 export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
   const [certifications, setCertifications] = useState<CertificationRequest[]>([]);
   const [selectedCertification, setSelectedCertification] = useState<CertificationRequest | null>(null);
@@ -253,7 +296,8 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
       headerName: 'Device Type',
       filter: 'agSetColumnFilter',
       cellClass: 'text-gray-700',
-      minWidth: 130,  hide: true,
+      minWidth: 130,
+      hide: true,
     },
     {
       field: 'assignee',
@@ -287,7 +331,8 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
       filter: 'agDateColumnFilter',
       cellRenderer: DateCellRenderer,
       sort: 'desc',
-      minWidth: 130, cellClass: 'cell-center',
+      minWidth: 130,
+      cellClass: 'cell-center',
     },
   ], []);
 
@@ -295,7 +340,6 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
     setGridApi(params.api);
     setColumnApi(params.columnApi);
     params.api.sizeColumnsToFit();
-    // Auto-size all columns to fit content
     setTimeout(() => {
       if (params.columnApi && typeof params.columnApi.getAllColumns === 'function') {
         const allColumnIds = params.columnApi.getAllColumns().map((col: any) => col.getColId());
@@ -369,7 +413,6 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
 
   useEffect(() => {
     if (viewMode === 'grid' && gridApi) {
-      // Sync type filter
       const typeFilter = gridApi.getFilterInstance('type');
       if (typeFilter && typeof typeFilter.setModel === 'function') {
         if (selectedTypes.length > 0) {
@@ -378,7 +421,6 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
           typeFilter.setModel(null);
         }
       }
-      // Sync status filter
       const statusFilter = gridApi.getFilterInstance('status');
       if (statusFilter && typeof statusFilter.setModel === 'function') {
         if (selectedStatus) {
@@ -403,6 +445,9 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
 
   const totalActive = certifications.filter(cert => cert.status !== 'CLOSED').length;
 
+  const currentUser = usersData.users[0];
+  const userInitials = currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase();
+
   return (
     <div className="p-8 mx-auto">
       {!selectedCertification ? (
@@ -412,27 +457,41 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
               <h1 className="text-3xl font-bold text-gray-900">Device Certification Dashboard</h1>
               <p className="text-sm text-gray-500">Manage and track your device certification requests</p>
             </div>
-            <div className="flex space-x-3">
-              <div className="flex items-center space-x-2 bg-white rounded-lg border p-1">
-                <button
-                  className={`p-2 rounded ${viewMode === 'card' ? 'bg-gray-100' : ''}`}
-                  onClick={() => setViewMode('card')}
-                >
-                  <Bars4Icon className="w-5 h-5" />
-                </button>
-                <button
-                  className={`p-2 rounded ${viewMode === 'grid' ? 'bg-gray-100' : ''}`}
-                  onClick={() => setViewMode('grid')}
-                >
-                  <TableCellsIcon className="w-5 h-5" />
-                </button>
-              </div>
+            <div className="flex items-center gap-4">
               <button
                 className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition duration-150 ease-in-out shadow-sm"
                 onClick={onNewCertification}
               >
                 <PlusIcon className="w-5 h-5 mr-2" />
                 New Certification
+              </button>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-4 flex-1">
+              <div className="relative flex-1 max-w-md">
+                <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search certifications..."
+                  className="w-full pl-10 pr-4 py-2 border rounded-lg shadow-sm focus:ring-blue-400 focus:border-blue-400"
+                />
+              </div>
+              <div className="flex items-center">
+                {usersData.users.map((user, index) => (
+                  <UserBubble key={user.id} user={user} />
+                ))}
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <button className="flex items-center gap-2 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                <ShareIcon className="w-5 h-5" />
+                <span>Share</span>
+              </button>
+              <button className="flex items-center gap-2 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                <ArrowDownTrayIcon className="w-5 h-5" />
+                <span>Export</span>
               </button>
             </div>
           </div>
@@ -528,6 +587,20 @@ export const Dashboard: FC<DashboardProps> = ({ onNewCertification }) => {
                   <option key={status} value={status}>{status.split('_').map(w => w.charAt(0) + w.slice(1).toLowerCase()).join(' ')}</option>
                 ))}
               </select>
+            </div>
+            <div className="flex items-center space-x-2 bg-white rounded-lg border p-1">
+              <button
+                className={`p-2 rounded ${viewMode === 'card' ? 'bg-gray-100' : ''}`}
+                onClick={() => setViewMode('card')}
+              >
+                <Bars4Icon className="w-5 h-5" />
+              </button>
+              <button
+                className={`p-2 rounded ${viewMode === 'grid' ? 'bg-gray-100' : ''}`}
+                onClick={() => setViewMode('grid')}
+              >
+                <TableCellsIcon className="w-5 h-5" />
+              </button>
             </div>
           </div>
 

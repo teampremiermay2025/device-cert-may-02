@@ -213,7 +213,7 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
              {certification.type}
            </span>
           </div>
-          <span className="text-lg text-gray-600">{certification.projectName} </span>
+          <span className="text-lg text-gray-600">{certification.projectName}</span>
         </div>
         <div className="flex gap-2 flex-wrap">
           <div className="flex bg-white rounded-lg shadow-sm border border-gray-100 p-1">
@@ -245,7 +245,7 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 cursor-pointer"
             onClick={() => toggleSection('deviceDetails')}
@@ -262,7 +262,7 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
           </div>
           {expandedSections.deviceDetails && (
             <div className="p-4">
-              <dl className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-3">
+              <dl className="grid grid-cols-1 gap-x-2 gap-y-3 sm:grid-cols-3">
                 <div className="flex items-center gap-2">
                   <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
                     <UserPlusIcon className="w-5 h-5" /> Vendor:
@@ -323,7 +323,7 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
               <dl className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2">
                 <div className="flex items-center gap-2">
                   <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
-                    <CalendarIcon className="w-5 h-5" /> Device Entry (DE):
+                    <CalendarIcon className="w-5 h-5" /> Device Entry:
                   </dt>
                   <dd className="text-sm text-gray-900">{certification.forecastedDEDate || '-'}</dd>
                 </div>
