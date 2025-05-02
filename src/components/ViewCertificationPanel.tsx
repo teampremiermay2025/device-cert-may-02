@@ -17,7 +17,7 @@ import {
   ClockIcon,
   EyeIcon,
 } from '@heroicons/react/24/outline';
-import { CertificationRequest, CertificationTask, CertificationStage, TaskStatus } from '../types';
+import { CertificationRequest, CertificationTask, CertificationStage, TaskStatus, Activity } from '../types';
 import { TaskBoard } from './TaskBoard';
 import { getStageColor } from '../lib/workflow';
 import { storage } from '../lib/storage';
@@ -66,6 +66,53 @@ const UserBubble: FC<{ userId: string; size?: 'sm' | 'md' }> = ({ userId, size =
   );
 };
 
+const ActivityItem: FC<{ activity: Activity }> = ({ activity }) => {
+  const user = usersData.users.find(u => u.id === activity.userId);
+  if (!user) return null;
+
+  const getActivityMessage = () => {
+    switch (activity.type) {
+      case 'certification_created':
+        return `created certification "${activity.details.projectName}"`;
+      case 'certification_updated':
+        return 'updated certification details';
+      case 'task_created':
+        return `created task "${activity.details.taskName}"`;
+      case 'task_updated':
+        return `updated task "${activity.details.taskName}"`;
+      case 'task_status_changed':
+        return `changed status of "${activity.details.taskName}" from ${activity.details.oldStatus} to ${activity.details.newStatus}`;
+      case 'task_assigned':
+        const oldAssignee = activity.details.oldAssignee ? usersData.users.find(u => u.id === activity.details.oldAssignee)?.name : 'unassigned';
+        const newAssignee = activity.details.newAssignee ? usersData.users.find(u => u.id === activity.details.newAssignee)?.name : 'unassigned';
+        return `reassigned task "${activity.details.taskName}" from ${oldAssignee} to ${newAssignee}`;
+      case 'comment_added':
+        return `commented on task "${activity.details.taskName}"`;
+      case 'attachment_added':
+        return `added attachment "${activity.details.attachmentName}" to task "${activity.details.taskName}"`;
+      case 'stage_changed':
+        return `moved certification from ${activity.details.oldStage} to ${activity.details.newStage}`;
+      default:
+        return 'performed an action';
+    }
+  };
+
+  return (
+    <div className="flex items-start gap-3 py-3">
+      <UserBubble userId={activity.userId} size="sm" />
+      <div className="flex-1 min-w-0">
+        <div className="text-sm">
+          <span className="font-medium">{user.name}</span>
+          {' '}{getActivityMessage()}
+        </div>
+        <span className="text-xs text-gray-500">
+          {new Date(activity.timestamp).toLocaleString()}
+        </span>
+      </div>
+    </div>
+  );
+};
+
 export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
   certification,
   onUpdate,
@@ -82,37 +129,6 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
     people: false,
     activity: true,
   });
-
-  // Mock activity data - in real app this would come from your backend
-  const activities = [
-    {
-      id: '1',
-      type: 'status_change',
-      user: usersData.users[0],
-      action: 'changed status to',
-      target: 'PLANNING',
-      timestamp: new Date(Date.now() - 3600000).toISOString(),
-    },
-    {
-      id: '2',
-      type: 'comment',
-      user: usersData.users[1],
-      action: 'commented',
-      content: 'All initial requirements have been reviewed.',
-      timestamp: new Date(Date.now() - 7200000).toISOString(),
-    },
-    {
-      id: '3',
-      type: 'task_update',
-      user: usersData.users[2],
-      action: 'completed task',
-      target: 'Initial Setup',
-      timestamp: new Date(Date.now() - 86400000).toISOString(),
-    },
-  ];
-
-  // Mock watchers - in real app this would be part of your certification data
-  const watchers = [usersData.users[0].id, usersData.users[1].id];
 
   useEffect(() => {
     const saved = localStorage.getItem('jiraWorkflows');
@@ -181,10 +197,13 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
       timeSpent: undefined,
       labels: [],
       stage: stage.toUpperCase() as CertificationStage,
+      createdAt: new Date().toISOString(),
+      createdBy: certification.assignee || 'system'
     }));
   };
 
   const handleTaskUpdate = (updatedTask: CertificationTask) => {
+    const originalTask = certification.tasks.find(t => t.id === updatedTask.id);
     const updatedTasks = certification.tasks.map(task =>
       task.id === updatedTask.id ? updatedTask : task
     );
@@ -194,6 +213,26 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
       tasks: updatedTasks,
       lastUpdated: new Date().toISOString(),
     };
+
+    // Track task status change
+    if (originalTask && originalTask.status !== updatedTask.status) {
+      storage.addActivity(certification.id, 'task_status_changed', certification.assignee, {
+        taskId: updatedTask.id,
+        taskName: updatedTask.name,
+        oldStatus: originalTask.status,
+        newStatus: updatedTask.status
+      });
+    }
+
+    // Track task assignment change
+    if (originalTask && originalTask.assignee !== updatedTask.assignee) {
+      storage.addActivity(certification.id, 'task_assigned', certification.assignee, {
+        taskId: updatedTask.id,
+        taskName: updatedTask.name,
+        oldAssignee: originalTask.assignee,
+        newAssignee: updatedTask.assignee
+      });
+    }
 
     const currentStageTasks = updatedCertification.tasks.filter(
       task => task.stage === certification.status
@@ -209,6 +248,12 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
         const nextStage = stageOrder[nextStageIndex] as CertificationStage;
         const newTasks = filterTasksFromRuleset(nextStage, certification.type, certification.deviceChannel);
 
+        // Track stage change
+        storage.addActivity(certification.id, 'stage_changed', certification.assignee, {
+          oldStage: certification.status,
+          newStage: nextStage
+        });
+
         updatedCertification = {
           ...updatedCertification,
           status: nextStage,
@@ -217,6 +262,14 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
             ...newTasks,
           ],
         };
+
+        // Track new tasks creation
+        newTasks.forEach(task => {
+          storage.addActivity(certification.id, 'task_created', certification.assignee, {
+            taskId: task.id,
+            taskName: task.name
+          });
+        });
       }
     }
 
@@ -226,7 +279,7 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
   };
 
   const handleTaskUpdateNoClose = (updatedTask: CertificationTask) => {
-    console.log('Updating task:', updatedTask);
+    const originalTask = certification.tasks.find(t => t.id === updatedTask.id);
     const updatedTasks = certification.tasks.map(task =>
       task.id === updatedTask.id ? updatedTask : task
     );
@@ -236,6 +289,27 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
       tasks: updatedTasks,
       lastUpdated: new Date().toISOString(),
     };
+
+    // Track task updates
+    if (originalTask) {
+      if (originalTask.status !== updatedTask.status) {
+        storage.addActivity(certification.id, 'task_status_changed', certification.assignee, {
+          taskId: updatedTask.id,
+          taskName: updatedTask.name,
+          oldStatus: originalTask.status,
+          newStatus: updatedTask.status
+        });
+      }
+
+      if (originalTask.assignee !== updatedTask.assignee) {
+        storage.addActivity(certification.id, 'task_assigned', certification.assignee, {
+          taskId: updatedTask.id,
+          taskName: updatedTask.name,
+          oldAssignee: originalTask.assignee,
+          newAssignee: updatedTask.assignee
+        });
+      }
+    }
 
     const currentStageTasks = updatedCertification.tasks.filter(
       task => task.stage === certification.status
@@ -251,6 +325,11 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
         const nextStage = stageOrder[nextStageIndex] as CertificationStage;
         const newTasks = filterTasksFromRuleset(nextStage, certification.type, certification.deviceChannel);
 
+        storage.addActivity(certification.id, 'stage_changed', certification.assignee, {
+          oldStage: certification.status,
+          newStage: nextStage
+        });
+
         updatedCertification = {
           ...updatedCertification,
           status: nextStage,
@@ -259,6 +338,13 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
             ...newTasks,
           ],
         };
+
+        newTasks.forEach(task => {
+          storage.addActivity(certification.id, 'task_created', certification.assignee, {
+            taskId: task.id,
+            taskName: task.name
+          });
+        });
       }
     }
 
@@ -466,14 +552,6 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
                     <span className="text-sm text-gray-500">No assignee</span>
                   )}
                 </div>
-                <div>
-                  <h4 className="text-sm font-medium text-gray-500 mb-2">Watchers</h4>
-                  <div className="space-y-2">
-                    {watchers.map(watcherId => (
-                      <UserBubble key={watcherId} userId={watcherId} size="sm" />
-                    ))}
-                  </div>
-                </div>
               </div>
             )}
           </div>
@@ -494,26 +572,9 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
             </div>
             {expandedSections.activity && (
               <div className="p-4">
-                <div className="space-y-4">
-                  {activities.map(activity => (
-                    <div key={activity.id} className="flex items-start gap-3">
-                      <UserBubble userId={activity.user.id} size="sm" />
-                      <div className="flex-1">
-                        <div className="text-sm">
-                          <span className="font-medium">{activity.user.name}</span>
-                          {' '}{activity.action}{' '}
-                          {activity.target && (
-                            <span className="font-medium">{activity.target}</span>
-                          )}
-                        </div>
-                        {activity.content && (
-                          <p className="text-sm text-gray-600 mt-1">{activity.content}</p>
-                        )}
-                        <span className="text-xs text-gray-500">
-                          {new Date(activity.timestamp).toLocaleString()}
-                        </span>
-                      </div>
-                    </div>
+                <div className="space-y-2 max-h-[400px] overflow-y-auto">
+                  {certification.activities?.map((activity) => (
+                    <ActivityItem key={activity.id} activity={activity} />
                   ))}
                 </div>
               </div>

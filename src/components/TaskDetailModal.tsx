@@ -18,6 +18,7 @@ import {
 import { CertificationTask, TaskPriority, CertificationStage } from '../types';
 import { storage } from '../lib/storage';
 import testCasesData from '../data/testcases.json';
+import usersData from '../data/users.json';
 
 interface TaskDetailModalProps {
   isOpen: boolean;
@@ -34,7 +35,6 @@ interface TestCase {
   status: string;
 }
 
-// Function to get background color for test case status (similar to workflow stages)
 const getTestCaseStatusColor = (status: string): string => {
   const colors: Record<string, string> = {
     'NOT STARTED': 'bg-gray-100 text-gray-800',
@@ -54,9 +54,7 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
   const [newComment, setNewComment] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  // State for AI test case generation UI
   const [showAITestCaseSection, setShowAITestCaseSection] = useState(false);
-  // Initialize aiStep from localStorage if available, otherwise default to 'idle'
   const initialAIStep = localStorage.getItem(`aiStep-${task.id}`) as 'idle' | 'extracting' | 'thinking' | 'understanding' | 'generating' | 'done' | null;
   const [aiStep, setAIStep] = useState<'idle' | 'extracting' | 'thinking' | 'understanding' | 'generating' | 'done'>(initialAIStep || 'idle');
   const [aiTestCases, setAITestCases] = useState<TestCase[]>([]);
@@ -65,7 +63,6 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
   const [editedTestCase, setEditedTestCase] = useState<Partial<TestCase>>({});
   const [isInitialRender, setIsInitialRender] = useState(true);
 
-  // Load test cases and set showAITestCaseSection when the modal opens
   useEffect(() => {
     if (isOpen) {
       console.log('Task details on modal open:', {
@@ -82,7 +79,6 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
     }
   }, [isOpen, task.id, editedTask.status, editedTask.name]);
 
-  // Save aiStep to localStorage whenever it changes
   useEffect(() => {
     if (isOpen && !isInitialRender) {
       console.log('Saving aiStep to localStorage:', aiStep);
@@ -90,7 +86,6 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
     }
   }, [aiStep, task.id, isOpen, isInitialRender]);
 
-  // Clean up localStorage when the modal closes (optional)
   useEffect(() => {
     if (!isOpen) {
       // Optionally clean up aiStep if needed
@@ -121,11 +116,19 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
       createdBy: 'Alex Carter',
     };
 
-    setEditedTask({
+    const updatedTask = {
       ...editedTask,
       comments: [...editedTask.comments, comment],
-    });
+    };
+
+    setEditedTask(updatedTask);
     setNewComment('');
+
+    storage.addActivity(task.id, 'comment_added', 'Alex Carter', {
+      taskId: task.id,
+      taskName: task.name,
+      comment: newComment
+    });
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -148,11 +151,19 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
       uploadedBy: 'Alex Carter',
     };
 
-    setEditedTask({
+    const updatedTask = {
       ...editedTask,
       attachments: [...editedTask.attachments, attachment],
-    });
+    };
+
+    setEditedTask(updatedTask);
     setSelectedFile(null);
+
+    storage.addActivity(task.id, 'attachment_added', 'Alex Carter', {
+      taskId: task.id,
+      taskName: task.name,
+      attachmentName: selectedFile.name
+    });
   };
 
   const handleAITestCaseClick = () => {
@@ -383,7 +394,6 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
                   </div>
                 </div>
 
-                {/* AI Test Case Generation Section */}
                 {showAITestCaseSection && (
                   <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                     {aiStep !== 'done' && (
@@ -690,7 +700,6 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
   );
 };
 
-/* Add simple loader, typing, and fade-in animations */
 <style jsx>{`
 .loader {
   border: 4px solid #e0e7ef;

@@ -9,7 +9,7 @@ export interface Node extends ReactFlowNode {
     description?: string;
     status?: 'pending' | 'active' | 'completed' | 'error';
     progress?: number;
-    category?: string; // Added to support JiraWorkflowEditor nodes
+    category?: string;
   };
 }
 
@@ -23,7 +23,7 @@ export interface Edge extends ReactFlowEdge {
   data?: {
     label: string;
     anyStatus: boolean;
-  }; // Added to support JiraWorkflowEditor edges
+  };
 }
 
 export interface Workflow {
@@ -37,7 +37,7 @@ export interface Workflow {
   createdAt: string;
   updatedAt: string;
   stages: WorkflowStage[];
-  tasks?: Record<string, any[]>; // Added to support JiraWorkflowEditor tasks (e.g., { "Forecast": [{ id, title, status }] })
+  tasks?: Record<string, any[]>;
 }
 
 export interface WorkflowStage {
@@ -77,7 +77,6 @@ export interface CertificationRequest {
   tasks: CertificationTask[];
   issues: CertificationIssue[];
   workflow: string;
-  // Extended fields
   vendor: string;
   deviceType: string;
   deviceModel: string;
@@ -102,6 +101,40 @@ export interface CertificationRequest {
   components: string;
   affectsVersion: string;
   resolution: string;
+  activities: Activity[]; // Added activities array
+}
+
+export interface Activity {
+  id: string;
+  type: ActivityType;
+  userId: string;
+  timestamp: string;
+  details: ActivityDetails;
+}
+
+export type ActivityType = 
+  | 'certification_created'
+  | 'certification_updated'
+  | 'task_created'
+  | 'task_updated'
+  | 'task_status_changed'
+  | 'task_assigned'
+  | 'comment_added'
+  | 'attachment_added'
+  | 'stage_changed';
+
+export interface ActivityDetails {
+  taskId?: string;
+  taskName?: string;
+  oldStatus?: string;
+  newStatus?: string;
+  oldAssignee?: string;
+  newAssignee?: string;
+  comment?: string;
+  attachmentName?: string;
+  oldStage?: CertificationStage;
+  newStage?: CertificationStage;
+  [key: string]: any;
 }
 
 export interface CertificationTask {
@@ -118,6 +151,8 @@ export interface CertificationTask {
   timeSpent?: number;
   labels: string[];
   stage: CertificationStage;
+  createdAt: string; // Added creation timestamp
+  createdBy: string; // Added creator ID
 }
 
 export type TaskStatus = 'TODO' | 'IN_PROGRESS' | 'REVIEW' | 'DONE' | 'PENDING_REVIEW' | 'READY_FOR_REVIEW' | 'PENDING_APPROVAL';
@@ -149,13 +184,13 @@ export interface CertificationIssue {
 export interface WorkflowStore {
   workflows: Workflow[];
   selectedWorkflow: Workflow | null;
-  predefinedTasks: Record<string, WorkflowTask[]>; // Updated to match implementation
+  predefinedTasks: Record<string, WorkflowTask[]>;
   setWorkflows: (workflows: Workflow[]) => void;
   addWorkflow: (workflow: Workflow) => void;
   updateWorkflow: (workflow: Workflow) => void;
   deleteWorkflow: (id: string) => void;
   setSelectedWorkflow: (workflow: Workflow | null) => void;
-  addPredefinedTask: (category: string, task: WorkflowTask) => void; // Updated to match implementation
+  addPredefinedTask: (category: string, task: WorkflowTask) => void;
 }
 
 export interface Dashboard {

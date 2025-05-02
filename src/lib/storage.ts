@@ -1,4 +1,4 @@
-import { CertificationRequest, Workflow, Dashboard } from '../types';
+import { CertificationRequest, Workflow, Dashboard, Activity, ActivityType, ActivityDetails } from '../types';
 
 const STORAGE_KEYS = {
   CERTIFICATIONS: 'certifications',
@@ -46,6 +46,18 @@ interface TaskTestCases {
   [taskId: string]: TestCase[];
 }
 
+const createActivity = (
+  type: ActivityType,
+  userId: string,
+  details: ActivityDetails
+): Activity => ({
+  id: crypto.randomUUID(),
+  type,
+  userId,
+  timestamp: new Date().toISOString(),
+  details,
+});
+
 const initialCertifications: CertificationRequest[] = [
   {
     id: 'DARP-127205',
@@ -92,7 +104,9 @@ const initialCertifications: CertificationRequest[] = [
         attachments: [],
         comments: [],
         labels: ['compliance'],
-        stage: 'PLANNING'
+        stage: 'PLANNING',
+        createdAt: '2025-02-28T11:08:00Z',
+        createdBy: 'TestUser1 - ST OEM'
       },
       {
         id: '2',
@@ -104,31 +118,47 @@ const initialCertifications: CertificationRequest[] = [
         attachments: [],
         comments: [],
         labels: ['deliverable'],
-        stage: 'PLANNING'
+        stage: 'PLANNING',
+        createdAt: '2025-02-28T11:08:00Z',
+        createdBy: 'TestUser1 - ST OEM'
       }
     ],
-    issues: []
+    issues: [],
+    activities: [
+      {
+        id: crypto.randomUUID(),
+        type: 'certification_created',
+        userId: 'TestUser1 - ST OEM',
+        timestamp: '2025-02-28T11:08:00Z',
+        details: {
+          projectName: 'DA IR Smoke Test ST0Y15A Stock/Push - 2025-02-28'
+        }
+      },
+      {
+        id: crypto.randomUUID(),
+        type: 'task_created',
+        userId: 'TestUser1 - ST OEM',
+        timestamp: '2025-02-28T11:08:00Z',
+        details: {
+          taskId: '1',
+          taskName: 'Compliance Reqs: Chapter Reviews'
+        }
+      },
+      {
+        id: crypto.randomUUID(),
+        type: 'task_created',
+        userId: 'TestUser1 - ST OEM',
+        timestamp: '2025-02-28T11:08:00Z',
+        details: {
+          taskId: '2',
+          taskName: 'Deliverable Reqs: Chapter Reviews'
+        }
+      }
+    ]
   },
 ];
 
-interface Storage {
-  getCertifications: () => CertificationRequest[];
-  saveCertifications: (certifications: CertificationRequest[]) => void;
-  updateCertification: (certification: CertificationRequest) => void;
-  getWorkflows: () => Workflow[];
-  saveWorkflows: (workflows: Workflow[]) => void;
-  getDashboards: () => Dashboard[];
-  saveDashboards: (dashboards: Dashboard[]) => void;
-  getDevices: () => Device[];
-  saveDevices: (devices: Device[]) => void;
-  updateDevice: (device: Device) => void;
-  getTaskTestCases: () => TaskTestCases;
-  saveTaskTestCases: (taskTestCases: TaskTestCases) => void;
-  getTestCasesForTask: (taskId: string) => TestCase[];
-  saveTestCasesForTask: (taskId: string, testCases: TestCase[]) => void;
-}
-
-export const storage: Storage = {
+export const storage = {
   getCertifications(): CertificationRequest[] {
     const data = localStorage.getItem(STORAGE_KEYS.CERTIFICATIONS);
     if (!data) {
@@ -149,6 +179,27 @@ export const storage: Storage = {
       cert.id === updatedCertification.id ? updatedCertification : cert
     );
     this.saveCertifications(updatedCertifications);
+  },
+
+  addActivity(certificationId: string, type: ActivityType, userId: string, details: ActivityDetails) {
+    console.log("Activity : " +certificationId);
+      console.log("Activity : " +ActivityDetails);
+    const certifications = this.getCertifications();
+    const certificationIndex = certifications.findIndex(cert => cert.id === certificationId);
+    
+    if (certificationIndex !== -1) {
+      const certification = certifications[certificationIndex];
+      const activity = createActivity(type, userId, details);
+      
+      certification.activities = certification.activities || [];
+      certification.activities.unshift(activity); // Add to beginning of array
+      
+      certifications[certificationIndex] = certification;
+      this.saveCertifications(certifications);
+      
+      return activity;
+    }
+    return null;
   },
 
   getWorkflows(): Workflow[] {

@@ -5,6 +5,7 @@ import 'react-resizable/css/styles.css';
 import { CertificationTask, TaskStatus } from '../types';
 import { getTaskPriorityIcon, getTaskPriorityColor } from '../lib/workflow';
 import { MagnifyingGlassIcon, ShareIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
+import { storage } from '../lib/storage';
 import users from '../data/users.json';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
@@ -131,6 +132,7 @@ export const TaskBoard: FC<TaskBoardProps> = ({ tasks, onTaskUpdate, onTaskClick
   };
 
   const handleLayoutChange = (newLayout: any) => {
+     console.log("Activity : :");
     newLayout.forEach((item: any) => {
       const task = tasks.find(t => t.id === item.i);
       if (task) {
@@ -141,6 +143,16 @@ export const TaskBoard: FC<TaskBoardProps> = ({ tasks, onTaskUpdate, onTaskClick
             ...task,
             status: newStatus
           };
+    console.log("Activity : :" +task.id);
+      
+          // Track status change activity
+          storage.addActivity(task.id, 'task_status_changed', task.assignee || 'system', {
+            taskId: task.id,
+            taskName: task.name,
+            oldStatus: task.status,
+            newStatus: newStatus
+          });
+
           onTaskUpdate(updatedTask);
         }
       }
