@@ -105,6 +105,12 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
   const [assigneeSearch, setAssigneeSearch] = useState('');
   const assigneeRef = useRef<HTMLDivElement>(null);
 
+  const getTomorrowDate = () => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow.toISOString().split('T')[0];
+  };
+
   useEffect(() => {
     if (isOpen) {
       console.log('TaskDetailModal opened for task:', task.id);
@@ -775,7 +781,7 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
                     <h3 className="text-sm font-medium text-gray-700 mb-2">Due Date</h3>
                     <input
                       type="date"
-                      value={editedTask.dueDate || ''}
+                      value={editedTask.dueDate || getTomorrowDate()}
                       onChange={(e) => setEditedTask({ ...editedTask, dueDate: e.target.value })}
                       className="w-full px-3 py-2 bg-white border rounded-lg text-sm"
                     />
