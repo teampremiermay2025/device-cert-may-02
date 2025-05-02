@@ -68,6 +68,8 @@ const UserBubble: FC<{ userId: string; size?: 'sm' | 'md' }> = ({ userId, size =
 
 const ActivityItem: FC<{ activity: Activity }> = ({ activity }) => {
   const user = usersData.users.find(u => u.id === activity.userId);
+  console.log('Activity Item:', activity);
+  console.log('Activity Item: User:', user);
   if (!user) return null;
 
   const getActivityMessage = () => {
@@ -571,11 +573,15 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
               )}
             </div>
             {expandedSections.activity && (
-              <div className="p-4">
+                <div className="p-4">
                 <div className="space-y-2 max-h-[400px] overflow-y-auto">
-                  {certification.activities?.map((activity) => (
-                    <ActivityItem key={activity.id} activity={activity} />
-                  ))}
+                {certification.activities && certification.activities.length > 0 ? (
+                  [...new Map(certification.activities.map(activity => [activity.id, activity])).values()].map((activity) => (
+                  <ActivityItem key={activity.id} activity={activity} />
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-500">No activities to display.</p>
+                )}
                 </div>
               </div>
             )}

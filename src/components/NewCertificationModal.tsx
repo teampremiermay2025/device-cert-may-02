@@ -372,6 +372,7 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
     console.log('Tasks created in handleConfirm:', tasks); // Debug: Log tasks at creation
 
     const now = new Date().toISOString();
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
     const newCertification: CertificationRequest = {
       id: crypto.randomUUID(),
       darpKey: formData.darpKey,
@@ -383,8 +384,23 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
       lastUpdated: now,
       tasks,
       issues: [],
+      activities: [
+      {
+        id: crypto.randomUUID(),
+        type: 'certification_created',
+        timestamp: now,
+        userId: formData.assignee || 'system',
+        details: {
+        message: 'Certification request created',
+        projectName: formData.projectName,
+        projectType: formData.projectType,
+        deviceModel: selectedDevice?.['Device Model'] || '',
+        }
+      }
+      ],
       workflow: selectedWorkflow.id,
       assignee: formData.assignee,
+      reporter: user.id || '',
       vendor: selectedDevice?.['Device Vendor'] || '',
       deviceType: selectedDevice?.['Device Type'] || '',
       deviceModel: selectedDevice?.['Device Model'] || '',
@@ -396,7 +412,6 @@ export const NewCertificationModal: FC<NewCertificationModalProps> = ({ isOpen, 
       devicePaymentType: selectedDevice?.['Device Payment Type'] || '',
       deviceChannel: deviceChannel,
       securityLevel: '',
-      reporter: '',
       primaryPC: '',
       vendorProjectLead: '',
       createdAt: now,
