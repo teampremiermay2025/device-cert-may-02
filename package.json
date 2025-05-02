@@ -12,11 +12,12 @@
   "dependencies": {
     "@dnd-kit/core": "^6.1.0",
     "@headlessui/react": "^1.7.18",
-    "@heroicons/react": "^2.1.1",
+    "@heroicons/react": "^2.2.0",
     "ag-grid-community": "^31.3.4",
     "ag-grid-enterprise": "^31.1.1",
     "ag-grid-react": "^31.3.4",
     "react": "^18.3.1",
+    "react-beautiful-dnd": "^13.1.1",
     "react-dom": "^18.3.1",
     "react-grid-layout": "^1.4.4",
     "react-router-dom": "^6.22.3",

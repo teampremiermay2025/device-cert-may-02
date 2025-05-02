@@ -15,7 +15,7 @@ import {
   CheckIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline';
-import { CertificationTask, TaskPriority, CertificationStage } from '../types';
+import { CertificationTask, TaskPriority, TaskStatus } from '../types';
 import { storage } from '../lib/storage';
 import testCasesData from '../data/testcases.json';
 import usersData from '../data/users.json';
@@ -93,7 +93,7 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
     }
   }, [isOpen, task.id]);
 
-  const handleStatusChange = (status: CertificationStage) => {
+  const handleStatusChange = (status: TaskStatus) => {
     setEditedTask({ ...editedTask, status });
   };
 
@@ -578,7 +578,7 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
                       Status
                     </h3>
                     <div className="flex flex-wrap gap-2">
-                      {(['FORECAST', 'PLANNING', 'SUBMITTED', 'SUBMISSION_REVIEW', 'DEVICE_ENTRY', 'DEVICE_TESTING', 'TAQ_REVIEW', 'TA_COMPLETE', 'CLOSED'] as CertificationStage[]).map((status) => (
+                      {(['TODO', 'IN_PROGRESS', 'REVIEW', 'DONE'] as TaskStatus[]).map((status) => (
                         <button
                           key={status}
                           onClick={() => handleStatusChange(status)}
@@ -588,7 +588,7 @@ export const TaskDetailModal: FC<TaskDetailModalProps> = ({
                               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                           }`}
                         >
-                          {status}
+                          {status.replace('_', ' ')}
                         </button>
                       ))}
                     </div>
