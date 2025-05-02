@@ -32,10 +32,77 @@
           "No disconnections or packet loss during the test."
 
         ],
-        "assigned_to": "4",
-        "status": "In Progress"
+        "assigned_to": "6",
+        "status": "TO DO"
 
-      }
+      },
+        {
+          "test_case_id": "LTE_PS_002",
+          "test_case_description": "Verify LTE PS data transfer at cell-edge conditions",
+          "acceptance_criteria": [
+            "The device must maintain PS data transfer when RSRP drops to –110 dBm.",
+            "Downlink throughput must exceed 20 Mbps for 3 minutes at cell edge.",
+            "Packet loss must remain below 0.5% throughout the test."
+          ],
+          "assigned_to": "5",
+          "status": "Not Started"
+        },
+        {
+          "test_case_id": "LTE_PS_003",
+          "test_case_description": "Verify LTE PS uplink throughput during mobility",
+          "acceptance_criteria": [
+            "The device must maintain uplink throughput > 30 Mbps while moving at 80 km/h for 5 minutes.",
+            "Uplink latency must be below 50 ms.",
+            "No service interruptions or disconnections during the test."
+          ],
+          "assigned_to": "3",
+          "status": "Not Started"
+        },
+        {
+          "test_case_id": "LTE_PS_004",
+          "test_case_description": "Verify seamless PS bearer handover between LTE cells",
+          "acceptance_criteria": [
+            "Interruption time during handover must be less than 150 ms.",
+            "Downlink throughput must recover to > 60 Mbps within 1 second after handover.",
+            "No packet duplicates or loss above 1%."
+          ],
+          "assigned_to": "7",
+          "status": "Not Started"
+        },
+        {
+          "test_case_id": "LTE_PS_005",
+          "test_case_description": "Verify LTE PS data transfer under peak network load",
+          "acceptance_criteria": [
+            "Under simulated congestion, downlink throughput must exceed 15 Mbps.",
+            "End-to-end latency must remain below 100 ms.",
+            "No disconnections during the congestion period."
+          ],
+          "assigned_to": "5",
+          "status": "Not Started"
+        },
+        {
+          "test_case_id": "LTE_PS_006",
+          "test_case_description": "Verify LTE PS PDP context re-establishment after radio link failure",
+          "acceptance_criteria": [
+            "The device must re-establish PDP context within 2 seconds of a forced radio link failure.",
+            "Downlink throughput must exceed 40 Mbps within 1 minute after re-establishment.",
+            "No residual packet loss following re-establishment."
+          ],
+          "assigned_to": "6",
+          "status": "Not Started"
+        },
+        {
+          "test_case_id": "LTE_PS_007",
+          "test_case_description": "Verify LTE PS data transfer after idle-mode resume",
+          "acceptance_criteria": [
+            "The device must resume PS data transfer within 1 second of exiting idle mode.",
+            "Downlink throughput must exceed 10 Mbps immediately upon resume.",
+            "No missing or delayed data packets following resume."
+          ],
+          "assigned_to": "3",
+          "status": "Not Started"
+        }
+      
 
     ]
 

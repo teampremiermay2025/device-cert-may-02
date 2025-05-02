@@ -1,6 +1,6 @@
 import React, { FC, useState, useCallback, useMemo } from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
-import { DevicePhoneMobileIcon, ComputerDesktopIcon, TvIcon, ClockIcon, LightBulbIcon, LockClosedIcon, HeartIcon, CloudIcon, SpeakerWaveIcon, Bars4Icon, TableCellsIcon } from '@heroicons/react/24/outline';
+import { DevicePhoneMobileIcon, ComputerDesktopIcon, TvIcon, ClockIcon, LightBulbIcon, LockClosedIcon, HeartIcon, CloudIcon, SpeakerWaveIcon, Bars4Icon, TableCellsIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { DeviceDetailsModal } from './DeviceDetailsModal';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
@@ -21,42 +21,43 @@ interface Device {
   channel: string;
   releaseHierarchy: { name: string; status: string }[];
   auditHistory: string[];
+  image: string;
 }
 
 const devicesData: { nonIot: Device[]; iot: Device[] } = {
   nonIot: [
     // Apple Devices
-    { id: 'DARP-1', name: 'DARP 1', vendor: 'Apple', type: 'Smartphone', model: 'iPhone 16', codeName: 'Code-iPhone-16', os: 'iOS', osVersion: '18.0', hardwareVersion: '1.0', paymentType: 'Post-Paid', channel: 'Retail', releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/15/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/15/2025: Initial release completed successfully'] },
-    { id: 'DARP-123', name: 'DARP 123', vendor: 'Apple', type: 'Laptop', model: 'MacBook Pro 2025', codeName: 'Code-MacBook-Pro-2025', os: 'macOS', osVersion: '15.0', hardwareVersion: '2.0', paymentType: 'Pre-Paid', channel: 'Online', releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/20/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/20/2025: Initial release completed successfully'] },
-    { id: 'DARP-124', name: 'DARP 124', vendor: 'Apple', type: 'Smartwatch', model: 'Apple Watch Series 10', codeName: 'Code-Apple-Watch-10', os: 'watchOS', osVersion: '11.0', hardwareVersion: '1.0', paymentType: 'Post-Paid', channel: 'Retail', releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/22/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/22/2025: Initial release completed successfully'] },
-    { id: 'DARP-125', name: 'DARP 125', vendor: 'Apple', type: 'Tablet', model: 'iPad Pro 2025', codeName: 'Code-iPad-Pro-2025', os: 'iPadOS', osVersion: '18.0', hardwareVersion: '1.0', paymentType: 'Pre-Paid', channel: 'Online', releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/25/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/25/2025: Initial release completed successfully'] },
+    { id: 'DARP-1', name: 'DARP 1', vendor: 'Apple', type: 'Smartphone', model: 'iPhone 16', codeName: 'Code-iPhone-16', os: 'iOS', osVersion: '18.0', hardwareVersion: '1.0', paymentType: 'Post-Paid', channel: 'Retail', image: "./public/assets/apple-logo.svg", releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/15/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/15/2025: Initial release completed successfully'] },
+    { id: 'DARP-123', name: 'DARP 123', vendor: 'Apple', type: 'Laptop', model: 'MacBook Pro 2025', codeName: 'Code-MacBook-Pro-2025', os: 'macOS', osVersion: '15.0', hardwareVersion: '2.0', paymentType: 'Pre-Paid', channel: 'Online', image: './apple-log.svg',releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/20/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/20/2025: Initial release completed successfully'] },
+    { id: 'DARP-124', name: 'DARP 124', vendor: 'Apple', type: 'Smartwatch', model: 'Apple Watch Series 10', codeName: 'Code-Apple-Watch-10', os: 'watchOS', osVersion: '11.0', hardwareVersion: '1.0', paymentType: 'Post-Paid', channel: 'Retail',image: './apple-log.svg', releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/22/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/22/2025: Initial release completed successfully'] },
+    { id: 'DARP-125', name: 'DARP 125', vendor: 'Apple', type: 'Tablet', model: 'iPad Pro 2025', codeName: 'Code-iPad-Pro-2025', os: 'iPadOS', osVersion: '18.0', hardwareVersion: '1.0', paymentType: 'Pre-Paid', channel: 'Online', image: './apple-log.svg',releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/25/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/25/2025: Initial release completed successfully'] },
     // Samsung Devices
-    { id: 'DARP-30', name: 'DARP 30', vendor: 'Samsung', type: 'Smartphone', model: 'Galaxy S25', codeName: 'Code-Galaxy-S25', os: 'Android', osVersion: '15.0', hardwareVersion: '1.1', paymentType: 'Post-Paid', channel: 'Retail', releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/25/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/25/2025: Initial release completed successfully'] },
-    { id: 'DARP-32', name: 'DARP 32', vendor: 'Samsung', type: 'Tablet', model: 'Galaxy Tab S9', codeName: 'Code-Galaxy-Tab-S9', os: 'Android', osVersion: '15.0', hardwareVersion: '1.0', paymentType: 'Pre-Paid', channel: 'Online', releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/25/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/25/2025: Initial release completed successfully'] },
-    { id: 'DARP-33', name: 'DARP 33', vendor: 'Samsung', type: 'Smartwatch', model: 'Galaxy Watch 7', codeName: 'Code-Galaxy-Watch-7', os: 'Wear OS', osVersion: '5.0', hardwareVersion: '1.0', paymentType: 'Post-Paid', channel: 'Retail', releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/26/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/26/2025: Initial release completed successfully'] },
-    { id: 'DARP-34', name: 'DARP 34', vendor: 'Samsung', type: 'Smart TV', model: 'QLED 2025', codeName: 'Code-QLED-2025', os: 'Tizen', osVersion: '7.0', hardwareVersion: '1.0', paymentType: 'Pre-Paid', channel: 'Online', releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/27/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/27/2025: Initial release completed successfully'] },
+    { id: 'DARP-30', name: 'DARP 30', vendor: 'Samsung', type: 'Smartphone', model: 'Galaxy S25', codeName: 'Code-Galaxy-S25', os: 'Android', osVersion: '15.0', hardwareVersion: '1.1', paymentType: 'Post-Paid', channel: 'Retail', image: './apple-log.svg',releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/25/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/25/2025: Initial release completed successfully'] },
+    { id: 'DARP-32', name: 'DARP 32', vendor: 'Samsung', type: 'Tablet', model: 'Galaxy Tab S9', codeName: 'Code-Galaxy-Tab-S9', os: 'Android', osVersion: '15.0', hardwareVersion: '1.0', paymentType: 'Pre-Paid', channel: 'Online', image: './apple-log.svg',releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/25/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/25/2025: Initial release completed successfully'] },
+    { id: 'DARP-33', name: 'DARP 33', vendor: 'Samsung', type: 'Smartwatch', model: 'Galaxy Watch 7', codeName: 'Code-Galaxy-Watch-7', os: 'Wear OS', osVersion: '5.0', hardwareVersion: '1.0', paymentType: 'Post-Paid', channel: 'Retail', image: './apple-log.svg',releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/26/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/26/2025: Initial release completed successfully'] },
+    { id: 'DARP-34', name: 'DARP 34', vendor: 'Samsung', type: 'Smart TV', model: 'QLED 2025', codeName: 'Code-QLED-2025', os: 'Tizen', osVersion: '7.0', hardwareVersion: '1.0', paymentType: 'Pre-Paid', channel: 'Online', image: './apple-log.svg',releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/27/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/27/2025: Initial release completed successfully'] },
     // Google Devices
-    { id: 'DARP-40', name: 'DARP 40', vendor: 'Google', type: 'Smartphone', model: 'Pixel 9', codeName: 'Code-Pixel-9', os: 'Android', osVersion: '15.0', hardwareVersion: '1.0', paymentType: 'Post-Paid', channel: 'Retail', releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/28/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/28/2025: Initial release completed successfully'] },
-    { id: 'DARP-41', name: 'DARP 41', vendor: 'Google', type: 'Tablet', model: 'Pixel Tablet 2', codeName: 'Code-Pixel-Tablet-2', os: 'Android', osVersion: '15.0', hardwareVersion: '1.0', paymentType: 'Pre-Paid', channel: 'Online', releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/29/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/29/2025: Initial release completed successfully'] },
-    { id: 'DARP-42', name: 'DARP 42', vendor: 'Google', type: 'Smartwatch', model: 'Pixel Watch 3', codeName: 'Code-Pixel-Watch-3', os: 'Wear OS', osVersion: '5.0', hardwareVersion: '1.0', paymentType: 'Post-Paid', channel: 'Retail', releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/30/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/30/2025: Initial release completed successfully'] },
-    { id: 'DARP-43', name: 'DARP 43', vendor: 'Google', type: 'Smart Speaker', model: 'Nest Audio 2', codeName: 'Code-Nest-Audio-2', os: 'Google Assistant', osVersion: '2.0', hardwareVersion: '1.0', paymentType: 'Pre-Paid', channel: 'Online', releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/30/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/30/2025: Initial release completed successfully'] },
+    { id: 'DARP-40', name: 'DARP 40', vendor: 'Google', type: 'Smartphone', model: 'Pixel 9', codeName: 'Code-Pixel-9', os: 'Android', osVersion: '15.0', hardwareVersion: '1.0', paymentType: 'Post-Paid', channel: 'Retail', image: './apple-log.svg',releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/28/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/28/2025: Initial release completed successfully'] },
+    { id: 'DARP-41', name: 'DARP 41', vendor: 'Google', type: 'Tablet', model: 'Pixel Tablet 2', codeName: 'Code-Pixel-Tablet-2', os: 'Android', osVersion: '15.0', hardwareVersion: '1.0', paymentType: 'Pre-Paid', channel: 'Online',image: './apple-log.svg', releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/29/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/29/2025: Initial release completed successfully'] },
+    { id: 'DARP-42', name: 'DARP 42', vendor: 'Google', type: 'Smartwatch', model: 'Pixel Watch 3', codeName: 'Code-Pixel-Watch-3', os: 'Wear OS', osVersion: '5.0', hardwareVersion: '1.0', paymentType: 'Post-Paid', channel: 'Retail',image: './apple-log.svg', releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/30/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/30/2025: Initial release completed successfully'] },
+    { id: 'DARP-43', name: 'DARP 43', vendor: 'Google', type: 'Smart Speaker', model: 'Nest Audio 2', codeName: 'Code-Nest-Audio-2', os: 'Google Assistant', osVersion: '2.0', hardwareVersion: '1.0', paymentType: 'Pre-Paid', channel: 'Online',image: './apple-log.svg', releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/30/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/30/2025: Initial release completed successfully'] },
   ],
   iot: [
     // IoT-HomeTech Devices
-    { id: 'IOT-100', name: 'IOT 100', vendor: 'IoT-HomeTech', type: 'Smart Thermostat', model: 'IoT-Thermostat-5000', codeName: 'Code-IoT-Thermostat-5000', os: 'Zepfix', osVersion: '3.1', hardwareVersion: '1.0', paymentType: 'Post-Paid', channel: 'Stock', releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/10/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/10/2025: Initial release completed successfully'] },
-    { id: 'IOT-101', name: 'IOT 101', vendor: 'IoT-HomeTech', type: 'Smart Water Sensor', model: 'IoT-WaterSense-3000', codeName: 'Code-IoT-WaterSense-3000', os: 'Zepfix', osVersion: '3.0', hardwareVersion: '1.0', paymentType: 'Pre-Paid', channel: 'Retail', releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/12/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/12/2025: Initial release completed successfully'] },
-    { id: 'IOT-102', name: 'IOT 102', vendor: 'IoT-HomeTech', type: 'Smart Lock', model: 'IoT-Lock-7000', codeName: 'Code-IoT-Lock-7000', os: 'Zepfix', osVersion: '3.2', hardwareVersion: '1.0', paymentType: 'Post-Paid', channel: 'Online', releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/14/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/14/2025: Initial release completed successfully'] },
-    { id: 'IOT-103', name: 'IOT 103', vendor: 'IoT-HomeTech', type: 'Smart Light Bulb', model: 'IoT-Light-4000', codeName: 'Code-IoT-Light-4000', os: 'Zepfix', osVersion: '3.0', hardwareVersion: '1.0', paymentType: 'Pre-Paid', channel: 'Retail', releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/16/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/16/2025: Initial release completed successfully'] },
+    { id: 'IOT-100', name: 'IOT 100', vendor: 'IoT-HomeTech', type: 'Smart Thermostat', model: 'IoT-Thermostat-5000', codeName: 'Code-IoT-Thermostat-5000', os: 'Zepfix', osVersion: '3.1', hardwareVersion: '1.0', paymentType: 'Post-Paid', channel: 'Stock', image: './apple-log.svg',releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/10/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/10/2025: Initial release completed successfully'] },
+    { id: 'IOT-101', name: 'IOT 101', vendor: 'IoT-HomeTech', type: 'Smart Water Sensor', model: 'IoT-WaterSense-3000', codeName: 'Code-IoT-WaterSense-3000', os: 'Zepfix', osVersion: '3.0', hardwareVersion: '1.0', paymentType: 'Pre-Paid', channel: 'Retail', image: './apple-log.svg',releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/12/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/12/2025: Initial release completed successfully'] },
+    { id: 'IOT-102', name: 'IOT 102', vendor: 'IoT-HomeTech', type: 'Smart Lock', model: 'IoT-Lock-7000', codeName: 'Code-IoT-Lock-7000', os: 'Zepfix', osVersion: '3.2', hardwareVersion: '1.0', paymentType: 'Post-Paid', channel: 'Online', image: './apple-log.svg',releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/14/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/14/2025: Initial release completed successfully'] },
+    { id: 'IOT-103', name: 'IOT 103', vendor: 'IoT-HomeTech', type: 'Smart Light Bulb', model: 'IoT-Light-4000', codeName: 'Code-IoT-Light-4000', os: 'Zepfix', osVersion: '3.0', hardwareVersion: '1.0', paymentType: 'Pre-Paid', channel: 'Retail', image: './apple-log.svg',releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/16/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/16/2025: Initial release completed successfully'] },
     // SmartCityCorp Devices
-    { id: 'IOT-200', name: 'IOT 200', vendor: 'SmartCityCorp', type: 'Smart Traffic Light', model: 'CityLight-4000', codeName: 'Code-CityLight-4000', os: 'CityOS', osVersion: '2.5', hardwareVersion: '1.0', paymentType: 'Post-Paid', channel: 'Municipal', releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/15/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/15/2025: Initial release completed successfully'] },
-    { id: 'IOT-201', name: 'IOT 201', vendor: 'SmartCityCorp', type: 'Smart Parking Sensor', model: 'ParkSense-2000', codeName: 'Code-ParkSense-2000', os: 'CityOS', osVersion: '2.0', hardwareVersion: '1.0', paymentType: 'Pre-Paid', channel: 'Municipal', releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/18/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/18/2025: Initial release completed successfully'] },
-    { id: 'IOT-202', name: 'IOT 202', vendor: 'SmartCityCorp', type: 'Air Quality Monitor', model: 'CityAir-3000', codeName: 'Code-CityAir-3000', os: 'CityOS', osVersion: '2.1', hardwareVersion: '1.0', paymentType: 'Post-Paid', channel: 'Municipal', releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/20/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/20/2025: Initial release completed successfully'] },
-    { id: 'IOT-203', name: 'IOT 203', vendor: 'SmartCityCorp', type: 'Smart Water Meter', model: 'WaterFlow-5000', codeName: 'Code-WaterFlow-5000', os: 'CityOS', osVersion: '2.0', hardwareVersion: '1.0', paymentType: 'Pre-Paid', channel: 'Municipal', releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/22/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/22/2025: Initial release completed successfully'] },
+    { id: 'IOT-200', name: 'IOT 200', vendor: 'SmartCityCorp', type: 'Smart Traffic Light', model: 'CityLight-4000', codeName: 'Code-CityLight-4000', os: 'CityOS', osVersion: '2.5', hardwareVersion: '1.0', paymentType: 'Post-Paid', channel: 'Municipal',image: './apple-log.svg', releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/15/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/15/2025: Initial release completed successfully'] },
+    { id: 'IOT-201', name: 'IOT 201', vendor: 'SmartCityCorp', type: 'Smart Parking Sensor', model: 'ParkSense-2000', codeName: 'Code-ParkSense-2000', os: 'CityOS', osVersion: '2.0', hardwareVersion: '1.0', paymentType: 'Pre-Paid', channel: 'Municipal',image: './apple-log.svg', releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/18/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/18/2025: Initial release completed successfully'] },
+    { id: 'IOT-202', name: 'IOT 202', vendor: 'SmartCityCorp', type: 'Air Quality Monitor', model: 'CityAir-3000', codeName: 'Code-CityAir-3000', os: 'CityOS', osVersion: '2.1', hardwareVersion: '1.0', paymentType: 'Post-Paid', channel: 'Municipal', image: './apple-log.svg',releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/20/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/20/2025: Initial release completed successfully'] },
+    { id: 'IOT-203', name: 'IOT 203', vendor: 'SmartCityCorp', type: 'Smart Water Meter', model: 'WaterFlow-5000', codeName: 'Code-WaterFlow-5000', os: 'CityOS', osVersion: '2.0', hardwareVersion: '1.0', paymentType: 'Pre-Paid', channel: 'Municipal', image: './apple-log.svg',releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/22/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/22/2025: Initial release completed successfully'] },
     // HealthTechIoT Devices
-    { id: 'IOT-300', name: 'IOT 300', vendor: 'HealthTechIoT', type: 'Smart Heart Monitor', model: 'HeartBeat-6000', codeName: 'Code-HeartBeat-6000', os: 'HealthOS', osVersion: '1.5', hardwareVersion: '1.0', paymentType: 'Post-Paid', channel: 'Healthcare', releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/20/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/20/2025: Initial release completed successfully'] },
-    { id: 'IOT-301', name: 'IOT 301', vendor: 'HealthTechIoT', type: 'Smart Insulin Pump', model: 'InsulinFlow-1000', codeName: 'Code-InsulinFlow-1000', os: 'HealthOS', osVersion: '1.0', hardwareVersion: '1.0', paymentType: 'Pre-Paid', channel: 'Healthcare', releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/22/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/22/2025: Initial release completed successfully'] },
-    { id: 'IOT-302', name: 'IOT 302', vendor: 'HealthTechIoT', type: 'Smart Thermometer', model: 'TempTrack-2000', codeName: 'Code-TempTrack-2000', os: 'HealthOS', osVersion: '1.1', hardwareVersion: '1.0', paymentType: 'Post-Paid', channel: 'Healthcare', releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/24/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/24/2025: Initial release completed successfully'] },
-    { id: 'IOT-303', name: 'IOT 303', vendor: 'HealthTechIoT', type: 'Smart Fitness Tracker', model: 'FitPulse-8000', codeName: 'Code-FitPulse-8000', os: 'HealthOS', osVersion: '1.5', hardwareVersion: '1.0', paymentType: 'Pre-Paid', channel: 'Healthcare', releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/26/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/26/2025: Initial release completed successfully'] },
+    { id: 'IOT-300', name: 'IOT 300', vendor: 'HealthTechIoT', type: 'Smart Heart Monitor', model: 'HeartBeat-6000', codeName: 'Code-HeartBeat-6000', os: 'HealthOS', osVersion: '1.5', hardwareVersion: '1.0', paymentType: 'Post-Paid', channel: 'Healthcare', image: './apple-log.svg',releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/20/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/20/2025: Initial release completed successfully'] },
+    { id: 'IOT-301', name: 'IOT 301', vendor: 'HealthTechIoT', type: 'Smart Insulin Pump', model: 'InsulinFlow-1000', codeName: 'Code-InsulinFlow-1000', os: 'HealthOS', osVersion: '1.0', hardwareVersion: '1.0', paymentType: 'Pre-Paid', channel: 'Healthcare', image: './apple-log.svg',releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/22/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/22/2025: Initial release completed successfully'] },
+    { id: 'IOT-302', name: 'IOT 302', vendor: 'HealthTechIoT', type: 'Smart Thermometer', model: 'TempTrack-2000', codeName: 'Code-TempTrack-2000', os: 'HealthOS', osVersion: '1.1', hardwareVersion: '1.0', paymentType: 'Post-Paid', channel: 'Healthcare', image: './apple-log.svg',releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/24/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/24/2025: Initial release completed successfully'] },
+    { id: 'IOT-303', name: 'IOT 303', vendor: 'HealthTechIoT', type: 'Smart Fitness Tracker', model: 'FitPulse-8000', codeName: 'Code-FitPulse-8000', os: 'HealthOS', osVersion: '1.5', hardwareVersion: '1.0', paymentType: 'Pre-Paid', channel: 'Healthcare', image: './apple-log.svg',releaseHierarchy: [{ name: 'DA-IR: Initial Release', status: 'Successful on 4/26/2025' }, { name: 'Current Maintenance Release', status: 'In Progress' }], auditHistory: ['4/26/2025: Initial release completed successfully'] },
   ],
 };
 
@@ -102,6 +103,7 @@ export const DevicesView: FC = () => {
   const [viewMode, setViewMode] = useState<'tiles' | 'list'>('tiles');
   const [gridApi, setGridApi] = useState<GridApi | null>(null);
   const [columnApi, setColumnApi] = useState<ColumnApi | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Get unique OEMs for the filter based on viewType
   const oems = useMemo(() => {
@@ -111,13 +113,36 @@ export const DevicesView: FC = () => {
     return ['All', ...new Set(vendors)];
   }, [viewType, devices]);
 
+  // Filter devices based on search term and OEM filter
+  const filteredDevices = useMemo(() => {
+    let filtered = devices[viewType];
+
+    // Apply search term filter
+    if (searchTerm) {
+      filtered = filtered.filter(device =>
+        device.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        device.vendor.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        device.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        device.model.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Apply OEM filter
+    if (filterOEM !== 'All') {
+      filtered = filtered.filter(device => device.vendor === filterOEM);
+    }
+
+    return filtered;
+  }, [devices, viewType, searchTerm, filterOEM]);
+
   // Group devices by OEM for the current view type
-  const groupedDevices = devices[viewType].reduce((acc, device) => {
-    if (filterOEM !== 'All' && device.vendor !== filterOEM) return acc;
-    if (!acc[device.vendor]) acc[device.vendor] = [];
-    acc[device.vendor].push(device);
-    return acc;
-  }, {} as Record<string, Device[]>);
+  const groupedDevices = useMemo(() => {
+    return filteredDevices.reduce((acc, device) => {
+      if (!acc[device.vendor]) acc[device.vendor] = [];
+      acc[device.vendor].push(device);
+      return acc;
+    }, {} as Record<string, Device[]>);
+  }, [filteredDevices]);
 
   // Handle drag-and-drop within the same OEM
   const onDragEnd = (result: DropResult) => {
@@ -253,7 +278,7 @@ export const DevicesView: FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-6">
+    <div className="min-h-screen bg-gray-50 py-8 px-6">
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>
@@ -269,6 +294,7 @@ export const DevicesView: FC = () => {
             onClick={() => {
               setViewType('nonIot');
               setFilterOEM('All'); // Reset filter when switching view type
+              setSearchTerm(''); // Reset search term
             }}
             className={`px-6 py-2 rounded-full font-semibold text-sm transition-all duration-300 ${
               viewType === 'nonIot'
@@ -282,6 +308,7 @@ export const DevicesView: FC = () => {
             onClick={() => {
               setViewType('iot');
               setFilterOEM('All'); // Reset filter when switching view type
+              setSearchTerm(''); // Reset search term
             }}
             className={`px-6 py-2 rounded-full font-semibold text-sm transition-all duration-300 ${
               viewType === 'iot'
@@ -294,23 +321,17 @@ export const DevicesView: FC = () => {
         </div>
       </div>
 
-      {/* OEM Filter and View Mode Toggle */}
-      <div className="mb-6 flex flex-wrap gap-4 items-center bg-gray-50 border border-gray-200 rounded-lg p-4">
-        <div className="flex gap-2 items-center">
-          <span className="font-medium text-gray-700">Vendor:</span>
-          {oems.map(oem => (
-            <button
-              key={oem}
-              onClick={() => setFilterOEM(oem)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors shadow-sm ${
-                filterOEM === oem
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              {oem}
-            </button>
-          ))}
+      {/* Search and OEM Filter */}
+      <div className="mb-6 flex flex-wrap gap-4 items-center">
+        <div className="flex-1 relative">
+          <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search devices..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border rounded-lg shadow-sm focus:ring-blue-400 focus:border-blue-400"
+          />
         </div>
         <div className="flex items-center space-x-2 bg-white rounded-lg border p-1">
           <button
@@ -328,17 +349,46 @@ export const DevicesView: FC = () => {
         </div>
       </div>
 
+      {/* OEM Filter */}
+      <div className="mb-6 flex flex-wrap gap-2 items-center">
+        <span className="font-medium text-gray-700 mr-2">Vendor:</span>
+        {oems.map(oem => (
+          <button
+            key={oem}
+            onClick={() => setFilterOEM(oem)}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors shadow-sm ${
+              filterOEM === oem
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            {oem}
+          </button>
+        ))}
+      </div>
+
       {/* Devices Display */}
       {viewMode === 'tiles' ? (
         <DragDropContext onDragEnd={onDragEnd}>
           <div className="space-y-10">
             {Object.keys(groupedDevices).map(oem => (
               <div key={oem}>
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">{oem}</h2>
+                <div className="flex items-center mb-6">
+                  {/* OEM Image */}
+                  {groupedDevices[oem].length > 0 && (
+                    <img
+                      src={groupedDevices[oem][0].image}
+                      alt={`${oem} logo`}
+                      className="w-16 h-16 rounded-full object-contain mr-4"
+                    />
+                  )}
+                  {/* OEM Name */}
+                  <h2 className="text-xl font-semibold text-gray-900">{oem}</h2>
+                </div>
                 <Droppable droppableId={oem} direction="horizontal">
                   {(provided) => (
                     <div
-                      className="flex flex-wrap gap-6"
+                      className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 justify-items-center"
                       {...provided.droppableProps}
                       ref={provided.innerRef}
                     >
@@ -349,19 +399,21 @@ export const DevicesView: FC = () => {
                               ref={provided.innerRef}
                               {...provided.draggableProps}
                               {...provided.dragHandleProps}
-                              className="w-80 bg-white rounded-xl shadow-md border border-gray-200 backdrop-blur-sm hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1"
+                              className="w-64 bg-white rounded-xl shadow-md border border-gray-200 hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1"
                               onClick={() => setSelectedDevice(device)}
                             >
-                              <div className="p-6 flex flex-col items-center">
-                                {/* Image Placeholder */}
-                                <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mb-4 -mt-12 border-4 border-white shadow-md">
-                                  <span className="text-gray-500 text-sm">Image</span>
-                                </div>
-                                <h3 className="text-lg font-semibold text-blue-700 mb-2 text-center">{device.name}</h3>
-                                <p className="text-sm text-gray-600 text-center"><span className="font-medium">Vendor:</span> {device.vendor}</p>
-                                <p className="text-sm text-gray-600 text-center"><span className="font-medium">Type:</span> {device.type}</p>
-                                <p className="text-sm text-gray-600 text-center"><span className="font-medium">Model:</span> {device.model}</p>
-                                <button className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-full font-semibold text-sm hover:bg-blue-700 transition-colors">
+                              <div className="p-4 flex flex-col items-center">
+                                {/* Device Image */}
+                                <img
+                                  src={device.image}
+                                  alt={`${device.name} logo`}
+                                  className="w-16 h-16 rounded-full object-contain mb-4"
+                                />
+                                <h3 className="text-lg font-semibold text-gray-900 mb-2">{device.name}</h3>
+                                <p className="text-sm text-gray-600"><span className="font-medium">Vendor:</span> {device.vendor}</p>
+                                <p className="text-sm text-gray-600"><span className="font-medium">Type:</span> {device.type}</p>
+                                <p className="text-sm text-gray-600"><span className="font-medium">Model:</span> {device.model}</p>
+                                <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors">
                                   View Details
                                 </button>
                               </div>
@@ -388,7 +440,7 @@ export const DevicesView: FC = () => {
             }}
           >
             <AgGridReact
-              rowData={devices[viewType]}
+              rowData={filteredDevices}
               columnDefs={columnDefs}
               defaultColDef={defaultColDef}
               onGridReady={onGridReady}
