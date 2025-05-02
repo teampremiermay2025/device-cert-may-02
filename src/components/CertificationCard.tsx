@@ -22,11 +22,40 @@ const getStatusColor = (status: string): string => {
   return statusColors[status] || 'bg-gray-100 text-gray-800';
 };
 
+const getWorkflowStages = (certification: CertificationRequest) => {
+  const stages = ['FORECAST', 'PLANNING', 'SUBMITTED', 'SUBMISSION_REVIEW', 'DEVICE_ENTRY', 'DEVICE_TESTING', 'TAQ_REVIEW', 'TA_COMPLETE', 'CLOSED'];
+  const currentStageIndex = stages.indexOf(certification.status);
+  
+  // Get workflow from localStorage
+  const workflowsStr = localStorage.getItem('jiraWorkflows');
+  if (!workflowsStr) return { stages, currentStageIndex };
+  
+  const workflows = JSON.parse(workflowsStr);
+  const workflow = workflows.find((w: any) => w.id === certification.workflow);
+  
+  if (workflow?.nodes) {
+    const workflowStages = workflow.nodes
+      .filter((node: any) => node.type === 'customNode')
+      .map((node: any) => node.data?.label.toUpperCase());
+    
+    if (workflowStages.length > 0) {
+      return {
+        stages: workflowStages,
+        currentStageIndex: workflowStages.indexOf(certification.status)
+      };
+    }
+  }
+  
+  return { stages, currentStageIndex };
+};
+
 export const CertificationCard: FC<CertificationCardProps> = ({ certification, onClick }) => {
   const statusColorClass = getStatusColor(certification.status);
   const completedTasks = certification.tasks.filter(task => task.status === 'DONE').length;
   const totalTasks = certification.tasks.length;
   const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+  
+  const { stages, currentStageIndex } = getWorkflowStages(certification);
 
   return (
     <div 
@@ -57,10 +86,41 @@ export const CertificationCard: FC<CertificationCardProps> = ({ certification, o
             <ClockIcon className="w-4 h-4 mr-2" />
             <span className="text-sm">Updated {new Date(certification.lastUpdated).toLocaleDateString()}</span>
           </div>
+          
+          {/* Workflow Progress Bar */}
+          <div className="mt-4">
+            <div className="flex justify-between text-sm mb-1">
+              <span className="text-gray-600">Workflow Progress</span>
+            </div>
+            <div className="relative">
+              <div className="flex w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                {stages.map((stage, index) => (
+                  <div
+                    key={stage}
+                    className={`h-full ${
+                      index < currentStageIndex
+                        ? 'bg-blue-500'
+                        : index === currentStageIndex
+                        ? 'bg-blue-600'
+                        : 'bg-gray-200'
+                    } ${index === 0 ? 'rounded-l-full' : ''} ${
+                      index === stages.length - 1 ? 'rounded-r-full' : ''
+                    }`}
+                    style={{ width: `${100 / stages.length}%` }}
+                  />
+                ))}
+              </div>
+              <div className="absolute -bottom-6 left-0 right-0 flex justify-between text-xs text-gray-500">
+                <span> {certification.status}</span>
+                <span>{stages[stages.length - 1]}</span>
+              </div>
+            </div>
+          </div>
+
           {totalTasks > 0 && (
-            <div className="mt-4">
+            <div className="mt-8 pt-6">
               <div className="flex justify-between text-sm mb-1">
-                <span className="text-gray-600">Progress</span>
+                <span className="text-gray-600">Current Stagge Progress</span>
                 <span className="text-gray-900">{progress}%</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
