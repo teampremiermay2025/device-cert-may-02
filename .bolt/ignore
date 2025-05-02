@@ -34,11 +34,11 @@ src/data/taskstep.json
 
 
 src/index.css
-src/lib/
+#src/lib/
 src/localStorageInit.ts
 src/main.tsx
 src/store/
-src/types.ts
+#src/types.ts
 src/vite-env.d.ts
 
 # Components by Functionality
@@ -62,7 +62,7 @@ src/components/KanbanReleasesBoard.tsx
 
 # --- Task Management ---
 
-src/components/TaskRules.tsx
+#src/components/TaskRules.tsx
 
 # --- Workflow ---
 src/components/JiraWorkflowEditor.tsx
