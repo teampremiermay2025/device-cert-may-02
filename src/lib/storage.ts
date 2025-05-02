@@ -32,7 +32,7 @@ interface Device {
   [key: string]: any;
 }
 
-// Define the TestCase interface (extended with assigned_to and status)
+// Define the TestCase interface
 interface TestCase {
   test_case_id: string;
   test_case_description: string;
@@ -182,8 +182,6 @@ export const storage = {
   },
 
   addActivity(certificationId: string, type: ActivityType, userId: string, details: ActivityDetails) {
-    console.log("Activity : " +certificationId);
-      console.log("Activity : " +ActivityDetails);
     const certifications = this.getCertifications();
     const certificationIndex = certifications.findIndex(cert => cert.id === certificationId);
     
