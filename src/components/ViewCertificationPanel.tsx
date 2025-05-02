@@ -213,7 +213,7 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
              {certification.type}
            </span>
           </div>
-          <span className="text-lg text-gray-600">{certification.projectName}</span>
+          <span className="text-lg text-gray-600">{certification.projectName} </span>
         </div>
         <div className="flex gap-2 flex-wrap">
           <div className="flex bg-white rounded-lg shadow-sm border border-gray-100 p-1">
@@ -235,7 +235,6 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
             <button className="p-2 hover:bg-blue-50 rounded-md transition-colors" title="More">
               <EllipsisHorizontalIcon className="w-5 h-5 text-blue-500" />
             </button>
-
           </div>
           <button
             className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium text-gray-700 transition-colors"
@@ -247,8 +246,6 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-       
-
         <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 cursor-pointer"
             onClick={() => toggleSection('deviceDetails')}
@@ -266,29 +263,41 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
           {expandedSections.deviceDetails && (
             <div className="p-4">
               <dl className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-3">
-                <div>
-                  <dt className="flex items-center gap-2 text-sm font-medium text-gray-500"><UserPlusIcon className="w-5 h-5" /> Vendor</dt>
-                  <dd className="mt-1 text-sm text-gray-900">{certification.vendor || '-'}</dd>
+                <div className="flex items-center gap-2">
+                  <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                    <UserPlusIcon className="w-5 h-5" /> Vendor:
+                  </dt>
+                  <dd className="text-sm text-gray-900">{certification.vendor || '-'}</dd>
                 </div>
-                <div>
-                  <dt className="flex items-center gap-2 text-sm font-medium text-gray-500"><DevicePhoneMobileIcon className="w-5 h-5" /> Device Type</dt>
-                  <dd className="mt-1 text-sm text-gray-900">{certification.deviceType || '-'}</dd>
+                <div className="flex items-center gap-2">
+                  <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                    <DevicePhoneMobileIcon className="w-5 h-5" /> Device Type:
+                  </dt>
+                  <dd className="text-sm text-gray-900">{certification.deviceType || '-'}</dd>
                 </div>
-                <div>
-                  <dt className="flex items-center gap-2 text-sm font-medium text-gray-500"><DevicePhoneMobileIcon className="w-5 h-5" /> Model</dt>
-                  <dd className="mt-1 text-sm text-gray-900">{certification.deviceModel || '-'}</dd>
+                <div className="flex items-center gap-2">
+                  <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                    <DevicePhoneMobileIcon className="w-5 h-5" /> Model:
+                  </dt>
+                  <dd className="text-sm text-gray-900">{certification.deviceModel || '-'}</dd>
                 </div>
-                <div>
-                  <dt className="flex items-center gap-2 text-sm font-medium text-gray-500"><PencilIcon className="w-5 h-5" /> Marketing Name</dt>
-                  <dd className="mt-1 text-sm text-gray-900">{certification.deviceMarketingName || '-'}</dd>
+                <div className="flex items-center gap-2">
+                  <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                    <PencilIcon className="w-5 h-5" /> Marketing Name:
+                  </dt>
+                  <dd className="text-sm text-gray-900">{certification.deviceMarketingName || '-'}</dd>
                 </div>
-                <div>
-                  <dt className="flex items-center gap-2 text-sm font-medium text-gray-500"><DevicePhoneMobileIcon className="w-5 h-5" /> OS Version</dt>
-                  <dd className="mt-1 text-sm text-gray-900">{certification.deviceOS} {certification.deviceOSVersion}</dd>
+                <div className="flex items-center gap-2">
+                  <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                    <DevicePhoneMobileIcon className="w-5 h-5" /> OS Version:
+                  </dt>
+                  <dd className="text-sm text-gray-900">{certification.deviceOS} {certification.deviceOSVersion}</dd>
                 </div>
-                <div>
-                  <dt className="flex items-center gap-2 text-sm font-medium text-gray-500"><DevicePhoneMobileIcon className="w-5 h-5" /> Hardware Version</dt>
-                  <dd className="mt-1 text-sm text-gray-900">{certification.deviceHardwareVersion || '-'}</dd>
+                <div className="flex items-center gap-2">
+                  <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                    <DevicePhoneMobileIcon className="w-5 h-5" /> Hardware Version:
+                  </dt>
+                  <dd className="text-sm text-gray-900">{certification.deviceHardwareVersion || '-'}</dd>
                 </div>
               </dl>
             </div>
@@ -312,21 +321,29 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
           {expandedSections.forecastedDates && (
             <div className="p-4">
               <dl className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2">
-                <div>
-                  <dt className="flex items-center gap-2 text-sm font-medium text-gray-500"><CalendarIcon className="w-5 h-5" /> Device Entry (DE)</dt>
-                  <dd className="mt-1 text-sm text-gray-900">{certification.forecastedDEDate || '-'}</dd>
+                <div className="flex items-center gap-2">
+                  <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                    <CalendarIcon className="w-5 h-5" /> Device Entry (DE):
+                  </dt>
+                  <dd className="text-sm text-gray-900">{certification.forecastedDEDate || '-'}</dd>
                 </div>
-                <div>
-                  <dt className="flex items-center gap-2 text-sm font-medium text-gray-500"><CalendarIcon className="w-5 h-5" /> FFW Date</dt>
-                  <dd className="mt-1 text-sm text-gray-900">{certification.forecastedFFWDate || '-'}</dd>
+                <div className="flex items-center gap-2">
+                  <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                    <CalendarIcon className="w-5 h-5" /> FFW Date:
+                  </dt>
+                  <dd className="text-sm text-gray-900">{certification.forecastedFFWDate || '-'}</dd>
                 </div>
-                <div>
-                  <dt className="flex items-center gap-2 text-sm font-medium text-gray-500"><CalendarIcon className="w-5 h-5" /> TA Date</dt>
-                  <dd className="mt-1 text-sm text-gray-900">{certification.forecastedTADate || '-'}</dd>
+                <div className="flex items-center gap-2">
+                  <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                    <CalendarIcon className="w-5 h-5" /> TA Date:
+                  </dt>
+                  <dd className="text-sm text-gray-900">{certification.forecastedTADate || '-'}</dd>
                 </div>
-                <div>
-                  <dt className="flex items-center gap-2 text-sm font-medium text-gray-500"><CalendarIcon className="w-5 h-5" /> Launch Date</dt>
-                  <dd className="mt-1 text-sm text-gray-900">{certification.forecastedLaunchDate || '-'}</dd>
+                <div className="flex items-center gap-2">
+                  <dt className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                    <CalendarIcon className="w-5 h-5" /> Launch Date:
+                  </dt>
+                  <dd className="text-sm text-gray-900">{certification.forecastedLaunchDate || '-'}</dd>
                 </div>
               </dl>
             </div>
