@@ -295,21 +295,41 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
     // Track task updates
     if (originalTask) {
       if (originalTask.status !== updatedTask.status) {
-        storage.addActivity(certification.id, 'task_status_changed', certification.assignee, {
-          taskId: updatedTask.id,
-          taskName: updatedTask.name,
-          oldStatus: originalTask.status,
-          newStatus: updatedTask.status
-        });
+        const activity: Activity = {
+          id: crypto.randomUUID(),
+          type: 'task_status_changed',
+          userId:originalTask.assignee ||  certification.assignee,
+          timestamp: new Date().toISOString(),
+          details: {
+            taskId: updatedTask.id,
+            taskName: updatedTask.name,
+            oldStatus: originalTask.status,
+            newStatus: updatedTask.status,
+          },
+        };
+        updatedCertification.activities = [
+          ...(updatedCertification.activities || []),
+          activity,
+        ];
       }
 
       if (originalTask.assignee !== updatedTask.assignee) {
-        storage.addActivity(certification.id, 'task_assigned', certification.assignee, {
-          taskId: updatedTask.id,
-          taskName: updatedTask.name,
-          oldAssignee: originalTask.assignee,
-          newAssignee: updatedTask.assignee
-        });
+        const activity: Activity = {
+          id: crypto.randomUUID(),
+          type: 'task_assigned',
+          userId:originalTask.assignee ||  certification.assignee,
+          timestamp: new Date().toISOString(),
+          details: {
+            taskId: updatedTask.id,
+            taskName: updatedTask.name,
+            oldAssignee: originalTask.assignee,
+            newAssignee: updatedTask.assignee,
+          },
+        };
+        updatedCertification.activities = [
+          ...(updatedCertification.activities || []),
+          activity,
+        ];
       }
     }
 
