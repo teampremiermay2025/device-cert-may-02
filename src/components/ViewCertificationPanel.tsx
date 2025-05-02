@@ -29,20 +29,19 @@ interface ViewCertificationPanelProps {
 
 export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
   certification,
-  onUpdate,onUpdateNoClose,
+  onUpdate,
+  onUpdateNoClose,
   onCancel,
 }) => {
   const [selectedTask, setSelectedTask] = useState<CertificationTask | null>(null);
   const [view, setView] = useState<'list' | 'board'>('board');
   const [workflow, setWorkflow] = useState<any>(null);
 
-  // State for expandable sections
   const [expandedSections, setExpandedSections] = useState({
-    deviceDetails: false,
-    forecastedDates: false,
+    deviceDetails: true,
+    forecastedDates: true,
   });
 
-  // Load the workflow associated with the certification
   useEffect(() => {
     const saved = localStorage.getItem('jiraWorkflows');
     if (saved) {
@@ -88,7 +87,6 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
     setSelectedTask(task);
   };
 
-  // Function to filter tasks from ruleset.json based on projectType, deviceChannel, and stage
   const filterTasksFromRuleset = (stage: string, projectType: string, deviceChannel: string): CertificationTask[] => {
     const filteredTasks = taskStepsData.filter((task) => {
       const matchesIssueType = task.issue_types.includes(projectType);
@@ -114,7 +112,6 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
     }));
   };
 
-  // Existing handler (keep as-is for TaskDetail modal)
   const handleTaskUpdate = (updatedTask: CertificationTask) => {
     const updatedTasks = certification.tasks.map(task =>
       task.id === updatedTask.id ? updatedTask : task
@@ -156,7 +153,6 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
     setSelectedTask(null);
   };
 
-  // New handler for TaskBoard (does NOT close the panel)
   const handleTaskUpdateNoClose = (updatedTask: CertificationTask) => {
     console.log('Updating task:', updatedTask);
     const updatedTasks = certification.tasks.map(task =>
@@ -203,37 +199,46 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
   );
 
   return (
-    <div className="view-certification-panel bg-white rounded-2xl shadow-xl p-10 w-full mx-auto min-h-[70vh] flex flex-col gap-8">
-      {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-2 border-b pb-4">
-        <div className="flex flex-col gap-1">
-          <h2 className="text-3xl font-extrabold text-blue-900 flex items-center gap-3">
-            {certification.darpKey}
-            <span className={`px-3 py-1 rounded-full text-base font-semibold ${getStageColor(certification.status)}`}>{certification.status}</span>
-          </h2>
+    <div className="view-certification-panel bg-gradient-to-br from-gray-50 to-white rounded-2xl shadow-xl p-6 w-full mx-auto min-h-[70vh] flex flex-col gap-4">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 pb-4 border-b border-gray-200">
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-3">
+            <h2 className="text-3xl font-extrabold bg-gradient-to-r from-blue-900 to-blue-700 bg-clip-text text-transparent">
+              {certification.darpKey}
+            </h2>
+            <span className={`px-3 py-1 rounded-full text-base font-semibold ${getStageColor(certification.status)}`}>
+              {certification.status}
+            </span>
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+             {certification.type}
+           </span>
+          </div>
           <span className="text-lg text-gray-600">{certification.projectName}</span>
         </div>
         <div className="flex gap-2 flex-wrap">
-          <button className="p-2 hover:bg-blue-50 rounded-lg" title="Star">
-            <StarIcon className="w-6 h-6 text-blue-400" />
-          </button>
-          <button className="p-2 hover:bg-blue-50 rounded-lg" title="Add User">
-            <UserPlusIcon className="w-6 h-6 text-blue-400" />
-          </button>
-          <button className="p-2 hover:bg-blue-50 rounded-lg" title="Comments">
-            <ChatBubbleLeftIcon className="w-6 h-6 text-blue-400" />
-          </button>
-          <button className="p-2 hover:bg-blue-50 rounded-lg" title="Edit">
-            <PencilIcon className="w-6 h-6 text-blue-400" />
-          </button>
-          <button className="p-2 hover:bg-blue-50 rounded-lg" title="Refresh">
-            <ArrowPathIcon className="w-6 h-6 text-blue-400" />
-          </button>
-          <button className="p-2 hover:bg-blue-50 rounded-lg" title="More">
-            <EllipsisHorizontalIcon className="w-6 h-6 text-blue-400" />
-          </button>
+          <div className="flex bg-white rounded-lg shadow-sm border border-gray-100 p-1">
+            <button className="p-2 hover:bg-blue-50 rounded-md transition-colors" title="Star">
+              <StarIcon className="w-5 h-5 text-blue-500" />
+            </button>
+            <button className="p-2 hover:bg-blue-50 rounded-md transition-colors" title="Add User">
+              <UserPlusIcon className="w-5 h-5 text-blue-500" />
+            </button>
+            <button className="p-2 hover:bg-blue-50 rounded-md transition-colors" title="Comments">
+              <ChatBubbleLeftIcon className="w-5 h-5 text-blue-500" />
+            </button>
+            <button className="p-2 hover:bg-blue-50 rounded-md transition-colors" title="Edit">
+              <PencilIcon className="w-5 h-5 text-blue-500" />
+            </button>
+            <button className="p-2 hover:bg-blue-50 rounded-md transition-colors" title="Refresh">
+              <ArrowPathIcon className="w-5 h-5 text-blue-500" />
+            </button>
+            <button className="p-2 hover:bg-blue-50 rounded-md transition-colors" title="More">
+              <EllipsisHorizontalIcon className="w-5 h-5 text-blue-500" />
+            </button>
+
+          </div>
           <button
-            className="px-5 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg font-semibold text-gray-700 ml-4"
+            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium text-gray-700 transition-colors"
             onClick={onCancel}
           >
             Cancel
@@ -241,129 +246,94 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
         </div>
       </div>
 
-      {/* Basic Details Section (already improved) */}
-      <div className="bg-gradient-to-tr from-blue-50 to-white rounded-xl border border-blue-100 p-6 shadow-sm">
-        <h3 className="text-lg font-bold mb-6 text-blue-900 flex items-center gap-2">
-          <span className="inline-block w-2 h-6 bg-blue-500 rounded-full mr-2"></span>
-          Basic Details
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="flex flex-col">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">DARP Key</span>
-            <span className="text-base font-medium text-gray-900 mt-1 break-all">{certification.darpKey}</span>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+       
+
+        <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 cursor-pointer"
+            onClick={() => toggleSection('deviceDetails')}
+          >
+            <div className="flex items-center gap-2">
+              <DevicePhoneMobileIcon className="w-5 h-5 text-gray-500" />
+              <h3 className="text-lg font-semibold text-gray-900">Device Details</h3>
+            </div>
+            {expandedSections.deviceDetails ? (
+              <ChevronUpIcon className="w-5 h-5 text-gray-500" />
+            ) : (
+              <ChevronDownIcon className="w-5 h-5 text-gray-500" />
+            )}
           </div>
-          <div className="flex flex-col">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Project Name</span>
-            <span className="text-base font-medium text-gray-900 mt-1">{certification.projectName}</span>
+          {expandedSections.deviceDetails && (
+            <div className="p-4">
+              <dl className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-3">
+                <div>
+                  <dt className="flex items-center gap-2 text-sm font-medium text-gray-500"><UserPlusIcon className="w-5 h-5" /> Vendor</dt>
+                  <dd className="mt-1 text-sm text-gray-900">{certification.vendor || '-'}</dd>
+                </div>
+                <div>
+                  <dt className="flex items-center gap-2 text-sm font-medium text-gray-500"><DevicePhoneMobileIcon className="w-5 h-5" /> Device Type</dt>
+                  <dd className="mt-1 text-sm text-gray-900">{certification.deviceType || '-'}</dd>
+                </div>
+                <div>
+                  <dt className="flex items-center gap-2 text-sm font-medium text-gray-500"><DevicePhoneMobileIcon className="w-5 h-5" /> Model</dt>
+                  <dd className="mt-1 text-sm text-gray-900">{certification.deviceModel || '-'}</dd>
+                </div>
+                <div>
+                  <dt className="flex items-center gap-2 text-sm font-medium text-gray-500"><PencilIcon className="w-5 h-5" /> Marketing Name</dt>
+                  <dd className="mt-1 text-sm text-gray-900">{certification.deviceMarketingName || '-'}</dd>
+                </div>
+                <div>
+                  <dt className="flex items-center gap-2 text-sm font-medium text-gray-500"><DevicePhoneMobileIcon className="w-5 h-5" /> OS Version</dt>
+                  <dd className="mt-1 text-sm text-gray-900">{certification.deviceOS} {certification.deviceOSVersion}</dd>
+                </div>
+                <div>
+                  <dt className="flex items-center gap-2 text-sm font-medium text-gray-500"><DevicePhoneMobileIcon className="w-5 h-5" /> Hardware Version</dt>
+                  <dd className="mt-1 text-sm text-gray-900">{certification.deviceHardwareVersion || '-'}</dd>
+                </div>
+              </dl>
+            </div>
+          )}
+        </div>
+
+        <div className="lg:col-span-1 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 cursor-pointer"
+            onClick={() => toggleSection('forecastedDates')}
+          >
+            <div className="flex items-center gap-2">
+              <CalendarIcon className="w-5 h-5 text-gray-500" />
+              <h3 className="text-lg font-semibold text-gray-900">Forecasted Dates</h3>
+            </div>
+            {expandedSections.forecastedDates ? (
+              <ChevronUpIcon className="w-5 h-5 text-gray-500" />
+            ) : (
+              <ChevronDownIcon className="w-5 h-5 text-gray-500" />
+            )}
           </div>
-          <div className="flex flex-col">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Type</span>
-            <span className="inline-block mt-1 px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold shadow-sm">{certification.type}</span>
-          </div>
+          {expandedSections.forecastedDates && (
+            <div className="p-4">
+              <dl className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2">
+                <div>
+                  <dt className="flex items-center gap-2 text-sm font-medium text-gray-500"><CalendarIcon className="w-5 h-5" /> Device Entry (DE)</dt>
+                  <dd className="mt-1 text-sm text-gray-900">{certification.forecastedDEDate || '-'}</dd>
+                </div>
+                <div>
+                  <dt className="flex items-center gap-2 text-sm font-medium text-gray-500"><CalendarIcon className="w-5 h-5" /> FFW Date</dt>
+                  <dd className="mt-1 text-sm text-gray-900">{certification.forecastedFFWDate || '-'}</dd>
+                </div>
+                <div>
+                  <dt className="flex items-center gap-2 text-sm font-medium text-gray-500"><CalendarIcon className="w-5 h-5" /> TA Date</dt>
+                  <dd className="mt-1 text-sm text-gray-900">{certification.forecastedTADate || '-'}</dd>
+                </div>
+                <div>
+                  <dt className="flex items-center gap-2 text-sm font-medium text-gray-500"><CalendarIcon className="w-5 h-5" /> Launch Date</dt>
+                  <dd className="mt-1 text-sm text-gray-900">{certification.forecastedLaunchDate || '-'}</dd>
+                </div>
+              </dl>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Device Details Section */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
-        <button
-          className="w-full p-5 flex justify-between items-center hover:bg-blue-50 rounded-t-xl transition"
-          onClick={() => toggleSection('deviceDetails')}
-        >
-          <div className="flex items-center">
-            <DevicePhoneMobileIcon className="w-6 h-6 mr-2 text-blue-400" />
-            <h3 className="text-lg font-semibold">Device Details</h3>
-          </div>
-          {expandedSections.deviceDetails ? (
-            <ChevronUpIcon className="w-6 h-6 text-blue-400" />
-          ) : (
-            <ChevronDownIcon className="w-6 h-6 text-blue-400" />
-          )}
-        </button>
-        {expandedSections.deviceDetails && (
-          <div className="px-6 pb-6 pt-2">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Vendor</p>
-                <p className="text-base text-gray-800">{certification.vendor}</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Device Type</p>
-                <p className="text-base text-gray-800">{certification.deviceType}</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Model</p>
-                <p className="text-base text-gray-800">{certification.deviceModel}</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Marketing Name</p>
-                <p className="text-base text-gray-800">{certification.deviceMarketingName}</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Code Name</p>
-                <p className="text-base text-gray-800">{certification.deviceCodeName}</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">OS</p>
-                <p className="text-base text-gray-800">{certification.deviceOS} {certification.deviceOSVersion}</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Hardware Version</p>
-                <p className="text-base text-gray-800">{certification.deviceHardwareVersion}</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Payment Type</p>
-                <p className="text-base text-gray-800">{certification.devicePaymentType}</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Channel</p>
-                <p className="text-base text-gray-800">{certification.deviceChannel}</p>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Forecasted Dates Section */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
-        <button
-          className="w-full p-5 flex justify-between items-center hover:bg-blue-50 rounded-t-xl transition"
-          onClick={() => toggleSection('forecastedDates')}
-        >
-          <div className="flex items-center">
-            <CalendarIcon className="w-6 h-6 mr-2 text-blue-400" />
-            <h3 className="text-lg font-semibold">Forecasted Dates</h3>
-          </div>
-          {expandedSections.forecastedDates ? (
-            <ChevronUpIcon className="w-6 h-6 text-blue-400" />
-          ) : (
-            <ChevronDownIcon className="w-6 h-6 text-blue-400" />
-          )}
-        </button>
-        {expandedSections.forecastedDates && (
-          <div className="px-6 pb-6 pt-2">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Device Entry (DE) Date</p>
-                <p className="text-base text-gray-800">{certification.forecastedDEDate || 'Not specified'}</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">FFW Date</p>
-                <p className="text-base text-gray-800">{certification.forecastedFFWDate || 'Not specified'}</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">TA Date</p>
-                <p className="text-base text-gray-800">{certification.forecastedTADate || 'Not specified'}</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Launch Date</p>
-                <p className="text-base text-gray-800">{certification.forecastedLaunchDate || 'Not specified'}</p>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Issues Section */}
       {certification.issues && certification.issues.length > 0 && (
         <div className="bg-white rounded-xl border border-yellow-200 shadow-sm p-6">
           <h3 className="text-lg font-bold mb-4 text-yellow-700 flex items-center gap-2">
@@ -375,8 +345,8 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
               <div key={index} className="flex items-start gap-2">
                 <ExclamationTriangleIcon className="w-4 h-4 text-yellow-600 mt-1" />
                 <div>
-                  <p className="text-sm font-semibold text-yellow-900">{issue.title}</p>
-                  <p className="text-sm text-yellow-700">{issue.description}</p>
+                  <p className="text-sm font-medium text-gray-900">{issue.title}</p>
+                  <p className="text-sm text-gray-700">{issue.description}</p>
                 </div>
               </div>
             ))}
@@ -384,7 +354,6 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
         </div>
       )}
 
-      {/* Task View Switcher & List/Board */}
       <div className="flex flex-col gap-4">
         <div className="flex justify-between items-center">
           <div className="flex gap-2">
@@ -453,13 +422,10 @@ export const ViewCertificationPanel: FC<ViewCertificationPanelProps> = ({
         </div>
       </div>
 
-      {/* Task Detail Modal (inline) */}
       {selectedTask && (
         <TaskDetailModal
           isOpen={true}
-          onClose={() => {
-            onCancel();
-          }}
+          onClose={() => setSelectedTask(null)}
           task={selectedTask}
           onUpdate={handleTaskUpdate}
         />
