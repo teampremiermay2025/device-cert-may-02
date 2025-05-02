@@ -6,6 +6,38 @@ import {
   horizontalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { 
+  PencilIcon, 
+  TrashIcon,
+  CloudIcon, 
+  ComputerDesktopIcon,
+} from '@heroicons/react/24/outline';
+import { Bar, Line } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler,
+} from 'chart.js';
+
+// Register Chart.js components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
 
 interface CardData {
   id: string;
@@ -40,33 +72,36 @@ const SortableCard: React.FC<{
   return (
     <div ref={setNodeRef} style={cardStyle}>
       <div style={styles.cardHeader}>
-        <div></div>
-        <button
-          style={styles.closeButton}
-          onClick={(e) => {
+        <button className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100">
+          <PencilIcon className="w-5 h-5" />
+        </button>
+        <button className="p-2 text-red-400 hover:text-red-600 rounded-lg hover:bg-red-50" onClick={(e) => {
             e.stopPropagation();
             console.log(`Removing card with id: ${card.id}`); // Debug log
             removeCard(card.id);
-          }}
-        >
-          ✕
+          }}>
+          <TrashIcon className="w-5 h-5" />
         </button>
       </div>
       <div style={styles.count}><h2 style={styles.count} {...attributes} {...listeners}>{card.title}</h2>{card.count}</div>
       {card.statuses.map((status, i) => (
         <div key={i} style={styles.status}>
-          <span
-            style={{
-              ...styles.dot,
-              ...(status.dotColor === 'orange'
-                ? styles.orangeDot
-                : status.dotColor === 'green'
-                ? styles.greenDot
-                : styles.blueDot),
-            }}
-          ></span>
-          {status.label}
-          <span style={styles.statusNumber}>{status.count}</span>
+          <div style={{width:'50%', ...(status.label === 'DA EMR'? styles.labelAlign:'')}}>
+            <span
+              style={{
+                ...styles.dot,
+                ...(status.dotColor === 'orange'
+                  ? styles.orangeDot
+                  : status.dotColor === 'green'
+                  ? styles.greenDot
+                  : styles.blueDot),
+              }}
+            ></span>
+            {status.label}
+          </div>
+          <div style={{width:'50%',...(status.label === 'DA EMR'? styles.countAlign:'')}}>
+            <span style={styles.statusNumber}>{status.count}</span>
+          </div>
         </div>
       ))}
       <div style={styles.actions}>
@@ -83,6 +118,271 @@ const SortableCard: React.FC<{
           </button>
         ))}
       </div>
+    </div>
+  );
+};
+
+// DashboardWidgets Component
+const DashboardWidgets: React.FC<{ styles: any }> = ({ styles }) => {
+  const widgetData = [
+    {
+      title: "IR",
+      count: "50",
+      change: "+5",
+      chartColor: "blue",
+      chartData: {
+        labels: ["", "", "", "", ""],
+        datasets: [
+          {
+            label: "IR",
+            data: [0.5,3,8,13,50],
+            fill: true,
+            backgroundColor: "rgba(0, 61, 122, 0.1)",
+            borderColor: "rgb(0, 61, 122)",
+            tension: 0.4,
+          },
+        ],
+      },
+    },
+    {
+      title: "EMR",
+      count: "9",
+      change: "-15",
+      chartColor: "blue",
+      chartData: {
+        labels: ["", "", "", "", ""],
+        datasets: [
+          {
+            label: "EMR",
+            data: [34, 36, 38, 40, 43],
+            fill: true,
+            backgroundColor: "rgba(245, 130, 32, 0.1)",
+            borderColor: "rgba(245, 130, 32, 1)",
+            tension: 0.4,
+          },
+        ],
+      },
+    },
+    {
+      title: "SMR",
+      count: "4",
+      change: "+1",
+      chartColor: "blue",
+      chartData: {
+        labels: ["", "", "", "", ""],
+        datasets: [
+          {
+            label: "SMR",
+            data: [33800, 33900, 33700, 34000, 34034],
+            fill: true,
+            backgroundColor: "rgba(0, 153, 0, 0.1)",
+            borderColor: "rgba(0, 153, 0,1)",
+            tension: 0.4,
+          },
+        ],
+      },
+    },
+    {
+      title: "BYOD",
+      count: "3",
+      change: "",
+      chartColor: "orange",
+      chartData: {
+        labels: ["", "", "", "", ""],
+        datasets: [
+          {
+            label: "BYOD",
+            data: [300, 301, 300.5, 301.5, 302],
+            fill: true,
+            backgroundColor: "rgba(0, 176, 240, 0.1)",
+            borderColor: "rgba(0, 176, 240, 1)",
+            tension: 0.4,
+          },
+        ],
+      },
+    },
+  ];
+
+  const chartOptions = {
+    plugins: {
+      legend: {
+        display: false,
+      },
+      tooltip: {
+        enabled: false,
+      },
+    },
+    scales: {
+      x: {
+        display: false,
+      },
+      y: {
+        display: false,
+      },
+    },
+    elements: {
+      point: {
+        radius: 0,
+      },
+    },
+    maintainAspectRatio: false,
+  };
+
+  const widgetStyles = {
+    widgetContainer: {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(2, 1fr)',
+      gap: '16px',
+      width: '100%',
+      height: '400px',
+    },
+    widget: {
+      backgroundColor: '#ffffff',
+      borderRadius: '1rem',
+      padding: '16px',
+      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)',
+      border: '1px solid #e5e7eb',
+      display: 'flex',
+      flexDirection: 'column' as const,
+      justifyContent: 'space-between',
+    },
+    widgetTitle: {
+      fontSize: '16px',
+      fontWeight: 500 as const,
+      color: '#4b5563',
+      marginBottom: '8px',
+    },
+    widgetCount: {
+      fontSize: '24px',
+      fontWeight: 700 as const,
+      color: '#1f2937',
+    },
+    widgetChange: {
+      fontSize: '14px',
+      color: '#4b5563',
+    },
+    chart: {
+      height: '50px',
+    },
+  };
+
+  return (
+    <div style={widgetStyles.widgetContainer}>
+      {widgetData.map((widget, index) => (
+        <div key={index} style={widgetStyles.widget}>
+          <div>
+            <div style={widgetStyles.widgetTitle}>{widget.title}</div>
+            <div style={widgetStyles.widgetCount}>{widget.count}</div>
+            <div style={widgetStyles.widgetChange}>{widget.change}</div>
+          </div>
+          <div style={widgetStyles.chart}>
+            <Line data={widget.chartData} options={chartOptions} />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+// New Grid Component for Inflight Work in Progress
+const InflightWorkGrid: React.FC<{ styles: any }> = ({ styles }) => {
+  const dummyData = [
+    {
+      id: "WIP001",
+      projectName: "IoT Sensor Integration",
+      status: "In Progress",
+      owner: "Alice Smith",
+      startDate: "2025-03-15",
+      estimatedCompletion: "2025-06-20",
+    },
+    {
+      id: "WIP002",
+      projectName: "Non-IoT Device Testing",
+      status: "In Progress",
+      owner: "Bob Johnson",
+      startDate: "2025-04-01",
+      estimatedCompletion: "2025-07-10",
+    },
+    {
+      id: "WIP003",
+      projectName: "Firmware Update Rollout",
+      status: "On Hold",
+      owner: "Clara Williams",
+      startDate: "2025-02-20",
+      estimatedCompletion: "2025-08-15",
+    },
+    {
+      id: "WIP004",
+      projectName: "Security Patch Deployment",
+      status: "In Progress",
+      owner: "David Brown",
+      startDate: "2025-04-10",
+      estimatedCompletion: "2025-06-30",
+    },
+  ];
+
+  const gridStyles = {
+    gridContainer: {
+      marginTop: '16px',
+      width: '100%',
+      backgroundColor: '#ffffff',
+      borderRadius: '1rem',
+      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)',
+      border: '1px solid #e5e7eb',
+      padding: '16px',
+    },
+    gridTitle: {
+      fontSize: '1.25rem',
+      fontWeight: 600 as const,
+      color: '#1f2937',
+      marginBottom: '16px',
+    },
+    table: {
+      width: '100%',
+      borderCollapse: 'collapse' as const,
+    },
+    th: {
+      padding: '12px',
+      fontSize: '14px',
+      fontWeight: 600 as const,
+      color: '#4b5563',
+      borderBottom: '1px solid #e5e7eb',
+    },
+    td: {
+      padding: '12px',
+      fontSize: '14px',
+      color: '#374151',
+      borderBottom: '1px solid #e5e7eb',
+    },
+  };
+
+  return (
+    <div style={gridStyles.gridContainer}>
+      <h3 style={gridStyles.gridTitle}>Inflight Work in Progress</h3>
+      <table style={gridStyles.table}>
+        <thead>
+          <tr>
+            <th style={gridStyles.th}>ID</th>
+            <th style={gridStyles.th}>Project Name</th>
+            <th style={gridStyles.th}>Status</th>
+            <th style={gridStyles.th}>Owner</th>
+            <th style={gridStyles.th}>Start Date</th>
+            <th style={gridStyles.th}>Estimated Completion</th>
+          </tr>
+        </thead>
+        <tbody>
+          {dummyData.map((item) => (
+            <tr key={item.id}>
+              <td style={gridStyles.td}>{item.id}</td>
+              <td style={gridStyles.td}>{item.projectName}</td>
+              <td style={gridStyles.td}>{item.status}</td>
+              <td style={gridStyles.td}>{item.owner}</td>
+              <td style={gridStyles.td}>{item.startDate}</td>
+              <td style={gridStyles.td}>{item.estimatedCompletion}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };
@@ -155,6 +455,61 @@ export const DashBoardHome = () => {
     });
   };
 
+  const chartData = {
+    labels: ["TAQ Review", "Submitted", "TA Review Complete", "Planning", "Cancelled", "Device Testing", "TA Rescinded", "Forecast"],
+    datasets: [
+      {
+        label: "IR",
+        data: [6, 2, 8, 2, 1, 6, 1, 14],
+        backgroundColor: "rgb(0, 61, 122)",
+      },
+      {
+        label: "EMR",
+        data: [1, 0, 2, 1, 1, 1, 1, 1],
+        backgroundColor: "rgb(245, 130, 32)",
+      },
+      {
+        label: "SMR",
+        data: [0, 1, 1, 0, 0, 1, 0, 0],
+        backgroundColor: "rgb(0, 153, 0)",
+      },
+      {
+        label: "BYOD",
+        data: [1, 0, 1, 0, 1, 0, 0, 1],
+        backgroundColor: "rgb(0, 176, 240)",
+      },
+    ],
+  };
+
+  const chartOptions = {
+    plugins: {
+      title: {
+        display: true,
+        text: 'IoT Certification Pipeline',
+        font: {
+          size: 18,
+        },
+      },
+      legend: {
+        position: 'bottom' as const,
+      },
+    },
+    scales: {
+      x: {
+        stacked: true,
+      },
+      y: {
+        stacked: true,
+        beginAtZero: true,
+        max: 18,
+        ticks: {
+          stepSize: 2,
+        },
+      },
+    },
+    maintainAspectRatio: false,
+  };
+
   const styles = {
     dashboardContainer: {
       padding: '16px',
@@ -209,8 +564,7 @@ export const DashBoardHome = () => {
     },
     cardHeader: {
       display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
+      justifyContent: 'right',
     },
     cardTitle: {
       fontSize: '16px',
@@ -225,16 +579,20 @@ export const DashBoardHome = () => {
       fontSize: '14px',
       color: '#6b7280',
     },
+    labelAlign:{
+      marginLeft:'14px',
+    },
+    countAlign:{
+      marginRight:'5px',
+    },
     count: {
       fontSize: '28px',
       fontWeight: 700 as const,
       color: 'rgb(30 58 138 / var(--tw-text-opacity, 1))',
-      marginBottom: '12px',
     },
     status: {
       display: 'flex',
-      alignItems: 'center',
-      fontSize: '13px',
+      fontSize: '16px',
       marginBottom: '4px',
       color: '#4b5563',
     },
@@ -243,6 +601,7 @@ export const DashBoardHome = () => {
       height: '6px',
       borderRadius: '50%',
       marginRight: '6px',
+      display:'inline-block',
     },
     orangeDot: {
       backgroundColor: '#f97316',
@@ -266,7 +625,7 @@ export const DashBoardHome = () => {
     },
     viewButton: {
       padding: '6px 12px',
-      borderRadius: '4px',
+      borderRadius: '.5rem',
       fontSize: '12px',
       cursor: 'pointer',
       backgroundColor: '#f3f4f6',
@@ -276,7 +635,7 @@ export const DashBoardHome = () => {
     },
     actionButton: {
       padding: '6px 12px',
-      borderRadius: '4px',
+      borderRadius: '.5rem',
       fontSize: '12px',
       cursor: 'pointer',
       backgroundColor: 'rgb(37 99 235 / var(--tw-bg-opacity, 1))',
@@ -284,7 +643,77 @@ export const DashBoardHome = () => {
       color: '#ffffff',
       fontWeight: 500 as const,
     },
+    tabContainer: {
+      display: 'flex',
+      gap: '16px',
+      marginBottom: '16px',
+      borderBottom: '1px solid #e5e7eb',
+    },
+    tab: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px',
+      padding: '8px 16px',
+      color: '#1f2937',
+      fontSize:'20px',
+      fontWeight: 500 as const,
+      cursor: 'pointer',
+      borderBottom: '2px solid transparent',
+    },
+    activeTab: {
+      color: 'rgb(30 58 138 / var(--tw-text-opacity, 1))',
+      borderBottom: '2px solid #2563eb',
+    },
+    tabIcon: {
+      width: '20px',
+      height: '20px',
+    },
+    filterContainer: {
+      marginBottom: '16px',
+    },
+    filterTitle: {
+      fontSize: '1rem',
+      fontWeight: 600 as const,
+      color: '#1f2937',
+      marginBottom: '8px',
+      textAlign: 'left' as const
+    },
+    filterDropdowns: {
+      display: 'flex',
+      gap: '16px',
+    },
+    dropdown: {
+      padding: '8px 12px',
+      borderRadius: '0.375rem',
+      border: '1px solid #d1d5db',
+      backgroundColor: '#ffffff',
+      fontSize: '14px',
+      color: '#374151',
+      cursor: 'pointer',
+    },
+    chartContainer: {
+      marginTop: '16px',
+      height: '400px',
+      width: '50%',
+    },
+    chartAndWidgetsContainer: {
+      display: 'flex',
+      gap: '16px',
+      width: '100%',
+    },
+    widgetsContainer: {
+      marginTop: '16px',
+      height: '400px',
+      width: '50%',
+    },
   };
+
+  const [activeTab, setActiveTab] = useState('IoT');
+
+  const tabs = [
+    { name: 'IoT', icon: CloudIcon },
+    { name: 'Non IoT', icon: ComputerDesktopIcon },
+  ];
 
   return (
     <div style={styles.dashboardContainer}>
@@ -305,6 +734,58 @@ export const DashBoardHome = () => {
           </SortableContext>
         </DndContext>
       </div>
+      <div style={styles.tabContainer}>
+        {tabs.map((tab) => (
+          <div
+            key={tab.name}
+            style={{
+              ...styles.tab,
+              ...(activeTab === tab.name ? styles.activeTab : {}),
+            }}
+            onClick={() => setActiveTab(tab.name)}
+          >
+            <tab.icon style={styles.tabIcon} />
+            {tab.name}
+          </div>
+        ))}
+      </div>
+      <div style={styles.filterContainer}>
+        <h3 style={styles.filterTitle}>Filters</h3>
+        <div style={styles.filterDropdowns}>
+          <select style={styles.dropdown}>
+            <option>Last 30 days</option>
+            <option>Last 60 days</option>
+            <option>Last 90 days</option>
+          </select>
+          <select style={styles.dropdown}>
+            <option>Stock</option>
+            <option>BYOD</option>
+            <option>Cricket Freelance</option>
+            <option>Cricket IRTA</option>
+            <option>MVNO</option>
+          </select>
+          <select style={styles.dropdown}>
+            <option>FN Devices</option>
+          </select>
+          <select style={styles.dropdown}>
+            <option>Owner</option>
+            <option>I’m the OEM Lead</option>
+            <option>I’m the DPD Lead</option>
+          </select>
+          <select style={styles.dropdown}>
+            <option>Status</option>
+          </select>
+        </div>
+      </div>
+      <div style={styles.chartAndWidgetsContainer}>
+        <div style={styles.chartContainer}>
+          <Bar data={chartData} options={chartOptions} />
+        </div>
+        <div style={styles.widgetsContainer}>
+          <DashboardWidgets styles={styles} />
+        </div>
+      </div>
+      <InflightWorkGrid styles={styles} />
     </div>
   );
 };
